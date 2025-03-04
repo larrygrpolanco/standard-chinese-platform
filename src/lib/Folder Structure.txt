@@ -1,0 +1,28 @@
+fsi-chinese-learning/
+├── src/
+│   ├── lib/
+│   │   ├── components/        # Reusable UI components
+│   │   │   ├── layout/        # Layout components 
+│   │   │   ├── content/       # Content display components
+│   │   │   ├── audio/         # Audio player components
+│   │   │   └── exercises/     # Exercise-related components
+│   │   ├── stores/            # Svelte stores for state management
+│   │   ├── utils/             # Utility functions
+│   │   ├── fonts/             # Chinese fonts for different display options
+│   │   └── supabase/          # Supabase client and database functions
+│   ├── routes/                # SvelteKit routes
+│   │   ├── +layout.svelte     # Main layout
+│   │   ├── +page.svelte       # Home page
+│   │   ├── modules/           # Module routes
+│   │   │   ├── +page.svelte   # Modules listing
+│   │   │   └── [moduleId]/    # Specific module pages
+│   │   │       ├── +page.svelte # Module overview
+│   │   │       └── units/     # Units within this module
+│   │   │           ├── [unitId]/ # Specific unit pages
+│   │   │               ├── +page.svelte # Unit content
+│   │   │               ├── vocabulary/  # Vocabulary route
+│   │   │               └── tapes/       # Tapes routes
+│   │   └── resources/         # Resource module routes
+├── static/                    # Static assets (images, favicon)
+│   └── fonts/                 # Font files
+└── supabase/                  # Supabase configuration files
