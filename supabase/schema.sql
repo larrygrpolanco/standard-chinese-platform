@@ -2,7 +2,7 @@
 
 -- ENUMS for basic typing
 CREATE TYPE module_type AS ENUM ('core', 'optional', 'resource');
-CREATE TYPE tape_type AS ENUM ('review', 'workbook');
+CREATE TYPE tape_type AS ENUM ('review', 'workbook', 'test');
 CREATE TYPE exercise_type AS ENUM ('listening', 'translation', 'multiple_choice', 'input_required', 'no_input_required');
 
 -- Modules table
