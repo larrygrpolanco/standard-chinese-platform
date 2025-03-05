@@ -46,10 +46,10 @@ CREATE TABLE public.tapes (
   UNIQUE (unit_id, title)
 );
 
--- Reference list (dialogues) for review tapes
+-- Reference list (dialogues) - moved to unit level instead of tape level
 CREATE TABLE public.reference_list (
   id SERIAL PRIMARY KEY,
-  tape_id INTEGER NOT NULL REFERENCES public.tapes(id) ON DELETE CASCADE,
+  unit_id INTEGER NOT NULL REFERENCES public.units(id) ON DELETE CASCADE, -- Changed from tape_id
   number INTEGER NOT NULL,  -- The reference number (1, 2, 3, etc.)
   chinese_simplified TEXT NOT NULL,
   chinese_traditional TEXT,  -- Optional
@@ -58,6 +58,7 @@ CREATE TABLE public.reference_list (
   notes TEXT,  -- Optional notes about the dialogue
   order_num INTEGER NOT NULL,
   UNIQUE (tape_id, number)
+  UNIQUE (unit_id, number)
 );
 
 -- Exercises for workbook tapes
@@ -70,6 +71,7 @@ CREATE TABLE public.exercises (
   audio_file TEXT,
   has_supporting_material BOOLEAN DEFAULT FALSE,
   supporting_material TEXT,  -- Could be URL to image, table HTML, etc.
+  requires_input BOOLEAN DEFAULT FALSE,
   order_num INTEGER NOT NULL
 );
 
@@ -77,7 +79,7 @@ CREATE TABLE public.exercises (
 CREATE INDEX idx_units_module_id ON public.units (module_id);
 CREATE INDEX idx_tapes_unit_id ON public.tapes (unit_id);
 CREATE INDEX idx_vocabulary_unit_id ON public.vocabulary (unit_id);
-CREATE INDEX idx_reference_list_tape_id ON public.reference_list (tape_id);
+CREATE INDEX idx_reference_list_unit_id ON public.reference_list (unit_id);
 CREATE INDEX idx_exercises_tape_id ON public.exercises (tape_id);
 
 -- Enable Row Level Security with simple policies
