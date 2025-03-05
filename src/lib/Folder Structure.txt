@@ -2,27 +2,27 @@ fsi-chinese-learning/
 ├── src/
 │   ├── lib/
 │   │   ├── components/        # Reusable UI components
-│   │   │   ├── layout/        # Layout components 
-│   │   │   ├── content/       # Content display components
-│   │   │   ├── audio/         # Audio player components
-│   │   │   └── exercises/     # Exercise-related components
-│   │   ├── stores/            # Svelte stores for state management
-│   │   ├── utils/             # Utility functions
-│   │   ├── fonts/             # Chinese fonts for different display options
-│   │   └── supabase/          # Supabase client and database functions
-│   ├── routes/                # SvelteKit routes
-│   │   ├── +layout.svelte     # Main layout
+│   │   │   ├── ChineseText.svelte  # Chinese text display with font options
+│   │   │   ├── AudioPlayer.svelte  # Audio playback component
+│   │   │   ├── FontToggle.svelte   # Toggle for character/pinyin display
+│   │   │   ├── Header.svelte       # Site header with navigation
+│   │   │   └── UnitContent.svelte  # Main content display for units
+│   │   ├── stores/            
+│   │   │   └── fontPreferences.js  # Store for font settings
+│   │   └── supabase/         
+│   │       └── client.js      # Supabase connection and functions
+│   ├── routes/               
+│   │   ├── +layout.svelte     # Main layout with header & navigation
 │   │   ├── +page.svelte       # Home page
-│   │   ├── modules/           # Module routes
-│   │   │   ├── +page.svelte   # Modules listing
-│   │   │   └── [moduleId]/    # Specific module pages
-│   │   │       ├── +page.svelte # Module overview
-│   │   │       └── units/     # Units within this module
-│   │   │           ├── [unitId]/ # Specific unit pages
-│   │   │               ├── +page.svelte # Unit content
-│   │   │               ├── vocabulary/  # Vocabulary route
-│   │   │               └── tapes/       # Tapes routes
-│   │   └── resources/         # Resource module routes
-├── static/                    # Static assets (images, favicon)
-│   └── fonts/                 # Font files
-└── supabase/                  # Supabase configuration files
+│   │   ├── modules/           
+│   │   │   ├── +page.svelte   # All modules listing
+│   │   │   └── [id]/          # Single module view
+│   │   │       └── +page.svelte
+│   │   └── units/             # All units are at the same level
+│   │       └── [id]/          # Individual unit page with tabs
+│   │           └── +page.svelte  # Contains vocabulary, tapes, exercises as tabs
+├── static/                  
+│   └── audio/                # Audio files
+│   └── fonts/                # Chinese font files
+└── supabase/                
+    └── schema.sql            # Database schema definitions

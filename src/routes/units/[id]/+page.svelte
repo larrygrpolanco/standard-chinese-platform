@@ -2,7 +2,7 @@
 <script>
 	import { page } from '$app/stores';
 	import { onMount } from 'svelte';
-	import { getUnitById } from '$lib/supabase/client';
+	import { getUnitsByModuleId } from '$lib/supabase/client';
 	import UnitContent from '$lib/components/UnitContent.svelte';
 
 	let unit = {};
@@ -10,7 +10,7 @@
 
 	onMount(async () => {
 		const unitId = $page.params.id;
-		unit = await getUnitById(unitId);
+		unit = await getUnitsByModuleId(unitId);
 		loading = false;
 	});
 </script>

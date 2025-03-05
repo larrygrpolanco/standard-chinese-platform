@@ -23,7 +23,7 @@ CREATE TABLE tapes (
   id SERIAL PRIMARY KEY,
   unit_id INTEGER REFERENCES units(id),
   title TEXT NOT NULL,
-  type TEXT NOT NULL, -- 'comprehension', 'production'
+  type TaEXT NOT NULL, -- 'comprehension', 'production'
   audio_file TEXT,
   order_num INTEGER NOT NULL
 );
