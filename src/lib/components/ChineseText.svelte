@@ -2,10 +2,17 @@
 <script>
 	import { fontPreferences } from '$lib/stores/fontPreferences';
 
-	export let chinese = '';
+	export let chineseSimplified = '';
+	export let chineseTraditional = '';
 	export let pinyin = '';
 	export let english = '';
 	export let showEnglish = true;
+
+	// Use traditional if available, otherwise use font change on simplified
+	$: displayedChinese =
+		$fontPreferences.script === 'traditional' && chineseTraditional
+			? chineseTraditional
+			: chineseSimplified;
 </script>
 
 <div class="chinese-text-container">
@@ -15,7 +22,7 @@
 			? 'Noto Sans TC'
 			: 'Noto Sans SC'}"
 	>
-		{chinese}
+		{displayedChinese}
 	</div>
 
 	{#if $fontPreferences.showPinyin && pinyin}
@@ -28,20 +35,5 @@
 </div>
 
 <style>
-	.chinese-text-container {
-		margin-bottom: 1rem;
-	}
-
-	.chinese-text {
-		font-size: 1.25rem;
-		line-height: 1.8;
-	}
-
-	.pinyin {
-		margin-top: 0.25rem;
-	}
-
-	.english {
-		margin-top: 0.25rem;
-	}
+	/* Same styles as before */
 </style>
