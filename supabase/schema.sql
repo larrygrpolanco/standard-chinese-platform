@@ -57,7 +57,6 @@ CREATE TABLE public.reference_list (
   english TEXT NOT NULL,
   notes TEXT,  -- Optional notes about the dialogue
   order_num INTEGER NOT NULL,
-  UNIQUE (tape_id, number)
   UNIQUE (unit_id, number)
 );
 
@@ -72,6 +71,7 @@ CREATE TABLE public.exercises (
   has_supporting_material BOOLEAN DEFAULT FALSE,
   supporting_material TEXT,  -- Could be URL to image, table HTML, etc.
   requires_input BOOLEAN DEFAULT FALSE,
+  answer_data TEXT, -- JSON or text representation of correct answers if needed
   order_num INTEGER NOT NULL
 );
 
@@ -97,4 +97,3 @@ CREATE POLICY "Public read-only access" ON public.vocabulary FOR SELECT USING (t
 CREATE POLICY "Public read-only access" ON public.tapes FOR SELECT USING (true);
 CREATE POLICY "Public read-only access" ON public.reference_list FOR SELECT USING (true);
 CREATE POLICY "Public read-only access" ON public.exercises FOR SELECT USING (true);
-```
