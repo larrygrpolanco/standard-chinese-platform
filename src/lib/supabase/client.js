@@ -71,6 +71,21 @@ export async function getVocabularyForUnit(unitId) {
 	return data;
 }
 
+// Reference list functions (now tied to unit, not tape)
+export async function getReferenceListForUnit(unitId) {
+	const { data, error } = await supabase
+		.from('reference_list')
+		.select('*')
+		.eq('unit_id', unitId)
+		.order('order_num');
+
+	if (error) {
+		console.error(`Error fetching reference list for unit ${unitId}:`, error);
+		return [];
+	}
+	return data;
+}
+
 // Tape functions
 export async function getTapesByUnitId(unitId, tapeType = null) {
 	let query = supabase.from('tapes').select('*').eq('unit_id', unitId);
@@ -83,21 +98,6 @@ export async function getTapesByUnitId(unitId, tapeType = null) {
 
 	if (error) {
 		console.error(`Error fetching tapes for unit ${unitId}:`, error);
-		return [];
-	}
-	return data;
-}
-
-// Reference list functions
-export async function getReferenceListForTape(tapeId) {
-	const { data, error } = await supabase
-		.from('reference_list')
-		.select('*')
-		.eq('tape_id', tapeId)
-		.order('order_num');
-
-	if (error) {
-		console.error(`Error fetching reference list for tape ${tapeId}:`, error);
 		return [];
 	}
 	return data;
@@ -118,6 +118,37 @@ export async function getExercisesForTape(tapeId) {
 	return data;
 }
 
+// New function: Get questions for an exercise
+export async function getQuestionsForExercise(exerciseId) {
+	const { data, error } = await supabase
+		.from('exercise_questions')
+		.select('*')
+		.eq('exercise_id', exerciseId)
+		.order('order_num');
+
+	if (error) {
+		console.error(`Error fetching questions for exercise ${exerciseId}:`, error);
+		return [];
+	}
+	return data;
+}
+
+// Get exercises with their questions
+export async function getExercisesWithQuestionsForTape(tapeId) {
+	// Get exercises
+	const exercises = await getExercisesForTape(tapeId);
+
+	// For each exercise, fetch its questions
+	const exercisesWithQuestions = await Promise.all(
+		exercises.map(async (exercise) => {
+			const questions = await getQuestionsForExercise(exercise.id);
+			return { ...exercise, questions };
+		})
+	);
+
+	return exercisesWithQuestions;
+}
+
 // Get complete unit data
 export async function getCompleteUnit(unitId) {
 	// Get basic unit info
@@ -127,20 +158,17 @@ export async function getCompleteUnit(unitId) {
 	// Get vocabulary
 	const vocabulary = await getVocabularyForUnit(unitId);
 
-	// Get review tapes and reference lists
-	const reviewTapes = await getTapesByUnitId(unitId, 'review');
-	const reviewTapesWithContent = await Promise.all(
-		reviewTapes.map(async (tape) => {
-			const referenceList = await getReferenceListForTape(tape.id);
-			return { ...tape, referenceList };
-		})
-	);
+	// Get reference list for the unit
+	const referenceList = await getReferenceListForUnit(unitId);
 
-	// Get workbook tapes and exercises
+	// Get review tapes
+	const reviewTapes = await getTapesByUnitId(unitId, 'review');
+
+	// Get workbook tapes and exercises with questions
 	const workbookTapes = await getTapesByUnitId(unitId, 'workbook');
 	const workbookTapesWithContent = await Promise.all(
 		workbookTapes.map(async (tape) => {
-			const exercises = await getExercisesForTape(tape.id);
+			const exercises = await getExercisesWithQuestionsForTape(tape.id);
 			return { ...tape, exercises };
 		})
 	);
@@ -148,7 +176,8 @@ export async function getCompleteUnit(unitId) {
 	return {
 		...unit,
 		vocabulary,
-		reviewTapes: reviewTapesWithContent,
+		referenceList,
+		reviewTapes,
 		workbookTapes: workbookTapesWithContent
 	};
 }
@@ -157,4 +186,10 @@ export async function getCompleteUnit(unitId) {
 export function getAudioUrl(filename) {
 	if (!filename) return null;
 	return `${supabaseUrl}/storage/v1/object/public/audio/${filename}`;
+}
+
+// Display image URL helper
+export function getDisplayImageUrl(filename) {
+	if (!filename) return null;
+	return `${supabaseUrl}/storage/v1/object/public/exercise-displays/${filename}`;
 }
