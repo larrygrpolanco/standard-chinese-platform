@@ -3,14 +3,14 @@
 	// Simple navigation header component
 </script>
 
-<header class="bg-blue-800 p-4 text-white">
-	<div class="container mx-auto flex items-center justify-between">
-		<a href="/" class="text-xl font-bold">FSI Chinese</a>
+<header class="py-4 border-b border-gray-200">
+	<div class="container mx-auto flex items-center justify-between px-4">
+		<a href="/" class="text-xl font-semibold text-gray-900">FSI Chinese</a>
 
 		<nav>
-			<ul class="flex space-x-6">
-				<li><a href="/" class="hover:text-blue-200">Home</a></li>
-				<li><a href="/modules" class="hover:text-blue-200">Modules</a></li>
+			<ul class="flex space-x-8">
+				<li><a href="/" class="text-gray-700 hover:text-gray-900">Home</a></li>
+				<li><a href="/modules" class="text-gray-700 hover:text-gray-900">Modules</a></li>
 			</ul>
 		</nav>
 	</div>

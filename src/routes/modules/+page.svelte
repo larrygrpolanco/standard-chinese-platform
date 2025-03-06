@@ -16,17 +16,17 @@
 	<title>Modules | FSI Chinese</title>
 </svelte:head>
 
-<section>
-	<h1 class="mb-6 text-3xl font-bold">Chinese Language Modules</h1>
+<section class="py-10">
+	<h1 class="text-3xl mb-8 text-center">Modules</h1>
 
 	{#if loading}
-		<p>Loading modules...</p>
+		<p class="text-center">Loading modules...</p>
 	{:else}
-		<div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+		<div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
 			{#each modules as module}
-				<a href="/modules/{module.id}" class="block rounded border p-4 hover:bg-blue-50">
-					<h3 class="text-lg font-medium">{module.title}</h3>
-					<p class="mt-2 text-gray-600">{module.description}</p>
+				<a href="/modules/{module.id}" class="block p-5 rounded-md bg-gray-100 hover:bg-gray-200 transition-colors">
+					<h2 class="text-xl font-semibold mb-2">{module.title}</h2>
+					<p class="text-gray-700">{module.description}</p>
 				</a>
 			{/each}
 		</div>

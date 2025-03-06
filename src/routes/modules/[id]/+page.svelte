@@ -10,15 +10,10 @@
 
 	onMount(async () => {
 		const moduleId = $page.params.id;
-
-		// Fetch module data
 		module = await getModuleById(moduleId);
-
-		// Fetch units in this module
 		if (module) {
 			units = await getUnitsByModuleId(moduleId);
 		}
-
 		loading = false;
 	});
 </script>
@@ -28,39 +23,36 @@
 </svelte:head>
 
 {#if loading}
-	<div class="p-8 text-center">
+	<div class="p-10 text-center">
 		<p>Loading module content...</p>
 	</div>
 {:else if module}
-	<div class="module-content">
-		<header class="mb-8">
-			<h1 class="mb-2 text-3xl font-bold">{module.title}</h1>
-			<p class="text-lg text-gray-700">{module.description}</p>
+	<div class="py-10 px-6 max-w-3xl mx-auto">
+		<header class="mb-10">
+			<h1 class="text-4xl font-semibold mb-4">{module.title}</h1>
+			<p class="text-gray-600 text-lg">{module.description}</p>
 		</header>
 
-		<section>
-			<h2 class="mb-4 text-xl font-semibold">Units in this Module</h2>
-
+		<section class="mb-12">
+			<h2 class="text-2xl font-semibold mb-6">Units</h2>
 			{#if units.length > 0}
-				<div class="grid gap-4 md:grid-cols-2">
+				<div class="grid gap-6 md:grid-cols-2">
 					{#each units as unit}
-						<a
-							href="/units/{unit.id}"
-							class="block rounded border bg-white p-4 transition-colors hover:bg-blue-50"
-						>
-							<h3 class="text-lg font-medium">{unit.title}</h3>
-							<p class="mt-1 text-gray-600">{unit.description || 'No description available'}</p>
+						<a href="/units/{unit.id}" class="block p-4 bg-white hover:bg-gray-50 rounded-md shadow-sm transition-colors">
+							<h3 class="text-lg font-semibold mb-1">{unit.title}</h3>
+							<p class="text-gray-500 text-sm">{unit.description || 'No description'}</p>
 						</a>
 					{/each}
 				</div>
 			{:else}
-				<p class="text-gray-600">No units found in this module.</p>
+				<p class="text-gray-500">No units found in this module.</p>
 			{/if}
 		</section>
+		<p class="text-center text-gray-500 text-sm">End of Module Content</p>
 	</div>
 {:else}
-	<div class="p-8">
-		<h1 class="text-xl text-red-600">Module Not Found</h1>
-		<a href="/modules" class="mt-4 inline-block text-blue-600 hover:underline">Back to Modules</a>
+	<div class="p-10 text-center">
+		<h1 class="text-xl text-red-600 mb-2">Module Not Found</h1>
+		<a href="/modules" class="text-blue-600 hover:underline">Back to Modules</a>
 	</div>
 {/if}
