@@ -18,25 +18,31 @@
 </script>
 
 <div class="chinese-content">
-	{#if $fontPreferences.displayMode === 'pinyin'}
-		<!-- Pinyin-only mode -->
-		<p class="pinyin-large whitespace-pre-line">{displayPinyin}</p>
-	{:else}
-		<!-- Pinyin above characters when enabled -->
-		{#if $fontPreferences.showPinyin && pinyin}
-			<p class="pinyin whitespace-pre-line">{displayPinyin}</p>
+	<div class="content-layout">
+		<div class="chinese-section">
+			{#if $fontPreferences.displayMode === 'pinyin'}
+				<!-- Pinyin-only mode -->
+				<p class="pinyin-large whitespace-pre-line">{displayPinyin}</p>
+			{:else}
+				<!-- Pinyin above characters when enabled -->
+				{#if $fontPreferences.showPinyin && pinyin}
+					<p class="pinyin whitespace-pre-line">{displayPinyin}</p>
+				{/if}
+
+				<!-- Chinese characters -->
+				<p class="chinese-text whitespace-pre-line" lang="zh">
+					{displayText}
+				</p>
+			{/if}
+		</div>
+
+		<!-- English translation -->
+		{#if english}
+			<div class="english-section">
+				<p class="english-text whitespace-pre-line">{english}</p>
+			</div>
 		{/if}
-
-		<!-- Chinese characters - larger size -->
-		<p class="chinese-text whitespace-pre-line" lang="zh">
-			{displayText}
-		</p>
-	{/if}
-
-	<!-- English translation below if provided -->
-	{#if english}
-		<p class="english-text mt-2 whitespace-pre-line">{english}</p>
-	{/if}
+	</div>
 </div>
 
 <style>
@@ -44,9 +50,33 @@
 		margin-bottom: 1rem;
 	}
 
+	.content-layout {
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+	}
+
+	@media (min-width: 640px) {
+		.content-layout {
+			flex-direction: row;
+			align-items: flex-start;
+		}
+
+		.chinese-section {
+			flex: 1;
+			min-width: 0; /* Allow text wrapping */
+			padding-right: 1rem;
+		}
+
+		.english-section {
+			flex: 1;
+			min-width: 0; /* Allow text wrapping */
+		}
+	}
+
 	.chinese-text {
 		font-family: 'Noto Sans SC', 'Noto Sans TC', sans-serif;
-		font-size: 1.25em;
+		font-size: 1.1em;
 		color: var(--color-charcoal);
 		line-height: 1.5;
 	}
@@ -61,8 +91,8 @@
 
 	.pinyin-large {
 		font-family: 'Work Sans', sans-serif;
-		color: var(--color-navy);
-		font-size: 1.1em;
+		color: var(--color-charcoal);
+		font-size: 1em;
 		line-height: 1.8;
 	}
 

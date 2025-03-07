@@ -3,7 +3,7 @@
 	import { slide } from 'svelte/transition';
 	import { fontPreferences } from '$lib/stores/fontPreferences';
 	import AudioPlayer from './AudioPlayer.svelte';
-	import DialogueDisplay from './DialogueDisplay.svelte';
+	import ReviewTab from './ReviewTab.svelte';
 	import ExerciseDisplay from './ExerciseDisplay.svelte';
 	import VocabularyDisplay from './VocabularyDisplay.svelte';
 
@@ -104,59 +104,7 @@
 		<!-- Review Tab -->
 		{#if activeTab === 'review'}
 			<div class="content-section">
-				<!-- Reference Dialogues Section -->
-				{#if dialogues.length > 0}
-					<section class="section-container">
-						<h3 class="section-header">Reference Dialogues</h3>
-						<div class="dialogue-container">
-							{#each dialogues as dialogue}
-								<DialogueDisplay {dialogue} expanded={expandedDialogueId === dialogue.id} />
-							{/each}
-						</div>
-					</section>
-				{/if}
-
-				<!-- C-1 Tape Section -->
-				{#each reviewTapes.filter((tape) => tape.title.includes('C-1')) as tape}
-					<section class="section-container">
-						<h3 class="section-header">
-							{tape.title} - Listening Practice
-						</h3>
-
-						{#if tape.audio_file}
-							<div class="audio-container">
-								<AudioPlayer audioSrc={tape.audio_file} title="Listening Practice Tape" />
-							</div>
-						{:else}
-							<div class="audio-placeholder">Audio file not available</div>
-						{/if}
-					</section>
-				{/each}
-
-				<!-- P-1 Tape Section -->
-				{#each reviewTapes.filter((tape) => tape.title.includes('P-1')) as tape}
-					<section class="section-container">
-						<h3 class="section-header">
-							{tape.title} - Speaking Practice
-						</h3>
-
-						{#if tape.audio_file}
-							<div class="audio-container">
-								<AudioPlayer audioSrc={tape.audio_file} title="Speaking Practice Tape" />
-							</div>
-						{:else}
-							<div class="audio-placeholder">Audio file not available</div>
-						{/if}
-
-						<div class="practice-note">
-							<p>
-								<strong>Speaking Practice:</strong> This tape contains exercises to practice your speaking
-								skills. Listen to the audio and repeat after the speaker. Try to match the pronunciation
-								and tones.
-							</p>
-						</div>
-					</section>
-				{/each}
+				<ReviewTab {dialogues} tapes={reviewTapes} />
 			</div>
 		{/if}
 
