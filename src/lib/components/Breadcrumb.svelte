@@ -5,47 +5,66 @@
 	export let unitName = '';
 </script>
 
-<nav class="mb-6">
-	<ol class="flex flex-wrap text-sm text-gray-500">
+<nav class="mb-4">
+	<ol class="text-warm-gray flex flex-wrap text-sm">
 		<li class="flex items-center">
-			<a href="/" class="hover:text-[#1A5276] hover:underline">Home</a>
-			<svg class="mx-2 h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+			<a href="/" class="text-navy hover:text-terracotta transition-colors hover:underline">Home</a>
+			<svg
+				class="text-warm-gray mx-2 h-5 w-5"
+				fill="none"
+				viewBox="0 0 24 24"
+				stroke="currentColor"
+				stroke-linecap="round"
+				stroke-linejoin="round"
+				stroke-width="1.5"
+			>
+				<path d="M10 7l5 5-5 5" />
 			</svg>
 		</li>
 
 		<li class="flex items-center">
-			<a href="/modules" class="hover:text-[#1A5276] hover:underline">Modules</a>
-			<svg class="mx-2 h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+			<a href="/modules" class="text-navy hover:text-terracotta transition-colors hover:underline"
+				>Modules</a
+			>
+			<svg
+				class="text-warm-gray mx-2 h-5 w-5"
+				fill="none"
+				viewBox="0 0 24 24"
+				stroke="currentColor"
+				stroke-linecap="round"
+				stroke-linejoin="round"
+				stroke-width="1.5"
+			>
+				<path d="M10 7l5 5-5 5" />
 			</svg>
 		</li>
 
 		{#if moduleName && moduleId}
 			<li class="flex items-center">
-				<a href="/modules/{moduleId}" class="hover:text-[#1A5276] hover:underline">
+				<a
+					href="/modules/{moduleId}"
+					class="text-navy hover:text-terracotta transition-colors hover:underline"
+				>
 					{moduleName}
 				</a>
 				{#if unitName}
 					<svg
-						class="mx-2 h-5 w-5 text-gray-400"
+						class="text-warm-gray mx-2 h-5 w-5"
 						fill="none"
 						viewBox="0 0 24 24"
 						stroke="currentColor"
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						stroke-width="1.5"
 					>
-						<path
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							stroke-width="2"
-							d="M9 5l7 7-7 7"
-						/>
+						<path d="M10 7l5 5-5 5" />
 					</svg>
 				{/if}
 			</li>
 		{/if}
 
 		{#if unitName}
-			<li class="font-medium text-gray-700">{unitName}</li>
+			<li class="text-charcoal font-medium">{unitName}</li>
 		{/if}
 	</ol>
 </nav>

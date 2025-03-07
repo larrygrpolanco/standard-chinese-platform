@@ -31,20 +31,32 @@
 	<title>{unitData ? `${unitData.title} | ${unitData.module.title}` : 'Unit'} | FSI Chinese</title>
 </svelte:head>
 
-<div class="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
+<div class="mx-auto max-w-6xl px-4 py-8 font-sans sm:px-6 lg:px-8">
 	{#if loading}
 		<div class="py-20 text-center">
-			<p>Loading unit content...</p>
+			<div class="mx-auto mb-4 inline-block">
+				<!-- Vintage-style loading spinner that looks like a cassette tape spinning -->
+				<svg class="text-terracotta h-12 w-12 animate-spin" fill="none" viewBox="0 0 24 24">
+					<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1"
+					></circle>
+					<path
+						class="opacity-75"
+						fill="currentColor"
+						d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+					></path>
+				</svg>
+			</div>
+			<p class="text-charcoal font-serif">Loading lesson materials...</p>
 		</div>
 	{:else if error}
 		<div class="py-20 text-center">
-			<h1 class="mb-4 text-xl text-red-600">{error}</h1>
-			<p class="mb-4 text-gray-600">
+			<h1 class="text-terracotta mb-4 font-serif text-xl">{error}</h1>
+			<p class="text-charcoal mb-4">
 				The unit you're looking for doesn't exist or has been removed.
 			</p>
 			<a
 				href="/modules"
-				class="inline-block rounded bg-[#1A5276] px-4 py-2 font-medium text-white transition-colors hover:bg-[#154360]"
+				class="bg-terracotta text-cream-paper border-terracotta/50 inline-block rounded-lg border px-4 py-2 font-medium transition-all hover:-translate-y-1 active:translate-y-0"
 			>
 				Browse All Modules
 			</a>
@@ -56,16 +68,19 @@
 			unitName={unitData.title}
 		/>
 
-		<header class="mb-6">
-			<div class="mb-2 flex items-center">
-				<h1 class="text-3xl font-bold text-gray-900">{unitData.title}</h1>
-				<span class="ml-3 rounded bg-gray-100 px-2 py-1 text-sm text-gray-600">
+		<header class="border-warm-gray mb-6 border-b pb-4">
+			<div class="mb-2 flex flex-wrap items-center gap-3">
+				<h1 class="text-2.5rem text-charcoal font-serif font-bold">{unitData.title}</h1>
+				<span
+					class="bg-beige border-warm-gray text-charcoal rounded-lg border px-3 py-1 text-sm"
+					style="transform: rotate(-1deg);"
+				>
 					Module {unitData.module.id}
 				</span>
 			</div>
 
 			{#if unitData.description}
-				<p class="text-lg text-gray-600">{unitData.description}</p>
+				<p class="text-charcoal mt-2 text-lg">{unitData.description}</p>
 			{/if}
 		</header>
 

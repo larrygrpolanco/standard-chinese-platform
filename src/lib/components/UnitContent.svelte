@@ -8,7 +8,6 @@
 	import VocabularyDisplay from './VocabularyDisplay.svelte';
 
 	// Props
-	// export let unit = {};
 	export let vocabulary = [];
 	export let reviewTapes = [];
 	export let workbookTapes = [];
@@ -34,15 +33,12 @@
 	}
 </script>
 
-<div class="overflow-hidden rounded-lg border border-gray-200 bg-white">
+<div class="unit-content overflow-hidden rounded-lg border border-[#A0998A] bg-[#E8E5D7]">
 	<!-- Tab Navigation -->
-	<div class="border-b border-gray-200">
-		<nav class="-mb-px flex flex-wrap">
+	<div class="tab-container">
+		<nav class="tabs">
 			<button
-				class="inline-flex items-center border-b-2 px-6 py-4 text-sm font-medium {activeTab ===
-				'review'
-					? 'border-[#1A5276] text-[#1A5276]'
-					: 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'}"
+				class="tab-button {activeTab === 'review' ? 'active' : ''}"
 				aria-current={activeTab === 'review' ? 'page' : undefined}
 				on:click={() => (activeTab = 'review')}
 			>
@@ -58,10 +54,7 @@
 			</button>
 
 			<button
-				class="inline-flex items-center border-b-2 px-6 py-4 text-sm font-medium {activeTab ===
-				'exercises'
-					? 'border-[#1A5276] text-[#1A5276]'
-					: 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'}"
+				class="tab-button {activeTab === 'exercises' ? 'active' : ''}"
 				aria-current={activeTab === 'exercises' ? 'page' : undefined}
 				on:click={() => (activeTab = 'exercises')}
 			>
@@ -77,10 +70,7 @@
 			</button>
 
 			<button
-				class="inline-flex items-center border-b-2 px-6 py-4 text-sm font-medium {activeTab ===
-				'vocabulary'
-					? 'border-[#1A5276] text-[#1A5276]'
-					: 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'}"
+				class="tab-button {activeTab === 'vocabulary' ? 'active' : ''}"
 				aria-current={activeTab === 'vocabulary' ? 'page' : undefined}
 				on:click={() => (activeTab = 'vocabulary')}
 			>
@@ -95,10 +85,7 @@
 				Vocabulary
 			</button>
 
-			<button
-				class="inline-flex items-center border-b-2 border-transparent px-6 py-4 text-sm font-medium text-gray-400"
-				disabled
-			>
+			<button class="tab-button disabled" disabled>
 				<svg class="mr-2 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 					<path
 						stroke-linecap="round"
@@ -113,15 +100,15 @@
 	</div>
 
 	<!-- Tab Content -->
-	<div class="p-6">
+	<div class="content-area">
 		<!-- Review Tab -->
 		{#if activeTab === 'review'}
-			<div class="space-y-8">
-				<!-- Reference Dialogues Section - Added as a separate section at the top -->
+			<div class="content-section">
+				<!-- Reference Dialogues Section -->
 				{#if dialogues.length > 0}
-					<section class="border-b border-gray-200 pb-8">
-						<h3 class="mb-4 text-lg font-semibold text-gray-900">Reference Dialogues</h3>
-						<div class="space-y-6">
+					<section class="section-container">
+						<h3 class="section-header">Reference Dialogues</h3>
+						<div class="dialogue-container">
 							{#each dialogues as dialogue}
 								<DialogueDisplay {dialogue} expanded={expandedDialogueId === dialogue.id} />
 							{/each}
@@ -131,38 +118,38 @@
 
 				<!-- C-1 Tape Section -->
 				{#each reviewTapes.filter((tape) => tape.title.includes('C-1')) as tape}
-					<section class="border-b border-gray-200 pb-8">
-						<h3 class="mb-4 text-lg font-semibold text-gray-900">
+					<section class="section-container">
+						<h3 class="section-header">
 							{tape.title} - Listening Practice
 						</h3>
 
 						{#if tape.audio_file}
-							<div class="mb-6">
+							<div class="audio-container">
 								<AudioPlayer audioSrc={tape.audio_file} title="Listening Practice Tape" />
 							</div>
 						{:else}
-							<div class="mb-6 rounded bg-gray-100 p-4 text-gray-500">Audio file not available</div>
+							<div class="audio-placeholder">Audio file not available</div>
 						{/if}
 					</section>
 				{/each}
 
 				<!-- P-1 Tape Section -->
 				{#each reviewTapes.filter((tape) => tape.title.includes('P-1')) as tape}
-					<section>
-						<h3 class="mb-4 text-lg font-semibold text-gray-900">
+					<section class="section-container">
+						<h3 class="section-header">
 							{tape.title} - Speaking Practice
 						</h3>
 
 						{#if tape.audio_file}
-							<div class="mb-6">
+							<div class="audio-container">
 								<AudioPlayer audioSrc={tape.audio_file} title="Speaking Practice Tape" />
 							</div>
 						{:else}
-							<div class="mb-6 rounded bg-gray-100 p-4 text-gray-500">Audio file not available</div>
+							<div class="audio-placeholder">Audio file not available</div>
 						{/if}
 
-						<div class="rounded-md border border-yellow-100 bg-yellow-50 p-4">
-							<p class="text-yellow-700">
+						<div class="practice-note">
+							<p>
 								<strong>Speaking Practice:</strong> This tape contains exercises to practice your speaking
 								skills. Listen to the audio and repeat after the speaker. Try to match the pronunciation
 								and tones.
@@ -175,13 +162,13 @@
 
 		<!-- Exercises Tab -->
 		{#if activeTab === 'exercises'}
-			<div class="space-y-8">
+			<div class="content-section">
 				<!-- Comprehension Exercises Section -->
 				{#if comprehensionExercises.length > 0}
-					<section class="mb-8 border-b border-gray-200 pb-8">
-						<h3 class="mb-6 text-xl font-semibold text-gray-900">Comprehension Exercises</h3>
+					<section class="section-container">
+						<h3 class="section-header">Comprehension Exercises</h3>
 
-						<div class="space-y-6">
+						<div class="exercise-container">
 							{#each comprehensionExercises as exercise}
 								{@const tape = getTapeForExercise(exercise.id)}
 								<ExerciseDisplay {exercise} {tape} />
@@ -192,10 +179,10 @@
 
 				<!-- Production Exercises Section -->
 				{#if productionExercises.length > 0}
-					<section>
-						<h3 class="mb-6 text-xl font-semibold text-gray-900">Production Exercises</h3>
+					<section class="section-container">
+						<h3 class="section-header">Production Exercises</h3>
 
-						<div class="space-y-6">
+						<div class="exercise-container">
 							{#each productionExercises as exercise}
 								{@const tape = getTapeForExercise(exercise.id)}
 								<ExerciseDisplay {exercise} {tape} />
@@ -205,8 +192,8 @@
 				{/if}
 
 				{#if comprehensionExercises.length === 0 && productionExercises.length === 0}
-					<div class="p-8 text-center">
-						<p class="text-gray-500">No exercises available for this unit yet.</p>
+					<div class="empty-state">
+						<p>No exercises available for this unit yet.</p>
 					</div>
 				{/if}
 			</div>
@@ -214,10 +201,166 @@
 
 		<!-- Vocabulary Tab -->
 		{#if activeTab === 'vocabulary'}
-			<div>
-				<h3 class="mb-6 text-xl font-semibold text-gray-900">Vocabulary List</h3>
+			<div class="content-section">
+				<h3 class="section-header">Vocabulary List</h3>
 				<VocabularyDisplay {vocabulary} />
 			</div>
 		{/if}
 	</div>
 </div>
+
+<style>
+	.unit-content {
+		background-color: var(--color-beige, #e8e5d7);
+		border: 1px solid var(--color-warm-gray, #a0998a);
+		border-radius: 8px;
+		overflow: hidden;
+		background-image: url('/textures/subtle-paper.png');
+		background-repeat: repeat;
+	}
+
+	.tab-container {
+		border-bottom: 1px solid var(--color-warm-gray, #a0998a);
+		background-color: var(--color-cream-paper, #f4f1de);
+	}
+
+	.tabs {
+		display: flex;
+		flex-wrap: wrap;
+		position: relative;
+		margin-bottom: -1px;
+	}
+
+	.tab-button {
+		display: inline-flex;
+		align-items: center;
+		padding: 16px 24px;
+		font-family: 'Work Sans', sans-serif;
+		font-size: 0.95rem;
+		font-weight: 600;
+		border: 1px solid transparent;
+		border-bottom: none;
+		border-top-left-radius: 8px;
+		border-top-right-radius: 8px;
+		margin-right: 4px;
+		margin-bottom: -1px;
+		position: relative;
+		background-color: transparent;
+		color: var(--color-charcoal, #33312e);
+		transition: all 0.2s ease;
+		cursor: pointer;
+	}
+
+	.tab-button:hover:not(.active):not(.disabled) {
+		background-color: rgba(160, 153, 138, 0.1);
+		border-color: var(--color-warm-gray, #a0998a);
+		color: var(--color-navy, #34667f);
+	}
+
+	.tab-button.active {
+		background-color: var(--color-beige, #e8e5d7);
+		border-color: var(--color-warm-gray, #a0998a);
+		border-bottom-color: var(--color-beige, #e8e5d7);
+		color: var(--color-terracotta, #c17c74);
+		z-index: 1;
+	}
+
+	.tab-button.disabled {
+		opacity: 0.6;
+		cursor: not-allowed;
+		color: var(--color-warm-gray, #a0998a);
+	}
+
+	.content-area {
+		padding: 24px;
+	}
+
+	.content-section {
+		display: flex;
+		flex-direction: column;
+		gap: 32px;
+	}
+
+	.section-container {
+		border-bottom: 1px solid var(--color-warm-gray, #a0998a);
+		padding-bottom: 32px;
+		margin-bottom: 16px;
+	}
+
+	.section-container:last-child {
+		border-bottom: none;
+		padding-bottom: 0;
+	}
+
+	.section-header {
+		font-family: 'Arvo', serif;
+		font-size: 1.5rem;
+		font-weight: 700;
+		color: var(--color-charcoal, #33312e);
+		margin-bottom: 24px;
+		position: relative;
+		padding-bottom: 8px;
+	}
+
+	.section-header::after {
+		content: '';
+		position: absolute;
+		left: 0;
+		bottom: 0;
+		width: 60px;
+		height: 3px;
+		background-color: var(--color-gold, #ddb967);
+	}
+
+	.dialogue-container,
+	.exercise-container {
+		display: flex;
+		flex-direction: column;
+		gap: 24px;
+	}
+
+	.audio-container {
+		margin-bottom: 24px;
+	}
+
+	.audio-placeholder {
+		padding: 16px;
+		background-color: var(--color-cream-paper, #f4f1de);
+		border: 1px dashed var(--color-warm-gray, #a0998a);
+		border-radius: 8px;
+		color: var(--color-warm-gray, #a0998a);
+		text-align: center;
+		font-style: italic;
+	}
+
+	.practice-note {
+		padding: 16px;
+		background-color: rgba(221, 185, 103, 0.15);
+		border: 1px solid rgba(221, 185, 103, 0.3);
+		border-radius: 8px;
+	}
+
+	.practice-note p {
+		color: var(--color-charcoal, #33312e);
+		margin: 0;
+		font-family: 'Work Sans', sans-serif;
+	}
+
+	.empty-state {
+		padding: 48px 24px;
+		text-align: center;
+		color: var(--color-warm-gray, #a0998a);
+		font-style: italic;
+	}
+
+	@media (max-width: 768px) {
+		.tab-button {
+			padding: 12px 16px;
+			font-size: 0.875rem;
+		}
+
+		.content-area {
+			padding: 16px;
+		}
+	}
+</style>

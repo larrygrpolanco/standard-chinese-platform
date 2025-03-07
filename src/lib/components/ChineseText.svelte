@@ -1,38 +1,62 @@
-<!-- src/lib/components/ChineseText.svelte -->
+<!-- ChineseText.svelte -->
 <script>
-  import { fontPreferences } from '$lib/stores/fontPreferences';
-  
-  // Props
-  export let simplified = '';
-  export let traditional = '';
-  export let pinyin = '';
-  export let showPinyin = $fontPreferences.showPinyin;
-  
-  // Use appropriate text based on user preference
-  $: displayText = $fontPreferences.useTraditional && traditional 
-    ? traditional.replace(/ /g, '\u00A0') 
-    : simplified.replace(/ /g, '\u00A0');
-    
-  $: displayPinyin = pinyin.replace(/ /g, '\u00A0');
-  
-  // Font class based on character set
-  $: fontClass = $fontPreferences.useTraditional ? 'font-traditional' : 'font-simplified';
+	import { fontPreferences } from '$lib/stores/fontPreferences';
+
+	// Props
+	export let simplified = '';
+	export let traditional = '';
+	export let pinyin = '';
+	export let english = '';
+
+	// Use appropriate text based on user preference
+	$: displayText =
+		$fontPreferences.script === 'traditional' && traditional
+			? traditional.replace(/ /g, '\u00A0')
+			: simplified.replace(/ /g, '\u00A0');
+
+	$: displayPinyin = pinyin.replace(/ /g, '\u00A0');
 </script>
 
-<div>
-  <p class="whitespace-pre-line {fontClass}">{displayText}</p>
-  
-  {#if showPinyin && pinyin}
-    <p class="whitespace-pre-line text-sm text-gray-500 mt-1">{displayPinyin}</p>
-  {/if}
+<div class="chinese-content">
+	<!-- Pinyin above characters when enabled -->
+	{#if $fontPreferences.showPinyin && pinyin}
+		<p class="pinyin whitespace-pre-line">{displayPinyin}</p>
+	{/if}
+
+	<!-- Chinese characters - larger size -->
+	<p class="chinese-text whitespace-pre-line" lang="zh">
+		{displayText}
+	</p>
+
+	<!-- English translation below if provided -->
+	{#if english}
+		<p class="english-text mt-2 whitespace-pre-line">{english}</p>
+	{/if}
 </div>
 
 <style>
-  .font-simplified {
-    font-family: 'Noto Sans SC', sans-serif;
-  }
-  
-  .font-traditional {
-    font-family: 'Noto Sans TC', sans-serif;
-  }
+	.chinese-content {
+		margin-bottom: 1rem;
+	}
+
+	.chinese-text {
+		font-family: 'Noto Sans SC', 'Noto Sans TC', sans-serif;
+		font-size: 1.25em;
+		color: var(--color-charcoal);
+		line-height: 1.5;
+	}
+
+	.pinyin {
+		font-family: 'Work Sans', sans-serif;
+		color: var(--color-warm-gray);
+		font-size: 0.85em;
+		margin-bottom: 0.25rem;
+		line-height: 1.4;
+	}
+
+	.english-text {
+		font-family: 'Work Sans', sans-serif;
+		color: var(--color-charcoal);
+		line-height: 1.5;
+	}
 </style>
