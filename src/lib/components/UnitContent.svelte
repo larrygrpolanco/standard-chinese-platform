@@ -261,40 +261,6 @@
 		background-color: var(--color-gold, #ddb967);
 	}
 
-	.dialogue-container,
-	.exercise-container {
-		display: flex;
-		flex-direction: column;
-		gap: 24px;
-	}
-
-	.audio-container {
-		margin-bottom: 24px;
-	}
-
-	.audio-placeholder {
-		padding: 16px;
-		background-color: var(--color-cream-paper, #f4f1de);
-		border: 1px dashed var(--color-warm-gray, #a0998a);
-		border-radius: 8px;
-		color: var(--color-warm-gray, #a0998a);
-		text-align: center;
-		font-style: italic;
-	}
-
-	.practice-note {
-		padding: 16px;
-		background-color: rgba(221, 185, 103, 0.15);
-		border: 1px solid rgba(221, 185, 103, 0.3);
-		border-radius: 8px;
-	}
-
-	.practice-note p {
-		color: var(--color-charcoal, #33312e);
-		margin: 0;
-		font-family: 'Work Sans', sans-serif;
-	}
-
 	.empty-state {
 		padding: 48px 24px;
 		text-align: center;

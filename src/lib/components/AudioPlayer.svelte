@@ -5,7 +5,6 @@
 	// Props
 	export let audioSrc = '';
 	export let title = '';
-	export let sync = null; // Reference to another audio player to sync with
 
 	// Audio element and state
 	let audio;
