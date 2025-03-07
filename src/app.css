@@ -1,17 +1,260 @@
+/* app.css or global.css */
 @import 'tailwindcss';
 
 @font-face {
-  font-family: 'Noto Sans SC';
-  src: url('/fonts/NotoSansSC-Regular.woff2') format('woff2');
-  font-weight: normal;
-  font-style: normal;
-  font-display: swap;
+	font-family: 'Noto Sans SC';
+	src: url('/fonts/NotoSansSC-Regular.woff2') format('woff2');
+	font-weight: normal;
+	font-style: normal;
+	font-display: swap;
 }
 
 @font-face {
-  font-family: 'Noto Sans TC';
-  src: url('/fonts/NotoSansTC-Regular.woff2') format('woff2');
-  font-weight: normal;
-  font-style: normal;
-  font-display: swap;
+	font-family: 'Noto Sans TC';
+	src: url('/fonts/NotoSansTC-Regular.woff2') format('woff2');
+	font-weight: normal;
+	font-style: normal;
+	font-display: swap;
+}
+@import url('https://fonts.googleapis.com/css2?family=Arvo:wght@400;700&family=DM+Serif+Display&family=Work+Sans:wght@300;400;500;600;700&display=swap');
+
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&family=Noto+Sans+TC:wght@400;500;700&display=swap');
+
+:root {
+	/* Color Variables */
+	--color-terracotta: #c17c74;
+	--color-avocado: #7d8c5c;
+	--color-gold: #ddb967;
+	--color-navy: #34667f;
+
+	--color-cream-paper: #f4f1de;
+	--color-charcoal: #33312e;
+	--color-beige: #e8e5d7;
+	--color-warm-gray: #a0998a;
+
+	/* Spacing Variables */
+	--space-1: 4px;
+	--space-2: 8px;
+	--space-3: 16px;
+	--space-4: 24px;
+	--space-5: 32px;
+	--space-6: 48px;
+	--space-7: 64px;
+
+	/* Font sizes */
+	--font-size-h1: 2.5rem;
+	--font-size-h2: 2rem;
+	--font-size-h3: 1.5rem;
+	--font-size-body: 1rem;
+	--font-size-small: 0.875rem;
+
+	/* Border radius */
+	--border-radius: 8px;
+}
+
+/* Base styles */
+html,
+body {
+	font-family: 'Work Sans', 'Noto Sans SC', 'Noto Sans TC', sans-serif;
+	background-color: var(--color-cream-paper);
+	color: var(--color-charcoal);
+	line-height: 1.6;
+	font-size: 16px;
+	margin: 0;
+	padding: 0;
+}
+
+/* Optional subtle paper texture */
+body {
+	background-image: url('/textures/subtle-paper.png');
+	background-repeat: repeat;
+}
+
+/* Typography */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+	font-family: 'Arvo', serif;
+	font-weight: bold;
+	margin-top: var(--space-5);
+	margin-bottom: var(--space-3);
+	line-height: 1.3;
+}
+
+h1 {
+	font-size: var(--font-size-h1);
+}
+
+h2 {
+	font-size: var(--font-size-h2);
+}
+
+h3 {
+	font-size: var(--font-size-h3);
+}
+
+p {
+	margin-bottom: var(--space-3);
+}
+
+/* Container */
+.container {
+	width: 100%;
+	max-width: 1200px;
+	margin: 0 auto;
+	padding: 0 var(--space-3);
+}
+
+.content-container {
+	max-width: 680px;
+	margin: 0 auto;
+}
+
+/* Button Base Styles */
+button,
+.button {
+	font-family: 'Work Sans', sans-serif;
+	font-weight: 600;
+	border-radius: var(--border-radius);
+	padding: var(--space-2) var(--space-4);
+	cursor: pointer;
+	transition:
+		transform 0.1s ease,
+		box-shadow 0.1s ease;
+}
+
+button:hover,
+.button:hover {
+	transform: translateY(-1px);
+}
+
+button:active,
+.button:active {
+	transform: translateY(1px);
+}
+
+/* Primary Button */
+.btn-primary {
+	background-color: var(--color-terracotta);
+	color: white;
+	border: 1px solid var(--color-terracotta);
+}
+
+/* Secondary Button */
+.btn-secondary {
+	background-color: transparent;
+	color: var(--color-avocado);
+	border: 1px solid var(--color-avocado);
+}
+
+/* Card Base Style */
+.card {
+	background-color: var(--color-beige);
+	border: 1px solid var(--color-warm-gray);
+	border-radius: var(--border-radius);
+	padding: var(--space-4);
+}
+
+/* Chinese Text Display */
+.chinese-text {
+	font-family: 'Noto Sans SC', 'Noto Sans TC', sans-serif;
+	font-size: 1.25em;
+}
+
+.pinyin {
+	font-family: 'Work Sans', sans-serif;
+	color: var(--color-warm-gray);
+	font-size: 0.85em;
+}
+
+/* Link styles */
+a {
+	color: var(--color-navy);
+	text-decoration: none;
+	transition: color 0.2s;
+}
+
+a:hover {
+	color: var(--color-terracotta);
+	text-decoration: underline;
+}
+
+/* Grid system basics */
+.row {
+	display: flex;
+	flex-wrap: wrap;
+	margin-right: -12px;
+	margin-left: -12px;
+}
+
+.col {
+	flex: 1 0 0%;
+	padding-right: 12px;
+	padding-left: 12px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+	.row {
+		margin-right: -8px;
+		margin-left: -8px;
+	}
+
+	.col {
+		padding-right: 8px;
+		padding-left: 8px;
+	}
+}
+
+/* Utility classes */
+.text-center {
+	text-align: center;
+}
+.mt-1 {
+	margin-top: var(--space-1);
+}
+.mt-2 {
+	margin-top: var(--space-2);
+}
+.mt-3 {
+	margin-top: var(--space-3);
+}
+.mt-4 {
+	margin-top: var(--space-4);
+}
+.mt-5 {
+	margin-top: var(--space-5);
+}
+.mb-1 {
+	margin-bottom: var(--space-1);
+}
+.mb-2 {
+	margin-bottom: var(--space-2);
+}
+.mb-3 {
+	margin-bottom: var(--space-3);
+}
+.mb-4 {
+	margin-bottom: var(--space-4);
+}
+.mb-5 {
+	margin-bottom: var(--space-5);
+}
+.p-1 {
+	padding: var(--space-1);
+}
+.p-2 {
+	padding: var(--space-2);
+}
+.p-3 {
+	padding: var(--space-3);
+}
+.p-4 {
+	padding: var(--space-4);
+}
+.p-5 {
+	padding: var(--space-5);
 }

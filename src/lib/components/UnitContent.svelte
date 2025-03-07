@@ -8,7 +8,7 @@
 	import VocabularyDisplay from './VocabularyDisplay.svelte';
 
 	// Props
-	export let unit = {};
+	// export let unit = {};
 	export let vocabulary = [];
 	export let reviewTapes = [];
 	export let workbookTapes = [];
