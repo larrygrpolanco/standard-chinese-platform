@@ -117,24 +117,16 @@
 		<!-- Review Tab -->
 		{#if activeTab === 'review'}
 			<div class="space-y-8">
-				<!-- Reference Dialogues Section -->
-				{#if dialogues && dialogues.length > 0}
+				<!-- Reference Dialogues Section - Added as a separate section at the top -->
+				{#if dialogues.length > 0}
 					<section class="border-b border-gray-200 pb-8">
 						<h3 class="mb-4 text-lg font-semibold text-gray-900">Reference Dialogues</h3>
-						<!-- Debug info - you can remove this after confirming dialogues are loaded -->
-						<p class="mb-4 text-sm text-gray-500">Found {dialogues.length} dialogues</p>
-
 						<div class="space-y-6">
 							{#each dialogues as dialogue}
 								<DialogueDisplay {dialogue} expanded={expandedDialogueId === dialogue.id} />
 							{/each}
 						</div>
 					</section>
-				{:else}
-					<!-- Debug info to check if dialogues array exists -->
-					<p class="mb-4 text-sm text-red-500">
-						No dialogues found. Debug: {JSON.stringify(dialogues)}
-					</p>
 				{/if}
 
 				<!-- C-1 Tape Section -->
@@ -151,13 +143,33 @@
 						{:else}
 							<div class="mb-6 rounded bg-gray-100 p-4 text-gray-500">Audio file not available</div>
 						{/if}
-
-						<!-- Removed the dialogues section from here -->
 					</section>
 				{/each}
 
-				<!-- P-1 Tape Section (keep as is) -->
-				<!-- Rest of your code... -->
+				<!-- P-1 Tape Section -->
+				{#each reviewTapes.filter((tape) => tape.title.includes('P-1')) as tape}
+					<section>
+						<h3 class="mb-4 text-lg font-semibold text-gray-900">
+							{tape.title} - Speaking Practice
+						</h3>
+
+						{#if tape.audio_file}
+							<div class="mb-6">
+								<AudioPlayer audioSrc={tape.audio_file} title="Speaking Practice Tape" />
+							</div>
+						{:else}
+							<div class="mb-6 rounded bg-gray-100 p-4 text-gray-500">Audio file not available</div>
+						{/if}
+
+						<div class="rounded-md border border-yellow-100 bg-yellow-50 p-4">
+							<p class="text-yellow-700">
+								<strong>Speaking Practice:</strong> This tape contains exercises to practice your speaking
+								skills. Listen to the audio and repeat after the speaker. Try to match the pronunciation
+								and tones.
+							</p>
+						</div>
+					</section>
+				{/each}
 			</div>
 		{/if}
 
