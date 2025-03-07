@@ -104,6 +104,7 @@
 		<!-- Review Tab -->
 		{#if activeTab === 'review'}
 			<div class="content-section">
+				<h3 class="section-header">Listening & Speaking Tapes</h3>
 				<ReviewTab {dialogues} tapes={reviewTapes} />
 			</div>
 		{/if}
