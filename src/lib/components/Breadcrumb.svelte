@@ -1,70 +1,84 @@
 <!-- src/lib/components/Breadcrumb.svelte -->
 <script>
+	import { page } from '$app/stores';
+	
 	export let moduleName = '';
 	export let moduleId = '';
 	export let unitName = '';
+	
+	// Determine if we should show the breadcrumb at all
+	$: showBreadcrumb = $page.url.pathname !== '/';
 </script>
 
-<nav class="mb-4">
-	<ol class="text-warm-gray flex flex-wrap text-sm">
-		<li class="flex items-center">
-			<a href="/" class="text-navy hover:text-terracotta transition-colors hover:underline">Home</a>
-			<svg
-				class="text-warm-gray mx-2 h-5 w-5"
-				fill="none"
-				viewBox="0 0 24 24"
-				stroke="currentColor"
-				stroke-linecap="round"
-				stroke-linejoin="round"
-				stroke-width="1.5"
-			>
-				<path d="M10 7l5 5-5 5" />
-			</svg>
-		</li>
-
-		<li class="flex items-center">
-			<a href="/modules" class="text-navy hover:text-terracotta transition-colors hover:underline"
-				>Modules</a
-			>
-			<svg
-				class="text-warm-gray mx-2 h-5 w-5"
-				fill="none"
-				viewBox="0 0 24 24"
-				stroke="currentColor"
-				stroke-linecap="round"
-				stroke-linejoin="round"
-				stroke-width="1.5"
-			>
-				<path d="M10 7l5 5-5 5" />
-			</svg>
-		</li>
-
-		{#if moduleName && moduleId}
+{#if showBreadcrumb}
+	<nav class="mb-6">
+		<ol class="flex flex-wrap items-center text-sm">
 			<li class="flex items-center">
-				<a
-					href="/modules/{moduleId}"
-					class="text-navy hover:text-terracotta transition-colors hover:underline"
+				<a 
+					href="/" 
+					class="text-[#34667F] transition-colors hover:text-[#C17C74] hover:underline"
 				>
-					{moduleName}
+					Home
 				</a>
-				{#if unitName}
-					<svg
-						class="text-warm-gray mx-2 h-5 w-5"
-						fill="none"
-						viewBox="0 0 24 24"
-						stroke="currentColor"
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						stroke-width="1.5"
-					>
-						<path d="M10 7l5 5-5 5" />
-					</svg>
-				{/if}
+				<svg
+					class="mx-2 h-4 w-4 text-[#A0998A]"
+					fill="none"
+					viewBox="0 0 24 24"
+					stroke="currentColor"
+				>
+					<path d="M9 5l7 7-7 7" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+				</svg>
 			</li>
-		{/if}
 
-		{#if unitName}
-			<li class="text-charcoal font-medium">{unitName}</li>
-		{/if}
-	</ol>
-</nav>
+			{#if $page.url.pathname.startsWith('/modules')}
+				<li class="flex items-center">
+					{#if moduleId}
+						<a
+							href="/modules"
+							class="text-[#34667F] transition-colors hover:text-[#C17C74] hover:underline"
+						>
+							Modules
+						</a>
+						<svg
+							class="mx-2 h-4 w-4 text-[#A0998A]"
+							fill="none"
+							viewBox="0 0 24 24"
+							stroke="currentColor"
+						>
+							<path d="M9 5l7 7-7 7" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+						</svg>
+					{:else}
+						<span class="font-medium text-[#33312E]">Modules</span>
+					{/if}
+				</li>
+			{/if}
+
+			{#if moduleName && moduleId}
+				<li class="flex items-center">
+					{#if unitName}
+						<a
+							href="/modules/{moduleId}"
+							class="text-[#34667F] transition-colors hover:text-[#C17C74] hover:underline max-w-[200px] truncate"
+						>
+							{moduleName}
+						</a>
+						<svg
+							class="mx-2 h-4 w-4 text-[#A0998A]"
+							fill="none"
+							viewBox="0 0 24 24"
+							stroke="currentColor"
+						>
+							<path d="M9 5l7 7-7 7" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+						</svg>
+					{:else}
+						<span class="font-medium text-[#33312E] max-w-[200px] truncate">{moduleName}</span>
+					{/if}
+				</li>
+			{/if}
+
+			{#if unitName}
+				<li class="font-medium text-[#33312E] max-w-[200px] truncate">{unitName}</li>
+			{/if}
+		</ol>
+	</nav>
+{/if}
