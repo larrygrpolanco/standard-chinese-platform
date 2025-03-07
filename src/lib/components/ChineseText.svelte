@@ -1,39 +1,38 @@
 <!-- src/lib/components/ChineseText.svelte -->
 <script>
-	import { fontPreferences } from '$lib/stores/fontPreferences';
-
-	export let chineseSimplified = '';
-	export let chineseTraditional = '';
-	export let pinyin = '';
-	export let english = '';
-	export let showEnglish = true;
-
-	// Use traditional if available, otherwise use font change on simplified
-	$: displayedChinese =
-		$fontPreferences.script === 'traditional' && chineseTraditional
-			? chineseTraditional
-			: chineseSimplified;
+  import { fontPreferences } from '$lib/stores/fontPreferences';
+  
+  // Props
+  export let simplified = '';
+  export let traditional = '';
+  export let pinyin = '';
+  export let showPinyin = $fontPreferences.showPinyin;
+  
+  // Use appropriate text based on user preference
+  $: displayText = $fontPreferences.useTraditional && traditional 
+    ? traditional.replace(/ /g, '\u00A0') 
+    : simplified.replace(/ /g, '\u00A0');
+    
+  $: displayPinyin = pinyin.replace(/ /g, '\u00A0');
+  
+  // Font class based on character set
+  $: fontClass = $fontPreferences.useTraditional ? 'font-traditional' : 'font-simplified';
 </script>
 
-<div class="chinese-text-container">
-	<div
-		class="chinese-text"
-		style="font-family: {$fontPreferences.script === 'traditional'
-			? 'Noto Sans TC'
-			: 'Noto Sans SC'}"
-	>
-		{displayedChinese}
-	</div>
-
-	{#if $fontPreferences.showPinyin && pinyin}
-		<div class="pinyin text-sm text-gray-500">{pinyin}</div>
-	{/if}
-
-	{#if showEnglish && english}
-		<div class="english text-gray-700 italic">{english}</div>
-	{/if}
+<div>
+  <p class="whitespace-pre-line {fontClass}">{displayText}</p>
+  
+  {#if showPinyin && pinyin}
+    <p class="whitespace-pre-line text-sm text-gray-500 mt-1">{displayPinyin}</p>
+  {/if}
 </div>
 
 <style>
-	/* Same styles as before */
+  .font-simplified {
+    font-family: 'Noto Sans SC', sans-serif;
+  }
+  
+  .font-traditional {
+    font-family: 'Noto Sans TC', sans-serif;
+  }
 </style>

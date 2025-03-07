@@ -1,21 +1,49 @@
 // src/lib/stores/fontPreferences.js
 import { writable } from 'svelte/store';
-import { browser } from '$app/environment';
 
-// Get saved preferences from localStorage if available
-const savedPrefs = browser ? JSON.parse(localStorage.getItem('fontPreferences')) : null;
-
-// Initialize with defaults or saved preferences
-export const fontPreferences = writable(
-	savedPrefs || {
-		script: 'simplified', // 'simplified' or 'traditional'
-		showPinyin: true
+// Initialize from localStorage if available
+function getInitialPreferences() {
+	if (typeof localStorage !== 'undefined') {
+		const savedPrefs = localStorage.getItem('fontPreferences');
+		if (savedPrefs) {
+			try {
+				return JSON.parse(savedPrefs);
+			} catch (e) {
+				console.error('Failed to parse stored font preferences');
+			}
+		}
 	}
-);
 
-// Save preferences to localStorage when they change
-if (browser) {
-	fontPreferences.subscribe((value) => {
-		localStorage.setItem('fontPreferences', JSON.stringify(value));
+	// Default preferences
+	return {
+		useTraditional: false, // Default to simplified
+		showPinyin: false // Default to hiding pinyin
+	};
+}
+
+// Create store with initial values
+const preferences = writable(getInitialPreferences());
+
+// Save to localStorage when store changes
+if (typeof window !== 'undefined') {
+	preferences.subscribe((prefs) => {
+		localStorage.setItem('fontPreferences', JSON.stringify(prefs));
 	});
 }
+
+// Export store with toggle methods
+export const fontPreferences = {
+	...preferences,
+	toggleCharacterSet: () => {
+		preferences.update((prefs) => ({
+			...prefs,
+			useTraditional: !prefs.useTraditional
+		}));
+	},
+	togglePinyin: () => {
+		preferences.update((prefs) => ({
+			...prefs,
+			showPinyin: !prefs.showPinyin
+		}));
+	}
+};
