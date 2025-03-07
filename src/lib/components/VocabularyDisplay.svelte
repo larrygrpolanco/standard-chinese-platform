@@ -6,44 +6,32 @@
 	export let vocabulary = [];
 </script>
 
-<div>
+<div class="vocabulary-display">
 	<!-- Vocabulary table -->
 	{#if vocabulary.length > 0}
-		<div class="overflow-x-auto">
-			<table class="min-w-full divide-y divide-gray-200">
-				<thead class="bg-gray-50">
+		<div class="table-wrapper">
+			<table class="vocabulary-table">
+				<thead>
 					<tr>
-						<th
-							class="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase"
-						>
-							Chinese
-						</th>
-						<th
-							class="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase"
-						>
-							Pinyin
-						</th>
-						<th
-							class="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase"
-						>
-							English
-						</th>
+						<th class="chinese-column">Chinese</th>
+						<th class="pinyin-column">Pinyin</th>
+						<th class="english-column">English</th>
 					</tr>
 				</thead>
-				<tbody class="divide-y divide-gray-200 bg-white">
+				<tbody>
 					{#each vocabulary as word}
-						<tr class="hover:bg-gray-50">
-							<td class="px-6 py-4 text-base whitespace-nowrap">
+						<tr>
+							<td class="chinese-cell">
 								<ChineseText
 									simplified={word.chinese_simplified}
 									traditional={word.chinese_traditional}
 									showPinyin={false}
 								/>
 							</td>
-							<td class="px-6 py-4 text-sm whitespace-nowrap text-gray-500">
+							<td class="pinyin-cell">
 								{word.pinyin}
 							</td>
-							<td class="px-6 py-4 text-sm whitespace-nowrap text-gray-500">
+							<td class="english-cell">
 								{word.english}
 							</td>
 						</tr>
@@ -52,8 +40,89 @@
 			</table>
 		</div>
 	{:else}
-		<div class="rounded-lg border border-gray-200 bg-white p-8 text-center">
-			<p class="text-gray-500">No vocabulary available for this unit.</p>
+		<div class="empty-vocabulary">
+			<p>No vocabulary available for this unit.</p>
 		</div>
 	{/if}
 </div>
+
+<style>
+	.vocabulary-display {
+		width: 100%;
+	}
+
+	.table-wrapper {
+		overflow-x: auto;
+		border-radius: 8px;
+		border: 1px solid var(--color-warm-gray, #a0998a);
+		background-color: var(--color-cream-paper, #f4f1de);
+		background-image: url('/textures/subtle-paper.png');
+		background-repeat: repeat;
+	}
+
+	.vocabulary-table {
+		width: 100%;
+		border-collapse: collapse;
+		font-family: 'Work Sans', sans-serif;
+	}
+
+	.vocabulary-table th {
+		padding: 12px 16px;
+		text-align: left;
+		font-size: 0.875rem;
+		text-transform: uppercase;
+		letter-spacing: 1px;
+		color: var(--color-charcoal, #33312e);
+		border-bottom: 2px solid var(--color-avocado, #7d8c5c);
+		background-color: rgba(125, 140, 92, 0.1);
+		font-weight: 600;
+	}
+
+	.vocabulary-table td {
+		padding: 12px 16px;
+		border-bottom: 1px solid var(--color-warm-gray, #a0998a);
+	}
+
+	.vocabulary-table tr:last-child td {
+		border-bottom: none;
+	}
+
+	.vocabulary-table tr:hover {
+		background-color: rgba(193, 124, 116, 0.05);
+	}
+
+	.chinese-column {
+		width: 30%;
+	}
+
+	.pinyin-column {
+		width: 30%;
+	}
+
+	.english-column {
+		width: 40%;
+	}
+
+	.chinese-cell {
+		font-size: 1.25em;
+	}
+
+	.pinyin-cell {
+		color: var(--color-warm-gray, #a0998a);
+		font-style: italic;
+	}
+
+	.english-cell {
+		color: var(--color-charcoal, #33312e);
+	}
+
+	.empty-vocabulary {
+		padding: 40px 24px;
+		text-align: center;
+		background-color: var(--color-cream-paper, #f4f1de);
+		border: 1px dashed var(--color-warm-gray, #a0998a);
+		border-radius: 8px;
+		color: var(--color-warm-gray, #a0998a);
+		font-style: italic;
+	}
+</style>

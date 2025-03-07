@@ -10,7 +10,7 @@
 
 	// Use appropriate text based on user preference
 	$: displayText =
-		$fontPreferences.script === 'traditional' && traditional
+		$fontPreferences.displayMode === 'traditional' && traditional
 			? traditional.replace(/ /g, '\u00A0')
 			: simplified.replace(/ /g, '\u00A0');
 
@@ -18,15 +18,20 @@
 </script>
 
 <div class="chinese-content">
-	<!-- Pinyin above characters when enabled -->
-	{#if $fontPreferences.showPinyin && pinyin}
-		<p class="pinyin whitespace-pre-line">{displayPinyin}</p>
-	{/if}
+	{#if $fontPreferences.displayMode === 'pinyin'}
+		<!-- Pinyin-only mode -->
+		<p class="pinyin-large whitespace-pre-line">{displayPinyin}</p>
+	{:else}
+		<!-- Pinyin above characters when enabled -->
+		{#if $fontPreferences.showPinyin && pinyin}
+			<p class="pinyin whitespace-pre-line">{displayPinyin}</p>
+		{/if}
 
-	<!-- Chinese characters - larger size -->
-	<p class="chinese-text whitespace-pre-line" lang="zh">
-		{displayText}
-	</p>
+		<!-- Chinese characters - larger size -->
+		<p class="chinese-text whitespace-pre-line" lang="zh">
+			{displayText}
+		</p>
+	{/if}
 
 	<!-- English translation below if provided -->
 	{#if english}
@@ -52,6 +57,13 @@
 		font-size: 0.85em;
 		margin-bottom: 0.25rem;
 		line-height: 1.4;
+	}
+
+	.pinyin-large {
+		font-family: 'Work Sans', sans-serif;
+		color: var(--color-navy);
+		font-size: 1.1em;
+		line-height: 1.8;
 	}
 
 	.english-text {

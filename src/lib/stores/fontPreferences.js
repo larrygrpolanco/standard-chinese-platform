@@ -1,49 +1,32 @@
-// src/lib/stores/fontPreferences.js
+// lib/stores/fontPreferences.js
 import { writable } from 'svelte/store';
 
 // Initialize from localStorage if available
-function getInitialPreferences() {
-	if (typeof localStorage !== 'undefined') {
-		const savedPrefs = localStorage.getItem('fontPreferences');
-		if (savedPrefs) {
-			try {
-				return JSON.parse(savedPrefs);
-			} catch (e) {
-				console.error('Failed to parse stored font preferences');
-			}
-		}
-	}
+const storedPrefs =
+	typeof localStorage !== 'undefined'
+		? JSON.parse(localStorage.getItem('fontPreferences') || '{}')
+		: {};
 
-	// Default preferences
-	return {
-		useTraditional: false, // Default to simplified
-		showPinyin: false // Default to hiding pinyin
-	};
-}
+// Create store with defaults, overridden by stored values
+const defaultPreferences = {
+	displayMode: storedPrefs.displayMode || 'simplified', // 'simplified', 'traditional', or 'pinyin'
+	showPinyin: storedPrefs.showPinyin !== undefined ? storedPrefs.showPinyin : true
+};
 
-// Create store with initial values
-const preferences = writable(getInitialPreferences());
+// Create the store
+const fontPrefsStore = writable(defaultPreferences);
 
-// Save to localStorage when store changes
-if (typeof window !== 'undefined') {
-	preferences.subscribe((prefs) => {
-		localStorage.setItem('fontPreferences', JSON.stringify(prefs));
-	});
-}
-
-// Export store with toggle methods
+// Export with extra methods
 export const fontPreferences = {
-	...preferences,
-	toggleCharacterSet: () => {
-		preferences.update((prefs) => ({
-			...prefs,
-			useTraditional: !prefs.useTraditional
-		}));
-	},
-	togglePinyin: () => {
-		preferences.update((prefs) => ({
-			...prefs,
-			showPinyin: !prefs.showPinyin
-		}));
+	...fontPrefsStore,
+	update: (updater) => {
+		fontPrefsStore.update((prefs) => {
+			const newPrefs = updater(prefs);
+			// Save to localStorage when updated
+			if (typeof localStorage !== 'undefined') {
+				localStorage.setItem('fontPreferences', JSON.stringify(newPrefs));
+			}
+			return newPrefs;
+		});
 	}
 };
