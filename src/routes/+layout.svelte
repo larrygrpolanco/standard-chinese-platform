@@ -1,21 +1,20 @@
 <!-- src/routes/+layout.svelte -->
 <script>
-	import '../app.css';
-	import Header from '$lib/components/Header.svelte';
-	let { children } = $props();
+  import '../app.css';
+  import Header from '$lib/components/Header.svelte';
 </script>
 
-<div class="app flex min-h-screen flex-col bg-white text-gray-900">
-	<Header />
-
-	<main class="container mx-auto flex-grow px-4 py-10">
-		{@render children()}
-	</main>
-
-	<footer class="bg-gray-100 py-6 text-gray-600 border-t border-gray-200">
-		<div class="container mx-auto text-center text-sm">
-			<p>© FSI Chinese Learning Platform</p>
-			<p class="mt-1">Based on materials from the Foreign Service Institute</p>
-		</div>
-	</footer>
+<div class="min-h-screen flex flex-col bg-gray-50">
+  <Header />
+  
+  <main class="flex-grow container mx-auto px-4 py-8">
+    <slot />
+  </main>
+  
+  <footer class="py-6 bg-white border-t border-gray-200 mt-auto">
+    <div class="container mx-auto px-4 text-center text-sm text-gray-600">
+      <p>© {new Date().getFullYear()} FSI Chinese Learning Platform</p>
+      <p class="mt-1">Based on materials from the Foreign Service Institute</p>
+    </div>
+  </footer>
 </div>

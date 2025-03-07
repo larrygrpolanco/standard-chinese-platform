@@ -6,32 +6,31 @@ const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-// Module functions
-export async function getModules(moduleType = 'core') {
-	const { data, error } = await supabase
-		.from('modules')
-		.select('*')
-		.eq('module_type', moduleType)
-		.order('order_num');
+// Fetch all modules (ordered by order_num)
+export async function getModules() {
+	const { data, error } = await supabase.from('modules').select('*').order('order_num');
 
 	if (error) {
 		console.error('Error fetching modules:', error);
 		return [];
 	}
-	return data;
+
+	return data || [];
 }
 
+// Fetch a specific module by ID
 export async function getModuleById(id) {
 	const { data, error } = await supabase.from('modules').select('*').eq('id', id).single();
 
 	if (error) {
-		console.error(`Error fetching module ${id}:`, error);
+		console.error('Error fetching module:', error);
 		return null;
 	}
+
 	return data;
 }
 
-// Unit functions
+// Fetch units by module ID
 export async function getUnitsByModuleId(moduleId) {
 	const { data, error } = await supabase
 		.from('units')
@@ -40,156 +39,105 @@ export async function getUnitsByModuleId(moduleId) {
 		.order('order_num');
 
 	if (error) {
-		console.error(`Error fetching units for module ${moduleId}:`, error);
+		console.error('Error fetching units:', error);
 		return [];
 	}
-	return data;
+
+	return data || [];
 }
 
-export async function getUnitById(id) {
-	const { data, error } = await supabase.from('units').select('*').eq('id', id).single();
+// Fetch complete unit with related data
+export async function getCompleteUnit(unitId) {
+	// First get the base unit data
+	const { data: unit, error: unitError } = await supabase
+		.from('units')
+		.select(
+			`
+      *,
+      module:modules(*)
+    `
+		)
+		.eq('id', unitId)
+		.single();
 
-	if (error) {
-		console.error(`Error fetching unit ${id}:`, error);
+	if (unitError) {
+		console.error('Error fetching unit:', unitError);
 		return null;
 	}
-	return data;
-}
 
-// Vocabulary functions
-export async function getVocabularyForUnit(unitId) {
-	const { data, error } = await supabase
+	if (!unit) return null;
+
+	// Get vocabulary for the unit
+	const { data: vocabulary, error: vocabError } = await supabase
 		.from('vocabulary')
 		.select('*')
 		.eq('unit_id', unitId)
 		.order('order_num');
 
-	if (error) {
-		console.error(`Error fetching vocabulary for unit ${unitId}:`, error);
-		return [];
+	if (vocabError) {
+		console.error('Error fetching vocabulary:', vocabError);
 	}
-	return data;
-}
 
-// Reference list functions (now tied to unit, not tape)
-export async function getReferenceListForUnit(unitId) {
-	const { data, error } = await supabase
+	// Get review tapes for the unit
+	const { data: reviewTapes, error: tapesError } = await supabase
+		.from('tapes')
+		.select('*')
+		.eq('unit_id', unitId)
+		.eq('tape_type', 'review')
+		.order('order_num');
+
+	if (tapesError) {
+		console.error('Error fetching review tapes:', tapesError);
+	}
+
+	// Get workbook tapes for the unit
+	const { data: workbookTapes, error: workbookError } = await supabase
+		.from('tapes')
+		.select('*')
+		.eq('unit_id', unitId)
+		.eq('tape_type', 'workbook')
+		.order('order_num');
+
+	if (workbookError) {
+		console.error('Error fetching workbook tapes:', workbookError);
+	}
+
+	// Get reference dialogues for the unit
+	const { data: dialogues, error: dialoguesError } = await supabase
 		.from('reference_list')
 		.select('*')
 		.eq('unit_id', unitId)
 		.order('order_num');
 
-	if (error) {
-		console.error(`Error fetching reference list for unit ${unitId}:`, error);
-		return [];
-	}
-	return data;
-}
-
-// Tape functions
-export async function getTapesByUnitId(unitId, tapeType = null) {
-	let query = supabase.from('tapes').select('*').eq('unit_id', unitId);
-
-	if (tapeType) {
-		query = query.eq('tape_type', tapeType);
+	if (dialoguesError) {
+		console.error('Error fetching dialogues:', dialoguesError);
 	}
 
-	const { data, error } = await query.order('order_num');
+	// Get exercises for all workbook tapes
+	const workbookTapeIds = (workbookTapes || []).map((tape) => tape.id);
 
-	if (error) {
-		console.error(`Error fetching tapes for unit ${unitId}:`, error);
-		return [];
+	let exercises = [];
+	if (workbookTapeIds.length > 0) {
+		const { data: exercisesData, error: exercisesError } = await supabase
+			.from('exercises')
+			.select('*')
+			.in('tape_id', workbookTapeIds)
+			.order('order_num');
+
+		if (exercisesError) {
+			console.error('Error fetching exercises:', exercisesError);
+		} else {
+			exercises = exercisesData || [];
+		}
 	}
-	return data;
-}
 
-// Exercise functions
-export async function getExercisesForTape(tapeId) {
-	const { data, error } = await supabase
-		.from('exercises')
-		.select('*')
-		.eq('tape_id', tapeId)
-		.order('order_num');
-
-	if (error) {
-		console.error(`Error fetching exercises for tape ${tapeId}:`, error);
-		return [];
-	}
-	return data;
-}
-
-// New function: Get questions for an exercise
-export async function getQuestionsForExercise(exerciseId) {
-	const { data, error } = await supabase
-		.from('exercise_questions')
-		.select('*')
-		.eq('exercise_id', exerciseId)
-		.order('order_num');
-
-	if (error) {
-		console.error(`Error fetching questions for exercise ${exerciseId}:`, error);
-		return [];
-	}
-	return data;
-}
-
-// Get exercises with their questions
-export async function getExercisesWithQuestionsForTape(tapeId) {
-	// Get exercises
-	const exercises = await getExercisesForTape(tapeId);
-
-	// For each exercise, fetch its questions
-	const exercisesWithQuestions = await Promise.all(
-		exercises.map(async (exercise) => {
-			const questions = await getQuestionsForExercise(exercise.id);
-			return { ...exercise, questions };
-		})
-	);
-
-	return exercisesWithQuestions;
-}
-
-// Get complete unit data
-export async function getCompleteUnit(unitId) {
-	// Get basic unit info
-	const unit = await getUnitById(unitId);
-	if (!unit) return null;
-
-	// Get vocabulary
-	const vocabulary = await getVocabularyForUnit(unitId);
-
-	// Get reference list for the unit
-	const referenceList = await getReferenceListForUnit(unitId);
-
-	// Get review tapes
-	const reviewTapes = await getTapesByUnitId(unitId, 'review');
-
-	// Get workbook tapes and exercises with questions
-	const workbookTapes = await getTapesByUnitId(unitId, 'workbook');
-	const workbookTapesWithContent = await Promise.all(
-		workbookTapes.map(async (tape) => {
-			const exercises = await getExercisesWithQuestionsForTape(tape.id);
-			return { ...tape, exercises };
-		})
-	);
-
+	// Return complete unit data
 	return {
 		...unit,
-		vocabulary,
-		referenceList,
-		reviewTapes,
-		workbookTapes: workbookTapesWithContent
+		vocabulary: vocabulary || [],
+		reviewTapes: reviewTapes || [],
+		workbookTapes: workbookTapes || [],
+		dialogues: dialogues || [],
+		exercises: exercises || []
 	};
-}
-
-// Audio URL helper
-export function getAudioUrl(filename) {
-	if (!filename) return null;
-	return `${supabaseUrl}/storage/v1/object/public/audio/${filename}`;
-}
-
-// Display image URL helper
-export function getDisplayImageUrl(filename) {
-	if (!filename) return null;
-	return `${supabaseUrl}/storage/v1/object/public/exercise-displays/${filename}`;
 }
