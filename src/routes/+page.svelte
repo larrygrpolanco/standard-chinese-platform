@@ -2,6 +2,7 @@
 <script>
 	import { onMount } from 'svelte';
 	import { getModules } from '$lib/supabase/client';
+	import Loader from '$lib/components/Loader.svelte';
 
 	let featuredModules = [];
 	let loading = true;
@@ -24,7 +25,6 @@
 		<h1 class="mb-6 font-['Arvo',serif] text-4xl font-bold text-[#34667F] md:text-5xl">
 			FSI Chinese Learning
 		</h1>
-
 		<p class="mx-auto mb-8 max-w-3xl text-lg leading-relaxed text-[#33312E] md:text-xl">
 			A modern approach to the Foreign Service Institute's "Standard Chinese" course, designed to
 			help you learn Mandarin effectively at your own pace.
@@ -55,9 +55,7 @@
 		</h2>
 
 		{#if loading}
-			<div class="py-8 text-center">
-				<p>Loading modules...</p>
-			</div>
+			<Loader />
 		{:else}
 			<div class="grid gap-6 md:grid-cols-3">
 				{#each featuredModules as module}

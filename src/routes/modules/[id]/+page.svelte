@@ -5,6 +5,7 @@
 	import { getModuleById, getUnitsByModuleId } from '$lib/supabase/client';
 	import Breadcrumb from '$lib/components/Breadcrumb.svelte';
 	import UnitCard from '$lib/components/UnitCard.svelte';
+	import Loader from '$lib/components/Loader.svelte';
 
 	let module = null;
 	let units = [];
@@ -25,9 +26,8 @@
 </svelte:head>
 
 {#if loading}
-	<div class="py-20 text-center">
-		<p class="text-[#A0998A]">Loading module content...</p>
-	</div>
+	<!-- Loading animation with spinning cassette reels -->
+	<Loader />
 {:else if module}
 	<Breadcrumb moduleName={`Module ${module.id}: ${module.title}`} />
 

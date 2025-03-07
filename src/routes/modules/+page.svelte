@@ -3,6 +3,7 @@
 	import { onMount } from 'svelte';
 	import { getModules } from '$lib/supabase/client';
 	import Breadcrumb from '$lib/components/Breadcrumb.svelte';
+	import Loader from '$lib/components/Loader.svelte';
 
 	let modules = [];
 	let loading = true;
@@ -12,18 +13,13 @@
 		loading = false;
 	});
 
-	// Function to get a color based on module number
-	function getModuleAccent(moduleNumber) {
+	// Function to get color attributes based on module number
+	function getModuleColors(moduleNumber) {
 		const colors = [
-			'border-[#C17C74]', // Terracotta
-			'border-[#7D8C5C]', // Avocado
-			'border-[#DDB967]', // Gold
-			'border-[#34667F]', // Navy
-			'border-[#C17C74]', // Repeat pattern
-			'border-[#7D8C5C]',
-			'border-[#DDB967]',
-			'border-[#34667F]',
-			'border-[#C17C74]'
+			{ border: 'border-[#C17C74]', bg: 'bg-[#F8EBE8]', accent: '#C17C74' }, // Terracotta
+			{ border: 'border-[#7D8C5C]', bg: 'bg-[#EBEEE7]', accent: '#7D8C5C' }, // Avocado
+			{ border: 'border-[#DDB967]', bg: 'bg-[#F9F4E8]', accent: '#DDB967' }, // Gold
+			{ border: 'border-[#34667F]', bg: 'bg-[#EAF0F3]', accent: '#34667F' } // Navy
 		];
 		return colors[(moduleNumber - 1) % colors.length];
 	}
@@ -31,88 +27,236 @@
 
 <svelte:head>
 	<title>Modules | FSI Chinese</title>
+	<meta
+		name="description"
+		content="Explore the FSI Standard Chinese course modules with authentic vintage audio recordings originally developed for U.S. diplomats."
+	/>
 </svelte:head>
 
-<Breadcrumb />
+<!-- Subtle paper texture background -->
+<div
+	class="min-h-screen bg-[#F4F1DE] pb-12"
+	style="background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAMAAAAp4XiDAAAAUVBMVEWFhYWDg4N3d3dtbW17e3t1dXWBgYGHh4d5eXlzc3OLi4ubm5uVlZWPj4+NjY19fX2JiYl/f39ra2uRkZGZmZlpaWmXl5dvb29xcXGTk5NnZ2c4zIiyAAAA70lEQVR4Ac2TWQoCQQxEc9fWbYrG3dz+/zMVBCHMZYoSPCQHTuo1bNdzlGUZx3GUphllHecPRQ7jOPa9Mk2hSFGbZZlzzmAwyHsvVW+IKnpnWVaW5TiOksSFyJcXojuOQ3S/rpGQBIAkOkgUYXsuQBTRPYGL1EAkY1dEVzz3jNi9CRBDdJESIkS1pEQRXdAoIkS3sQkQRXSIk4uQKCJAFNEVB4IQRQDQAYiii0URTgIiQeTLf0QA0QWtItpHPQmInwRESiLgTUZXKbRJFNH5SYPec86qqrrvu67DwCKngau6rvf7/R8BAFkOiU1BQQAAAABJRU5ErkJggg=='); background-repeat: repeat; background-blend-mode: overlay;"
+>
+	<Breadcrumb />
 
-<section class="container mx-auto px-4">
-	<header class="mb-10">
-		<h1 class="font-['Arvo',serif] text-[2.5rem] font-bold text-[#33312E]">Learning Modules</h1>
-		<p class="mt-2 font-['Work_Sans',sans-serif] text-[#A0998A]">
-			Explore all 9 core modules of the FSI Standard Chinese course
-		</p>
-	</header>
-
-	{#if loading}
-		<div class="py-20 text-center">
-			<p class="text-[#A0998A]">Loading modules...</p>
-		</div>
-	{:else}
-		<div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-			{#each modules as module}
-				<!-- Module card styled as vintage lesson booklet -->
-				<a
-					href="/modules/{module.id}"
-					class="group relative flex flex-col overflow-hidden rounded-[8px] border border-[#A0998A] bg-[#E8E5D7] transition-all hover:-translate-y-1"
-				>
-					<!-- Module number badge styled as vintage circular sticker -->
+	<section class="container mx-auto px-4">
+		<!-- Vintage-inspired header -->
+		<header class="relative mb-10 pt-6">
+			<!-- Decorative cassette tape icon -->
+			<div class="absolute -top-2 right-8 hidden h-16 w-24 rotate-12 opacity-30 md:block">
+				<div class="relative h-full w-full rounded-md border-2 border-[#33312E] bg-[#E8E5D7]">
 					<div
-						class="absolute top-4 left-4 flex h-12 w-12 items-center justify-center rounded-full border-2 bg-[#F4F1DE] {getModuleAccent(
-							module.id
-						)}"
+						class="absolute top-1/2 left-1/2 h-8 w-10 -translate-x-1/2 -translate-y-1/2 transform"
 					>
-						<span class="font-['Arvo',serif] font-bold text-[#33312E]">
-							{module.id}
-						</span>
+						<div class="absolute top-0 left-0 h-4 w-4 rounded-full border border-[#33312E]"></div>
+						<div class="absolute top-0 right-0 h-4 w-4 rounded-full border border-[#33312E]"></div>
 					</div>
+				</div>
+			</div>
 
-					<!-- Module content -->
-					<div class="p-6 pt-16">
-						<h2
-							class="mb-2 font-['Arvo',serif] text-xl font-semibold text-[#33312E] transition-colors group-hover:text-[#C17C74]"
-						>
-							{module.title}
-						</h2>
+			<!-- Title with retro underline -->
+			<div class="relative inline-block">
+				<h1 class=" font-['Arvo',serif] text-[2.5rem] font-bold text-[#33312E]">
+					Learning Modules
+				</h1>
+				<div class="absolute -bottom-2 left-0 h-1.5 w-full bg-[#DDB967]"></div>
+			</div>
 
-						<!-- Progress indicator styled as vintage meter -->
-						<div
-							class="mt-4 h-2 w-full overflow-hidden rounded-full border border-[#A0998A] bg-[#F4F1DE]"
-						>
-							<div class="h-2 w-0 rounded-full bg-[#DDB967]"></div>
-						</div>
-						<p class="mt-1 text-xs text-[#A0998A]">Not started</p>
-					</div>
+			<p
+				class="mt-6 max-w-2xl font-['Work_Sans',sans-serif] leading-relaxed text-[#33312E] opacity-80"
+			>
+				<br />
+				Explore all 9 core modules of the FSI Standard Chinese course. These materials were originally
+				developed for U.S. diplomats and come with authentic vintage audio recordings from the original
+				tape collection.
+			</p>
+		</header>
 
-					<!-- Module description -->
-					<div class="flex-grow border-t border-[#A0998A] bg-[#F4F1DE] p-4">
-						<p class="line-clamp-3 text-sm text-[#33312E]">
-							{module.description}
-						</p>
-					</div>
+		{#if loading}
+			<!-- Loading animation with spinning cassette reels -->
+			<Loader />
+		{:else}
+			<!-- Module cards grid -->
+			<div class="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+				{#each modules as module}
+					<!-- Module card styled as vintage cassette case -->
+					{@const colors = getModuleColors(module.id)}
+					<a
+						href="/modules/{module.id}"
+						class="group relative flex h-full flex-col overflow-hidden rounded-lg border-2 border-[#33312E] bg-[#E8E5D7] transition-all hover:-translate-y-1 hover:shadow-[4px_4px_0_#826D5B]"
+						style="box-shadow: inset 0 1px 20px rgba(255, 255, 255, 0.5), 2px 2px 0 #826D5B;"
+					>
+						<!-- Top colored binding -->
+						<div class="h-3 w-full {colors.bg} border-b-2 border-[#33312E]"></div>
 
-					<!-- Call to action -->
-					<div class="border-t border-[#A0998A] bg-[#F4F1DE] p-4 text-right">
-						<span
-							class="inline-flex items-center text-sm font-medium text-[#34667F] group-hover:text-[#C17C74] group-hover:underline"
-						>
-							Start learning
-							<svg
-								class="ml-1 h-4 w-4 transition-transform group-hover:translate-x-1"
-								fill="none"
-								viewBox="0 0 24 24"
-								stroke="currentColor"
+						<!-- Card content -->
+						<div class="flex flex-grow flex-col">
+							<!-- Header section with badge and title -->
+							<div class="p-6">
+								<div class="relative mb-3 flex gap-4">
+									<!-- Module number badge -->
+									<div
+										class="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-full border-2 border-[#33312E] {colors.bg}"
+										style="transform: rotate(-5deg); box-shadow: 1px 1px 0 #826D5B;"
+									>
+										<span class="font-['Arvo',serif] text-xl font-bold text-[#33312E]">
+											{module.id}
+										</span>
+									</div>
+
+									<!-- Title next to badge -->
+									<h2
+										class="flex-1 self-center font-['Arvo',serif] text-xl font-semibold text-[#33312E] transition-colors group-hover:text-[#C17C74]"
+									>
+										{module.title}
+									</h2>
+
+									<!-- Small tape icon - positioned relative to the top-right -->
+									<div class="absolute top-0 right-0 opacity-70">
+										<svg
+											width="24"
+											height="24"
+											viewBox="0 0 24 24"
+											fill="none"
+											xmlns="http://www.w3.org/2000/svg"
+										>
+											<rect
+												x="2"
+												y="4"
+												width="20"
+												height="16"
+												rx="2"
+												stroke="#33312E"
+												stroke-width="2"
+											/>
+											<circle cx="7" cy="12" r="2.5" stroke="#33312E" stroke-width="1.5" />
+											<circle cx="17" cy="12" r="2.5" stroke="#33312E" stroke-width="1.5" />
+											<line
+												x1="9.5"
+												y1="12"
+												x2="14.5"
+												y2="12"
+												stroke="#33312E"
+												stroke-width="1.5"
+											/>
+										</svg>
+									</div>
+								</div>
+
+								<!-- Progress meter styled as tape counter -->
+								<div class="mt-4">
+									<div class="flex items-center">
+										<div
+											class="mr-2 font-['Courier_New',monospace] text-xs tracking-tight opacity-80"
+										>
+											PROGRESS:
+										</div>
+										<div
+											class="relative h-4 flex-grow overflow-hidden rounded-sm border border-[#33312E] bg-[#F4F1DE]"
+											style="box-shadow: inset 0 1px 3px rgba(0,0,0,0.2);"
+										>
+											<!-- Progress bar -->
+											<div
+												class="h-full w-0"
+												style="transition: width 0.3s ease-out; background-color: {colors.accent}; opacity: 0.8;"
+											></div>
+											<!-- Tick marks -->
+											<div
+												class="pointer-events-none absolute top-0 left-12 flex h-full w-full justify-between px-1"
+											>
+												{#each Array(4) as _, i}
+													<span class="mt-1 h-1 w-px bg-[#33312E] opacity-40"></span>
+												{/each}
+											</div>
+										</div>
+									</div>
+									<p class="mt-1 font-['Courier_New',monospace] text-xs text-[#33312E] opacity-70">
+										SIDE A - NOT STARTED
+									</p>
+								</div>
+							</div>
+
+							<!-- Divider with perforated line -->
+							<div class="flex items-center px-4">
+								<div class="flex-grow border-t border-dashed border-[#A0998A]"></div>
+							</div>
+
+							<!-- Module description -->
+							<div class="bg-opacity-50 flex-grow bg-[#F4F1DE] p-4">
+								<p
+									class="line-clamp-3 font-['Work_Sans',sans-serif] text-sm leading-relaxed text-[#33312E]"
+								>
+									{module.description}
+								</p>
+							</div>
+
+							<!-- Call to action styled as a mechanical button -->
+							<div
+								class="border-t-2 border-[#33312E] p-3 text-right"
+								style="background: repeating-linear-gradient(45deg, {colors.accent}10, {colors.accent}10 10px, transparent 10px, transparent 20px);"
 							>
-								<path
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									stroke-width="2"
-									d="M14 5l7 7m0 0l-7 7m7-7H3"
-								/>
-							</svg>
-						</span>
+								<span
+									class="inline-flex items-center rounded-full border border-[#33312E] bg-[#F4F1DE] px-4 py-1.5 text-sm font-medium text-[#33312E] transition-all group-hover:-translate-y-0.5 group-hover:shadow-[2px_2px_0_#826D5B] active:translate-y-0.5 active:shadow-none"
+									style="box-shadow: 1px 1px 0 #826D5B; transition: all 0.15s ease-out;"
+								>
+									<!-- Play icon -->
+									<span class="mr-1.5 text-xs" style="color: {colors.accent};">▶</span>
+									Start learning
+									<svg
+										class="ml-1.5 h-4 w-4 transition-transform group-hover:translate-x-1"
+										fill="none"
+										viewBox="0 0 24 24"
+										stroke="currentColor"
+									>
+										<path
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											stroke-width="2"
+											d="M14 5l7 7m0 0l-7 7m7-7H3"
+										/>
+									</svg>
+								</span>
+							</div>
+						</div>
+					</a>
+				{/each}
+			</div>
+
+			<!-- Vintage footer with tape decoration -->
+			<div class="mt-16 text-center">
+				<div class="relative mx-auto inline-block w-full max-w-md">
+					<div class="h-px w-full bg-[#33312E] opacity-30"></div>
+					<div class="mt-3 font-['Courier_New',monospace] text-xs text-[#33312E] opacity-50">
+						© FOREIGN SERVICE INSTITUTE - ORIGINALLY RECORDED ON CASSETTE TAPES
 					</div>
-				</a>
-			{/each}
-		</div>
-	{/if}
-</section>
+
+					<!-- Cassette tape illustration -->
+					<div class="mt-6 inline-block opacity-30">
+						<svg
+							width="80"
+							height="48"
+							viewBox="0 0 80 48"
+							fill="none"
+							xmlns="http://www.w3.org/2000/svg"
+						>
+							<rect x="2" y="2" width="76" height="44" rx="4" stroke="#33312E" stroke-width="2" />
+							<circle cx="24" cy="24" r="8" stroke="#33312E" stroke-width="2" />
+							<circle cx="56" cy="24" r="8" stroke="#33312E" stroke-width="2" />
+							<line x1="32" y1="24" x2="48" y2="24" stroke="#33312E" stroke-width="2" />
+							<rect
+								x="14"
+								y="6"
+								width="52"
+								height="12"
+								rx="2"
+								stroke="#33312E"
+								stroke-width="1.5"
+							/>
+						</svg>
+					</div>
+				</div>
+			</div>
+		{/if}
+	</section>
+</div>

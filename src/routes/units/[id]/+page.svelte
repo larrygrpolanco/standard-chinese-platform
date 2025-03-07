@@ -5,6 +5,7 @@
 	import { getCompleteUnit } from '$lib/supabase/client';
 	import Breadcrumb from '$lib/components/Breadcrumb.svelte';
 	import UnitContent from '$lib/components/UnitContent.svelte';
+    import Loader from '$lib/components/Loader.svelte';
 
 	let unitData = null;
 	let loading = true;
@@ -33,21 +34,7 @@
 
 <div class="mx-auto max-w-6xl px-4 py-8 font-sans sm:px-6 lg:px-8">
 	{#if loading}
-		<div class="py-20 text-center">
-			<div class="mx-auto mb-4 inline-block">
-				<!-- Vintage-style loading spinner that looks like a cassette tape spinning -->
-				<svg class="text-terracotta h-12 w-12 animate-spin" fill="none" viewBox="0 0 24 24">
-					<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1"
-					></circle>
-					<path
-						class="opacity-75"
-						fill="currentColor"
-						d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-					></path>
-				</svg>
-			</div>
-			<p class="text-charcoal font-serif">Loading lesson materials...</p>
-		</div>
+		<Loader />
 	{:else if error}
 		<div class="py-20 text-center">
 			<h1 class="text-terracotta mb-4 font-serif text-xl">{error}</h1>
