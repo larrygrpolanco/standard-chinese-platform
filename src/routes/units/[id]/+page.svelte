@@ -2,7 +2,12 @@
 <script>
 	import { page } from '$app/stores';
 	import { onMount } from 'svelte';
-	import { getCompleteUnit } from '$lib/supabase/client';
+	import {
+		getUnitBasicInfo,
+		getUnitReviewData,
+		getUnitExercisesData,
+		getUnitVocabularyData
+	} from '$lib/supabase/client';
 	import Breadcrumb from '$lib/components/Breadcrumb.svelte';
 	import UnitContent from '$lib/components/UnitContent.svelte';
 	import Loader from '$lib/components/Loader.svelte';
@@ -10,14 +15,52 @@
 	let unitData = null;
 	let loading = true;
 	let error = null;
+	let activeTab = 'review'; // Default tab
+
+	// Tab data holders
+	let tabData = {
+		review: null,
+		exercises: null,
+		vocabulary: null
+	};
+
+	// Load data for a specific tab
+	async function loadTabData(tab) {
+		if (!unitData?.id) return; // Only skip if we don't have unit ID
+
+		try {
+			switch (tab) {
+				case 'review':
+					tabData.review = await getUnitReviewData(unitData.id);
+					break;
+				case 'exercises':
+					tabData.exercises = await getUnitExercisesData(unitData.id);
+					break;
+				case 'vocabulary':
+					tabData.vocabulary = await getUnitVocabularyData(unitData.id);
+					break;
+			}
+		} catch (err) {
+			console.error(`Error loading ${tab} data:`, err);
+		}
+	}
+
+	// Handle tab change event from UnitContent
+	function handleTabChange(event) {
+		activeTab = event.detail.tabId;
+		loadTabData(activeTab);
+	}
 
 	onMount(async () => {
 		try {
 			const unitId = $page.params.id;
-			unitData = await getCompleteUnit(unitId);
+			unitData = await getUnitBasicInfo(unitId);
 
 			if (!unitData) {
 				error = 'Unit not found';
+			} else {
+				// Load initial tab data
+				await loadTabData(activeTab);
 			}
 		} catch (err) {
 			console.error('Error loading unit:', err);
@@ -26,6 +69,19 @@
 			loading = false;
 		}
 	});
+
+	function getAllTapes() {
+		// Safe access to ensure we don't try to use properties of undefined
+		const reviewTapes = tabData.review?.reviewTapes || [];
+		const workbookTapes = tabData.exercises?.workbookTapes || [];
+		console.log('getAllTapes called with:', {
+			reviewLoaded: !!tabData.review,
+			exercisesLoaded: !!tabData.exercises,
+			reviewTapesCount: reviewTapes.length,
+			workbookTapesCount: workbookTapes.length
+		});
+		return [...reviewTapes, ...workbookTapes];
+	}
 </script>
 
 <svelte:head>
@@ -73,11 +129,12 @@
 
 		<UnitContent
 			unit={unitData}
-			vocabulary={unitData.vocabulary}
-			reviewTapes={unitData.reviewTapes}
-			workbookTapes={unitData.workbookTapes}
-			dialogues={unitData.dialogues}
-			exercises={unitData.exercises}
+			vocabulary={tabData.vocabulary?.vocabulary || []}
+			tapes={getAllTapes()}
+			dialogues={tabData.review?.dialogues || []}
+			exercises={tabData.exercises?.exercises || []}
+			{activeTab}
+			on:tabChange={handleTabChange}
 		/>
 	{/if}
 </div>

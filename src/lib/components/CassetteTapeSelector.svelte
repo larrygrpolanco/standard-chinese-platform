@@ -1,33 +1,60 @@
-<!-- CassetteTapeSelector.svelte -->
+<!-- src/lib/components/CassetteTapeSelector.svelte -->
 <script>
 	import AudioPlayer from './AudioPlayer.svelte';
 	import { fly } from 'svelte/transition';
 	import { elasticOut, backOut } from 'svelte/easing';
-	import { createEventDispatcher } from 'svelte';
+	import { createEventDispatcher, onMount } from 'svelte';
 
 	const dispatch = createEventDispatcher();
 
 	// Props
 	export let tapes = []; // All tapes to choose from
-	export let tapeType = 'review'; // Type of tapes to filter (review, exercise, etc.)
+	export let tapeType = 'workbook'; // Type of tapes to filter (review, exercise, etc.)
 	export let initialTapePrefix = 'C-1'; // Default tape to select (e.g., C-1, P-1)
 
 	// State management
 	let selectedTapeId = null;
 	let previousTapeId = null;
 	let animateFromRight = true;
+	let hasMounted = false;
 
 	// Set directions based on toggle
 	$: inDirection = animateFromRight ? 300 : -300;
 	$: outDirection = animateFromRight ? -300 : 300;
 
 	// Filter tapes by type
-	$: filteredTapes = tapes.filter((tape) => tape.tape_type === tapeType);
+	$: filteredTapes =
+		tapeType === 'none'
+			? tapes // Skip filtering if tapeType is 'none'
+			: tapes.filter((tape) => tape.tape_type === tapeType);
 
-	// Get the currently selected tape
-	$: selectedTape =
-		tapes.find((tape) => tape.id === selectedTapeId) ||
-		(filteredTapes.length > 0 ? filteredTapes[0] : null);
+	$: console.log('CassetteTapeSelector filtered tapes:', filteredTapes);
+
+	// Handle tape data changes and update selection when needed
+	$: {
+		if (hasMounted && filteredTapes.length > 0) {
+			// If no tape is selected or the selected tape is no longer in the filtered list
+			const currentTapeExists =
+				selectedTapeId && filteredTapes.some((tape) => tape.id === selectedTapeId);
+
+			if (!currentTapeExists) {
+				// Try to find a tape with the initial prefix
+				const defaultTape = filteredTapes.find((tape) => tape.title.includes(initialTapePrefix));
+				// Or just use the first available tape
+				selectedTapeId = defaultTape ? defaultTape.id : filteredTapes[0].id;
+				console.log('Tape selection updated after data change:', selectedTapeId);
+			}
+		}
+	}
+
+	// Get the currently selected tape from the filtered list
+	$: selectedTape = selectedTapeId
+		? filteredTapes.find((tape) => tape.id === selectedTapeId)
+		: filteredTapes.length > 0
+			? filteredTapes[0]
+			: null;
+
+	$: console.log('CassetteTapeSelector selected tape:', selectedTape);
 
 	// Dispatch selected tape to parent
 	$: {
@@ -36,13 +63,16 @@
 		}
 	}
 
-	// Set initial selected tape based on prefix if available
-	$: {
-		if (!selectedTapeId && filteredTapes.length > 0) {
+	// Initialize when component mounts
+	onMount(() => {
+		if (filteredTapes.length > 0) {
+			// Try to find a tape with the initial prefix
 			const defaultTape = filteredTapes.find((tape) => tape.title.includes(initialTapePrefix));
 			selectedTapeId = defaultTape ? defaultTape.id : filteredTapes[0].id;
+			console.log('Initial tape selected on mount:', selectedTapeId);
 		}
-	}
+		hasMounted = true;
+	});
 
 	// Toggle animation direction whenever tape changes
 	$: {
@@ -63,11 +93,10 @@
 		const tapeNumber = tape.title.split('-')[1] || '';
 
 		if (tape.title.includes('C-')) {
-			return `Comprehension Tape ${tapeNumber}`;
+			return `Comprehension Tape-${tapeNumber}`;
 		} else if (tape.title.includes('P-')) {
-			return `Production Tape ${tapeNumber}`;
-		} else if (tape.title.includes('E-')) {
-			return `Exercise Tape ${tapeNumber}`;
+			return `Production Tape-${tapeNumber}`;
+
 		} else {
 			return tape.title; // Fallback to original title
 		}
@@ -75,6 +104,13 @@
 </script>
 
 <section class="section-container">
+	<!-- Debug info (can be removed later) -->
+	{#if tapes.length === 0}
+		<div class="debug-info mb-2 rounded bg-yellow-100 p-2 text-sm text-gray-700">
+			No tapes received by CassetteTapeSelector
+		</div>
+	{/if}
+
 	<!-- Tape Selection Tabs -->
 	<div class="tape-tabs-container mb-4 flex flex-wrap gap-2">
 		{#each filteredTapes as tape}
@@ -117,9 +153,13 @@
 					}}
 				>
 					{#if selectedTape && selectedTape.audio_file}
-						<div><AudioPlayer audioSrc={selectedTape.audio_file} /></div>
+						<div>
+							<AudioPlayer audioSrc={selectedTape.audio_file} />
+						</div>
 					{:else}
-						<div class="audio-placeholder">No audio available for this tape</div>
+						<div class="audio-placeholder">
+							{selectedTape ? 'No audio available for this tape' : 'No tape selected'}
+						</div>
 					{/if}
 				</div>
 			{/key}
@@ -137,11 +177,13 @@
 	.audio-player-grid-container {
 		display: grid;
 		margin: 0 auto;
+		background-color: var(--color-cream-paper);
 	}
 
 	/* This critical CSS ensures transitioning elements occupy same space */
 	.audio-player-grid-container > :global(*) {
 		grid-area: 1 / 1;
+		background-color: var(--color-cream-paper);
 	}
 
 	.audio-player-content {

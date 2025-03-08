@@ -55,12 +55,17 @@
 							class="nav-button svg h-4 w-4"
 							viewBox="0 0 24 24"
 							fill="none"
-							stroke="currentColor"
 						>
-							<polygon points="12,8 6,12 12,16" fill="currentColor" />
-							<polygon points="18,8 12,12 18,16" fill="currentColor" />
+							<path
+								d="M13 7L7 12L13 17M19 7L13 12L19 17"
+								stroke="currentColor"
+								stroke-width="2"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+							/>
 						</svg>
 					</button>
+
 					<button
 						class="nav-button"
 						class:disabled={isLast}
@@ -73,10 +78,14 @@
 							class="nav-button svg h-4 w-4"
 							viewBox="0 0 24 24"
 							fill="none"
-							stroke="currentColor"
 						>
-							<polygon points="6,8 12,12 6,16" fill="currentColor" />
-							<polygon points="12,8 18,12 12,16" fill="currentColor" />
+							<path
+								d="M5 7L11 12L5 17M11 7L17 12L11 17"
+								stroke="currentColor"
+								stroke-width="2"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+							/>
 						</svg>
 					</button>
 				</div>
@@ -360,10 +369,11 @@
 
 	/* Make sure SVG is visible */
 	.nav-button svg {
-		position: relative;
-		z-index: 2; /* Position above the pseudo-element */
-		width: 100%; /* Use available space */
+		position: absolute;
+		z-index: 2; 
+		width: 100%;
 		height: 100%;
+        
 	}
 
 	/* Hover and active states */

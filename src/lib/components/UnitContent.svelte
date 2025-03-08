@@ -1,21 +1,42 @@
 <!-- src/lib/components/UnitContent.svelte -->
 <script>
 	import { fade } from 'svelte/transition';
+	import { createEventDispatcher, onMount } from 'svelte';
+	import { getUnitExercisesData } from '$lib/supabase/client';
 	import TabSelector from './TabSelector.svelte';
 	import ReviewTab from './ReviewTab.svelte';
 	import ExercisesTab from './ExercisesTab.svelte';
 	import VocabularyTab from './VocabularyTab.svelte';
 	import AIPracticeTab from './AIPracticeTab.svelte';
 
+	const dispatch = createEventDispatcher();
+
 	// Props
+	export let unit;
 	export let vocabulary = [];
-	export let reviewTapes = [];
-	export let workbookTapes = [];
+	export let tapes = [];
 	export let dialogues = [];
 	export let exercises = [];
+	export let activeTab = 'review';
 
-	// Tab state
-	let activeTab = 'review'; // Default tab
+	// Direct data for exercises tab
+	let directWorkbookTapes = [];
+	let directExercises = [];
+	let isLoadingExercisesData = false;
+	let hasFetchedExercisesData = false;
+
+	$: reviewTapes = tapes.filter((tape) => tape.tape_type === 'review');
+	$: workbookTapes = tapes.filter((tape) => tape.tape_type === 'workbook');
+
+	// Fetch exercises data when tab changes or on initial load
+	$: if (
+		activeTab === 'exercises' &&
+		unit?.id &&
+		!hasFetchedExercisesData &&
+		!isLoadingExercisesData
+	) {
+		fetchExercisesData(unit.id);
+	}
 
 	// Tab data for easier management
 	const tabs = [
@@ -41,31 +62,71 @@
 			icon: `<svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>`
 		}
 	];
+
+	// Handle tab change and dispatch event up to parent
+	function handleTabChange(event) {
+		const newTab = event.detail.tabId;
+		if (newTab !== activeTab) {
+			dispatch('tabChange', { tabId: newTab });
+		}
+	}
+
+	// Fetch exercises data directly from Supabase
+	async function fetchExercisesData(unitId) {
+		console.log('Directly fetching exercises data for unit:', unitId);
+		isLoadingExercisesData = true;
+
+		try {
+			const { workbookTapes, exercises } = await getUnitExercisesData(unitId);
+
+			directWorkbookTapes = workbookTapes;
+			directExercises = exercises;
+			hasFetchedExercisesData = true;
+
+			console.log('Directly fetched workbook tapes:', directWorkbookTapes.length);
+			console.log('Directly fetched exercises:', directExercises.length);
+		} catch (error) {
+			console.error('Error directly fetching exercises data:', error);
+		} finally {
+			isLoadingExercisesData = false;
+		}
+	}
+
+	// Forward exercise change event from ExercisesTab
+	function handleExerciseChange(event) {
+		dispatch('exerciseChange', event.detail);
+	}
 </script>
 
 <div class="unit-content overflow-hidden rounded-lg border border-[#A0998A] bg-[#E8E5D7]">
-	<TabSelector {tabs} bind:activeTab />
+	<TabSelector {tabs} bind:activeTab on:tabChange={handleTabChange} />
 
 	<div class="content-area">
-		{#if activeTab === 'review'}
+		{#key activeTab}
 			<div transition:fade={{ duration: 200 }}>
-				<h3 class="section-header">Listening & Speaking Tapes</h3>
-				<ReviewTab {dialogues} tapes={reviewTapes} />
+				{#if activeTab === 'review'}
+					<h3 class="section-header">Listening & Speaking Tapes</h3>
+					<ReviewTab {dialogues} tapes={reviewTapes} />
+				{:else if activeTab === 'exercises'}
+					{#if isLoadingExercisesData}
+						<div class="loading-state p-4 text-center">
+							<p>Loading workbook tapes and exercises...</p>
+						</div>
+					{:else}
+						<ExercisesTab
+							exercises={directExercises.length > 0 ? directExercises : exercises}
+							tapes={directWorkbookTapes.length > 0 ? directWorkbookTapes : workbookTapes}
+							on:exerciseChange={handleExerciseChange}
+						/>
+					{/if}
+				{:else if activeTab === 'vocabulary'}
+					<h3 class="section-header">Vocabulary List</h3>
+					<VocabularyTab {vocabulary} />
+				{:else if activeTab === 'ai-practice'}
+					<AIPracticeTab />
+				{/if}
 			</div>
-		{:else if activeTab === 'exercises'}
-			<div transition:fade={{ duration: 200 }}>
-				<ExercisesTab {exercises} {workbookTapes} />
-			</div>
-		{:else if activeTab === 'vocabulary'}
-			<div transition:fade={{ duration: 200 }}>
-				<h3 class="section-header">Vocabulary List</h3>
-				<VocabularyTab {vocabulary} />
-			</div>
-		{:else if activeTab === 'ai-practice'}
-			<div transition:fade={{ duration: 200 }}>
-				<AIPracticeTab />
-			</div>
-		{/if}
+		{/key}
 	</div>
 </div>
 
@@ -78,10 +139,13 @@
 		overflow: hidden;
 		background-image: url('/textures/subtle-paper.png');
 		background-repeat: repeat;
+		margin-bottom: 32px; /* Add bottom margin to create space */
 	}
 
 	.content-area {
 		padding: 24px;
+		min-height: 450px;
+		position: relative;
 	}
 
 	.section-header {
@@ -107,6 +171,7 @@
 	@media (max-width: 768px) {
 		.content-area {
 			padding: 16px;
+			min-height: 350px; /* Adjusted for mobile */
 		}
 
 		.section-header {

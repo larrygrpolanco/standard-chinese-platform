@@ -312,7 +312,8 @@
 		display: flex;
 		flex-direction: column;
 		gap: 8px;
-		background-color: var(--color-cream-paper);
+		/* background-color: var(--color-cream-paper); */
+        background-color: #c5b59051;
 		border-radius: 6px;
 		padding: 12px;
 		box-shadow: inset 0 1px 3px rgba(51, 49, 46, 0.1);

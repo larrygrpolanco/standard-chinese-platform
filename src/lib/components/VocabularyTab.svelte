@@ -2,7 +2,7 @@
 <script>
 	import ChineseText from './ChineseText.svelte';
 
-	/** @type {Array<{ chinese_simplified: string, chinese_traditional: string, pinyin: string, english: string }>} - Array of vocabulary words. */
+	/** @type {Array<{ chinese_simplified: string, chinese_traditional: string, pinyin: string, english: string }>} */
 	export let vocabulary = [];
 </script>
 

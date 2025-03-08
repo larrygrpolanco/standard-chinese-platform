@@ -1,7 +1,7 @@
 <!-- TabSelector.svelte -->
 <script>
 	import { slide } from 'svelte/transition';
-	import { createEventDispatcher } from 'svelte';
+	import { createEventDispatcher, onMount, onDestroy } from 'svelte';
 
 	// Props
 	export let tabs = []; // Array of tab objects with id, label, icon, disabled properties
@@ -9,6 +9,7 @@
 
 	// Local state
 	let showMobileMenu = false;
+	let mobileSelector;
 
 	// Event dispatcher
 	const dispatch = createEventDispatcher();
@@ -19,6 +20,31 @@
 		showMobileMenu = false;
 		dispatch('tabChange', { tabId });
 	}
+
+	// Handle click outside to close dropdown
+	function handleClickOutside(event) {
+		if (mobileSelector && !mobileSelector.contains(event.target) && showMobileMenu) {
+			showMobileMenu = false;
+		}
+	}
+
+	// Handle window resize
+	function handleResize() {
+		if (window.innerWidth >= 768 && showMobileMenu) {
+			showMobileMenu = false;
+		}
+	}
+
+	// Lifecycle hooks
+	onMount(() => {
+		document.addEventListener('click', handleClickOutside);
+		window.addEventListener('resize', handleResize);
+	});
+
+	onDestroy(() => {
+		document.removeEventListener('click', handleClickOutside);
+		window.removeEventListener('resize', handleResize);
+	});
 
 	// Get current tab info
 	$: currentTab = tabs.find((tab) => tab.id === activeTab) || tabs[0] || {};
@@ -49,10 +75,13 @@
 	</div>
 
 	<!-- Tab Navigation - Mobile Version -->
-	<div class="mobile-tab-selector block md:hidden">
+	<div class="mobile-tab-selector block md:hidden" bind:this={mobileSelector}>
 		<button
 			class="vintage-selector-button"
-			on:click={() => (showMobileMenu = !showMobileMenu)}
+			on:click={(e) => {
+				e.stopPropagation(); // Prevent click from bubbling to document
+				showMobileMenu = !showMobileMenu;
+			}}
 			aria-expanded={showMobileMenu}
 			aria-controls="mobileTabs"
 		>
@@ -63,7 +92,11 @@
 			</span>
 
 			<!-- Vintage Dropdown Arrow -->
-			<svg class="vintage-selector-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+			<svg 
+				class="vintage-selector-icon {showMobileMenu ? 'rotate-180' : ''}" 
+				viewBox="0 0 24 24" 
+				xmlns="http://www.w3.org/2000/svg"
+			>
 				<circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1" fill="none" />
 				<path
 					d="M8 11L12 15L16 11"
@@ -77,7 +110,11 @@
 
 		<!-- Mobile Dropdown Menu -->
 		{#if showMobileMenu}
-			<div id="mobileTabs" class="vintage-selector-menu" transition:slide={{ duration: 300 }}>
+			<div 
+				id="mobileTabs" 
+				class="vintage-selector-menu" 
+				transition:slide={{ duration: 300 }}
+			>
 				{#each tabs as tab}
 					<button
 						class="vintage-selector-option {activeTab === tab.id ? 'active' : ''} {tab.disabled
@@ -164,6 +201,7 @@
 	.mobile-tab-selector {
 		position: relative;
 		border-bottom: 1px solid var(--color-warm-gray, #a0998a);
+		z-index: 20; /* Ensure dropdown shows above content */
 	}
 
 	.vintage-selector-button {
@@ -186,6 +224,10 @@
 		transition: transform 0.3s ease;
 		color: var(--color-warm-gray, #a0998a);
 	}
+	
+	.rotate-180 {
+		transform: rotate(180deg);
+	}
 
 	.vintage-selector-menu {
 		position: absolute;
@@ -193,7 +235,10 @@
 		width: 100%;
 		background-color: var(--color-cream-paper, #f4f1de);
 		border: 1px solid var(--color-warm-gray, #a0998a);
+		border-top: none;
 		box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+		max-height: 300px; /* Limit height with many options */
+		overflow-y: auto; /* Enable scrolling for many options */
 	}
 
 	.vintage-selector-option {
