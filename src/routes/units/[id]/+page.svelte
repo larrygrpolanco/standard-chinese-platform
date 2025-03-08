@@ -5,7 +5,7 @@
 	import { getCompleteUnit } from '$lib/supabase/client';
 	import Breadcrumb from '$lib/components/Breadcrumb.svelte';
 	import UnitContent from '$lib/components/UnitContent.svelte';
-    import Loader from '$lib/components/Loader.svelte';
+	import Loader from '$lib/components/Loader.svelte';
 
 	let unitData = null;
 	let loading = true;

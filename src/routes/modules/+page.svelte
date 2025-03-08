@@ -36,7 +36,7 @@
 <!-- Subtle paper texture background -->
 <div
 	class="min-h-screen bg-[#F4F1DE] pb-12"
-	style="background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAMAAAAp4XiDAAAAUVBMVEWFhYWDg4N3d3dtbW17e3t1dXWBgYGHh4d5eXlzc3OLi4ubm5uVlZWPj4+NjY19fX2JiYl/f39ra2uRkZGZmZlpaWmXl5dvb29xcXGTk5NnZ2c4zIiyAAAA70lEQVR4Ac2TWQoCQQxEc9fWbYrG3dz+/zMVBCHMZYoSPCQHTuo1bNdzlGUZx3GUphllHecPRQ7jOPa9Mk2hSFGbZZlzzmAwyHsvVW+IKnpnWVaW5TiOksSFyJcXojuOQ3S/rpGQBIAkOkgUYXsuQBTRPYGL1EAkY1dEVzz3jNi9CRBDdJESIkS1pEQRXdAoIkS3sQkQRXSIk4uQKCJAFNEVB4IQRQDQAYiii0URTgIiQeTLf0QA0QWtItpHPQmInwRESiLgTUZXKbRJFNH5SYPec86qqrrvu67DwCKngau6rvf7/R8BAFkOiU1BQQAAAABJRU5ErkJggg=='); background-repeat: repeat; background-blend-mode: overlay;"
+	style="background-image: url('/textures/subtle-paper.png'); background-repeat: repeat; background-blend-mode: overlay;"
 >
 	<Breadcrumb />
 
@@ -75,7 +75,7 @@
 
 		{#if loading}
 			<!-- Loading animation with spinning cassette reels -->
-			<Loader />
+				<Loader />
 		{:else}
 			<!-- Module cards grid -->
 			<div class="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">

@@ -1,450 +1,235 @@
-<!-- src/lib/components/CassetteTapeSelector.svelte -->
+<!-- CassetteTapeSelector.svelte -->
 <script>
-	import { slide } from 'svelte/transition';
+	import AudioPlayer from './AudioPlayer.svelte';
+	import { fly } from 'svelte/transition';
+	import { elasticOut, backOut } from 'svelte/easing';
+	import { createEventDispatcher } from 'svelte';
+
+	const dispatch = createEventDispatcher();
 
 	// Props
-	export let tabs = []; // Array of tab objects {id, label, icon, disabled}
-	export let activeTab; // Currently active tab ID
-	export let onTabChange = () => {}; // Function to call when tab changes
+	export let tapes = []; // All tapes to choose from
+	export let tapeType = 'review'; // Type of tapes to filter (review, exercise, etc.)
+	export let initialTapePrefix = 'C-1'; // Default tape to select (e.g., C-1, P-1)
 
-	// Local state for mobile dropdown
-	let isDropdownOpen = false;
+	// State management
+	let selectedTapeId = null;
+	let previousTapeId = null;
+	let animateFromRight = true;
 
-	// Toggle dropdown for mobile view
-	function toggleDropdown() {
-		isDropdownOpen = !isDropdownOpen;
-	}
+	// Set directions based on toggle
+	$: inDirection = animateFromRight ? 300 : -300;
+	$: outDirection = animateFromRight ? -300 : 300;
 
-	// Change the active tab
-	function selectTab(tabId) {
-		if (activeTab !== tabId) {
-			activeTab = tabId;
-			onTabChange(tabId);
-			isDropdownOpen = false; // Close dropdown after selection
+	// Filter tapes by type
+	$: filteredTapes = tapes.filter((tape) => tape.tape_type === tapeType);
+
+	// Get the currently selected tape
+	$: selectedTape =
+		tapes.find((tape) => tape.id === selectedTapeId) ||
+		(filteredTapes.length > 0 ? filteredTapes[0] : null);
+
+	// Dispatch selected tape to parent
+	$: {
+		if (selectedTape) {
+			dispatch('tapeChange', selectedTape);
 		}
 	}
 
-	// Get the currently active tab
-	$: currentTab = tabs.find((tab) => tab.id === activeTab) || tabs[0];
+	// Set initial selected tape based on prefix if available
+	$: {
+		if (!selectedTapeId && filteredTapes.length > 0) {
+			const defaultTape = filteredTapes.find((tape) => tape.title.includes(initialTapePrefix));
+			selectedTapeId = defaultTape ? defaultTape.id : filteredTapes[0].id;
+		}
+	}
+
+	// Toggle animation direction whenever tape changes
+	$: {
+		if (selectedTapeId !== previousTapeId && selectedTapeId !== null) {
+			// Only toggle after the first selection
+			if (previousTapeId !== null) {
+				animateFromRight = !animateFromRight;
+			}
+			previousTapeId = selectedTapeId;
+		}
+	}
+
+	// Generate display title for the UI
+	function getTapeDisplayTitle(tape) {
+		if (!tape) return '';
+
+		// Extract the number from the tape title (e.g., "C-1" -> "1")
+		const tapeNumber = tape.title.split('-')[1] || '';
+
+		if (tape.title.includes('C-')) {
+			return `Comprehension Tape ${tapeNumber}`;
+		} else if (tape.title.includes('P-')) {
+			return `Production Tape ${tapeNumber}`;
+		} else if (tape.title.includes('E-')) {
+			return `Exercise Tape ${tapeNumber}`;
+		} else {
+			return tape.title; // Fallback to original title
+		}
+	}
 </script>
 
-<div class="cassette-player">
-	<!-- Desktop view: Show all tapes side by side with one inserted -->
-	<div class="cassette-rack desktop-only">
-		{#each tabs as tab}
+<section class="section-container">
+	<!-- Tape Selection Tabs -->
+	<div class="tape-tabs-container mb-4 flex flex-wrap gap-2">
+		{#each filteredTapes as tape}
 			<button
-				class="cassette-tape {tab.id === activeTab ? 'active' : ''} {tab.disabled
-					? 'disabled'
-					: ''}"
-				on:click={() => !tab.disabled && selectTab(tab.id)}
-				disabled={tab.disabled}
-				aria-current={tab.id === activeTab ? 'page' : undefined}
-				title={tab.disabled ? `${tab.label} (Coming Soon)` : tab.label}
+				class="tape-tab {selectedTapeId === tape.id ? 'active' : ''}"
+				on:click={() => (selectedTapeId = tape.id)}
+				aria-pressed={selectedTapeId === tape.id}
 			>
-				<div class="cassette-shell">
-					<div class="cassette-label">
-						{#if tab.icon}
-							<span class="cassette-icon">
-								{@html tab.icon}
-							</span>
-						{/if}
-						<span class="cassette-text">{tab.label}</span>
-						{#if tab.disabled}
-							<span class="coming-soon-badge">Coming Soon</span>
-						{/if}
-					</div>
-					<div class="cassette-reels">
-						<div class="reel left-reel"></div>
-						<div class="reel right-reel"></div>
-					</div>
-					<div class="cassette-windows">
-						<div class="window"></div>
-						<div class="window"></div>
-					</div>
-				</div>
+				<svg
+					class="mr-2 h-4 w-4"
+					viewBox="0 0 24 24"
+					fill="none"
+					stroke="currentColor"
+					stroke-width="2"
+				>
+					<circle cx="12" cy="12" r="10" />
+					<circle cx="12" cy="12" r="3" />
+				</svg>
+				{getTapeDisplayTitle(tape)}
 			</button>
 		{/each}
 	</div>
 
-	<!-- Mobile view: Show current tape with dropdown -->
-	<div class="cassette-player-mobile mobile-only">
-		<button class="current-tape" on:click={toggleDropdown} aria-expanded={isDropdownOpen}>
-			<div class="cassette-shell">
-				<div class="cassette-label">
-					{#if currentTab.icon}
-						<span class="cassette-icon">
-							{@html currentTab.icon}
-						</span>
-					{/if}
-					<span class="cassette-text">{currentTab.label}</span>
-					{#if currentTab.disabled}
-						<span class="coming-soon-badge">Coming Soon</span>
+	<!-- Audio Player Container with animation -->
+	<div class="audio-player-wrapper bg-beige border-warm-gray rounded-lg border">
+		<div class="audio-player-grid-container">
+			{#key selectedTapeId}
+				<div
+					class="audio-player-content p-4"
+					in:fly={{
+						x: inDirection,
+						duration: 600,
+						delay: 300,
+						easing: elasticOut
+					}}
+					out:fly={{
+						x: outDirection,
+						duration: 300,
+						easing: backOut
+					}}
+				>
+					{#if selectedTape && selectedTape.audio_file}
+						<div><AudioPlayer audioSrc={selectedTape.audio_file} /></div>
+					{:else}
+						<div class="audio-placeholder">No audio available for this tape</div>
 					{/if}
 				</div>
-				<div class="cassette-reels">
-					<div class="reel left-reel"></div>
-					<div class="reel right-reel"></div>
-				</div>
-				<div class="cassette-windows">
-					<div class="window"></div>
-					<div class="window"></div>
-				</div>
-			</div>
-			<div class="dropdown-indicator">
-				<svg viewBox="0 0 20 20" fill="currentColor" class="h-5 w-5">
-					<path
-						fill-rule="evenodd"
-						d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-						clip-rule="evenodd"
-					/>
-				</svg>
-			</div>
-		</button>
-
-		{#if isDropdownOpen}
-			<div class="cassette-dropdown" transition:slide={{ duration: 200 }}>
-				{#each tabs as tab}
-					{#if tab.id !== activeTab}
-						<button
-							class="cassette-tape-option {tab.disabled ? 'disabled' : ''}"
-							on:click={() => !tab.disabled && selectTab(tab.id)}
-							disabled={tab.disabled}
-						>
-							{#if tab.icon}
-								<span class="cassette-icon">
-									{@html tab.icon}
-								</span>
-							{/if}
-							<span>{tab.label}</span>
-							{#if tab.disabled}
-								<span class="option-badge">Coming Soon</span>
-							{/if}
-						</button>
-					{/if}
-				{/each}
-			</div>
-		{/if}
+			{/key}
+		</div>
 	</div>
-</div>
+</section>
 
 <style>
-	.cassette-player {
-		width: 100%;
+	.audio-player-wrapper {
 		position: relative;
-		font-family: 'Work Sans', sans-serif;
-	}
-
-	/* Desktop Layout */
-	.cassette-rack {
-		display: flex;
-		gap: 8px;
-		padding: 12px;
-		border-radius: 8px;
-		position: relative;
-		justify-content: center;
-	}
-
-	.cassette-tape {
-		position: relative;
-		border: none;
-		background: transparent;
-		padding: 0;
-		cursor: pointer;
-		transition:
-			transform 0.3s ease,
-			filter 0.2s ease;
-		width: 110px;
-		transform-origin: center bottom;
-		filter: saturate(0.8) brightness(0.95);
-		margin: 0 4px;
-	}
-
-	.cassette-tape:not(.active):not(.disabled):hover {
-		transform: translateY(-8px);
-		filter: saturate(1) brightness(1.05);
-		z-index: 2;
-	}
-
-	.cassette-tape.active {
-		filter: saturate(1.2) brightness(1.1);
-		transform: translateY(-16px) scale(1.05);
-		z-index: 3;
-	}
-
-	.cassette-tape.disabled {
-		opacity: 0.5;
-		cursor: not-allowed;
-		filter: grayscale(0.5);
-	}
-
-	.cassette-shell {
-		width: 100%;
-		aspect-ratio: 3/2;
-		background-color: var(--color-muted-navy, #34667f);
-		border-radius: 6px;
-		padding: 4px;
-		box-shadow:
-			0 2px 4px rgba(0, 0, 0, 0.2),
-			inset 0 1px 2px rgba(255, 255, 255, 0.2);
-		display: flex;
-		flex-direction: column;
-		position: relative;
+		min-height: 180px;
 		overflow: hidden;
 	}
 
-	.active .cassette-shell {
-		background-color: var(--color-terracotta, #c17c74);
+	.audio-player-grid-container {
+		display: grid;
+		margin: 0 auto;
 	}
 
-	/* Different colors for different tapes */
-	.cassette-tape:nth-child(2) .cassette-shell {
-		background-color: var(--color-avocado-green, #7d8c5c);
+	/* This critical CSS ensures transitioning elements occupy same space */
+	.audio-player-grid-container > :global(*) {
+		grid-area: 1 / 1;
 	}
 
-	.cassette-tape:nth-child(3) .cassette-shell {
-		background-color: var(--color-gold, #ddb967);
+	.audio-player-content {
+		width: 100%;
 	}
 
-	.cassette-tape.active .cassette-shell {
-		background-color: var(--color-terracotta, #c17c74);
-	}
-
-	.cassette-label {
-		flex: 1;
-		background-color: var(--color-cream-paper, #f4f1de);
-		border-radius: 4px;
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		justify-content: center;
-		padding: 6px;
-		gap: 4px;
-		box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
+	/* Mechanical styling for tape tabs */
+	.tape-tab {
 		position: relative;
+		display: inline-flex;
+		align-items: center;
+		padding: 8px 12px;
+		font-size: 0.875rem;
+		font-weight: 600;
+		color: var(--color-charcoal);
+		background-color: var(--color-cream-paper);
+		border: 1px solid var(--color-warm-gray);
+		border-radius: 6px;
+		transition: all 0.1s ease;
+		transform: translateZ(0);
 	}
 
-	.cassette-label::after {
+	/* Button shadow and 3D effect */
+	.tape-tab::before {
 		content: '';
 		position: absolute;
 		top: 0;
 		left: 0;
-		right: 0;
-		bottom: 0;
-		background-image: repeating-linear-gradient(
-			-45deg,
-			transparent,
-			transparent 2px,
-			rgba(0, 0, 0, 0.03) 2px,
-			rgba(0, 0, 0, 0.03) 4px
-		);
-		pointer-events: none;
-	}
-
-	.cassette-icon {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		margin-bottom: 2px;
-	}
-
-	.cassette-icon svg {
-		width: 18px;
-		height: 18px;
-		color: var(--color-charcoal, #33312e);
-		opacity: 0.8;
-	}
-
-	.cassette-text {
-		font-size: 0.8rem;
-		font-weight: 600;
-		text-align: center;
-		color: var(--color-charcoal, #33312e);
-		line-height: 1.2;
-	}
-
-	.coming-soon-badge {
-		position: absolute;
-		bottom: 2px;
-		right: 2px;
-		background-color: var(--color-warm-gray, #a0998a);
-		color: white;
-		font-size: 0.55rem;
-		font-weight: 600;
-		padding: 1px 4px;
-		border-radius: 4px;
-		opacity: 0.8;
-		transform: rotate(-3deg);
-	}
-
-	.cassette-reels {
-		display: flex;
-		justify-content: space-between;
-		padding: 6px 20%;
-		margin-top: 4px;
-		position: relative;
-		z-index: 1;
-	}
-
-	.reel {
-		width: 20px;
-		height: 20px;
-		border-radius: 50%;
-		background-color: var(--color-beige, #e8e5d7);
-		border: 2px solid var(--color-warm-gray, #a0998a);
-		position: relative;
-	}
-
-	.reel::before {
-		content: '';
-		position: absolute;
-		top: 50%;
-		left: 50%;
-		width: 6px;
-		height: 6px;
-		border-radius: 50%;
-		background-color: var(--color-warm-gray, #a0998a);
-		transform: translate(-50%, -50%);
-	}
-
-	.cassette-windows {
-		position: absolute;
-		left: 0;
-		right: 0;
-		bottom: 4px;
-		display: flex;
-		justify-content: space-between;
-		padding: 0 5%;
-		pointer-events: none;
-	}
-
-	.window {
-		width: 40%;
-		height: 8px;
-		background-color: rgba(0, 0, 0, 0.3);
-		border-radius: 2px;
-	}
-
-	.active .reel {
-		animation: rotate 8s linear infinite;
-	}
-
-	.active .left-reel {
-		animation-direction: reverse;
-	}
-
-	/* Mobile Layout */
-	.cassette-player-mobile {
 		width: 100%;
-		position: relative;
-	}
-
-	.current-tape {
-		width: 100%;
+		height: 100%;
 		background: transparent;
-		border: none;
-		padding: 0;
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		cursor: pointer;
-	}
-
-	.current-tape .cassette-shell {
-		width: calc(100% - 40px);
-		max-width: 220px;
-	}
-
-	.dropdown-indicator {
-		width: 32px;
-		height: 32px;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		background-color: var(--color-cream-paper, #f4f1de);
-		border-radius: 50%;
-		border: 1px solid var(--color-warm-gray, #a0998a);
-		box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-		transition: transform 0.2s ease;
-		margin-left: 8px;
-	}
-
-	.current-tape:hover .dropdown-indicator {
-		transform: translateY(2px);
-	}
-
-	.cassette-dropdown {
-		position: absolute;
-		top: calc(100% + 8px);
-		left: 0;
-		right: 0;
-		background-color: var(--color-cream-paper, #f4f1de);
-		border: 1px solid var(--color-warm-gray, #a0998a);
-		border-radius: 8px;
-		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-		z-index: 10;
-		padding: 8px;
-		display: flex;
-		flex-direction: column;
-		gap: 4px;
-	}
-
-	.cassette-tape-option {
-		display: flex;
-		align-items: center;
-		gap: 12px;
-		padding: 12px;
-		border: none;
-		background-color: var(--color-beige, #e8e5d7);
 		border-radius: 6px;
-		cursor: pointer;
-		text-align: left;
-		transition: background-color 0.2s ease;
-		position: relative;
+		box-shadow:
+			0 5px 0 0 var(--color-button-shadow),
+			inset 0 -1px 0 rgba(0, 0, 0, 0.2),
+			inset 0 1px 0 rgba(255, 255, 255, 0.7),
+			0 6px 4px rgba(0, 0, 0, 0.15);
+		transition: all 0.1s ease;
+		z-index: -1;
 	}
 
-	.cassette-tape-option:hover:not(.disabled) {
-		background-color: var(--color-gold, #ddb967);
+	.tape-tab:hover:not(.active) {
+		background-color: rgba(221, 185, 103, 0.2);
+		transform: translateY(-1px);
 	}
 
-	.cassette-tape-option.disabled {
-		opacity: 0.5;
-		cursor: not-allowed;
+	.tape-tab:hover:not(.active)::before {
+		box-shadow:
+			0 6px 0 0 var(--color-button-shadow),
+			inset 0 -1px 0 rgba(0, 0, 0, 0.2),
+			inset 0 1px 0 rgba(255, 255, 255, 0.7),
+			0 7px 4px rgba(0, 0, 0, 0.15);
 	}
 
-	.option-badge {
-		position: absolute;
-		right: 8px;
-		top: 50%;
-		transform: translateY(-50%);
-		font-size: 0.7rem;
-		background-color: var(--color-warm-gray, #a0998a);
-		color: white;
-		padding: 2px 6px;
-		border-radius: 20px;
+	/* Pressed state */
+	.tape-tab.active {
+		background-color: var(--color-gold);
+		color: var(--color-charcoal);
+		transform: translateY(5px);
 	}
 
-	/* Responsive helpers */
-	.mobile-only {
-		display: none;
+	.tape-tab.active::before {
+		box-shadow:
+			0 0 0 0 var(--color-button-shadow),
+			inset 0 -1px 0 rgba(0, 0, 0, 0.2),
+			inset 0 1px 0 rgba(255, 255, 255, 0.7),
+			0 1px 2px rgba(0, 0, 0, 0.1);
 	}
 
-	@media (max-width: 768px) {
-		.desktop-only {
-			display: none;
-		}
-
-		.mobile-only {
-			display: block;
-		}
+	.tape-tab:active {
+		transform: translateY(5px);
 	}
 
-	/* Animation for reels */
-	@keyframes rotate {
-		0% {
-			transform: rotate(0deg);
-		}
-		100% {
-			transform: rotate(360deg);
-		}
+	.tape-tab:active::before {
+		box-shadow:
+			0 0 0 0 var(--color-button-shadow),
+			inset 0 -1px 0 rgba(0, 0, 0, 0.2),
+			inset 0 1px 0 rgba(255, 255, 255, 0.7),
+			0 1px 2px rgba(0, 0, 0, 0.1);
+	}
+
+	.audio-placeholder {
+		padding: 16px;
+		background-color: var(--color-cream-paper);
+		border: 1px dashed var(--color-warm-gray);
+		border-radius: 8px;
+		color: var(--color-warm-gray);
+		text-align: center;
+		font-style: italic;
 	}
 </style>

@@ -179,12 +179,14 @@
 					<div class="tape-path">
 						<div class="tape-top"></div>
 						<div class="tape-roller tape-roller-left"></div>
-						<div
-							class="tape-middle"
-							class:move-left={(playing || scrubbing) && isMovingForward}
-							class:move-right={(playing || scrubbing) && !isMovingForward}
-							style="--tape-duration: {tapeAnimationDuration}s;"
-						></div>
+						{#key isMovingForward + tapeAnimationDuration}
+							<div
+								class="tape-middle"
+								class:move-left={(playing || scrubbing) && isMovingForward}
+								class:move-right={(playing || scrubbing) && !isMovingForward}
+								style="--tape-duration: {tapeAnimationDuration}s;"
+							></div>
+						{/key}
 						<div class="tape-roller tape-roller-right"></div>
 						<div class="tape-bottom"></div>
 					</div>

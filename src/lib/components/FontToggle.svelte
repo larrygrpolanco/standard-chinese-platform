@@ -5,9 +5,14 @@
 	// Optional props for customization
 	export let compact = false;
 	export let label = 'Character Style:';
+
+	// Common button classes to improve maintainability
+	const buttonBaseClasses = 'relative rounded px-3 py-1 text-sm transition-all';
+	const buttonActiveClasses = 'bg-gold text-charcoal shadow-inner';
+	const buttonInactiveClasses = 'text-warm-gray';
 </script>
 
-<div class="vintage-switch-container {compact ? 'compact' : ''}">
+<div class={compact ? 'compact' : ''}>
 	<div class="flex items-center gap-2">
 		{#if label}
 			<span class="text-charcoal text-sm">{label}</span>
@@ -16,19 +21,25 @@
 			class="vintage-switch bg-cream-paper border-warm-gray flex rounded-md border p-1 shadow-inner"
 		>
 			<button
-				class={`relative rounded px-3 py-1 text-sm transition-all ${$fontPreferences.displayMode === 'simplified' ? 'bg-gold text-charcoal shadow-inner' : 'text-warm-gray'}`}
+				class="{buttonBaseClasses} {$fontPreferences.displayMode === 'simplified'
+					? buttonActiveClasses
+					: buttonInactiveClasses}"
 				on:click={() => fontPreferences.update((p) => ({ ...p, displayMode: 'simplified' }))}
 			>
 				简体字
 			</button>
 			<button
-				class={`relative rounded px-3 py-1 text-sm transition-all ${$fontPreferences.displayMode === 'traditional' ? 'bg-gold text-charcoal shadow-inner' : 'text-warm-gray'}`}
+				class="{buttonBaseClasses} {$fontPreferences.displayMode === 'traditional'
+					? buttonActiveClasses
+					: buttonInactiveClasses}"
 				on:click={() => fontPreferences.update((p) => ({ ...p, displayMode: 'traditional' }))}
 			>
 				繁體字
 			</button>
 			<button
-				class={`relative rounded px-3 py-1 text-sm transition-all ${$fontPreferences.displayMode === 'pinyin' ? 'bg-gold text-charcoal shadow-inner' : 'text-warm-gray'}`}
+				class="{buttonBaseClasses} {$fontPreferences.displayMode === 'pinyin'
+					? buttonActiveClasses
+					: buttonInactiveClasses}"
 				on:click={() => fontPreferences.update((p) => ({ ...p, displayMode: 'pinyin' }))}
 			>
 				Pīnyīn

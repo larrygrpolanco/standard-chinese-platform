@@ -1,4 +1,4 @@
-<!-- src/lib/components/VocabularyDisplay.svelte -->
+<!-- VocabularyTab.svelte -->
 <script>
 	import ChineseText from './ChineseText.svelte';
 
@@ -13,7 +13,8 @@
 			<table class="vocabulary-table">
 				<thead>
 					<tr>
-						<th class="chinese-column">Chinese</th>
+						<th class="simplified-column">Simplified</th>
+						<th class="traditional-column">Traditional</th>
 						<th class="pinyin-column">Pinyin</th>
 						<th class="english-column">English</th>
 					</tr>
@@ -22,11 +23,10 @@
 					{#each vocabulary as word}
 						<tr>
 							<td class="chinese-cell">
-								<ChineseText
-									simplified={word.chinese_simplified}
-									traditional={word.chinese_traditional}
-									showPinyin={false}
-								/>
+								<span class="chinese-text" lang="zh">{word.chinese_simplified}</span>
+							</td>
+							<td class="chinese-cell">
+								<span class="chinese-text" lang="zh">{word.chinese_traditional}</span>
 							</td>
 							<td class="pinyin-cell">
 								{word.pinyin}
@@ -91,20 +91,32 @@
 		background-color: rgba(193, 124, 116, 0.05);
 	}
 
-	.chinese-column {
-		width: 30%;
+	/* Column width ratio: 
+	   - Simplified, Traditional, Pinyin equally sharing 2/3 of the width
+	   - English taking 1/3 of the width */
+	.simplified-column {
+		width: 22.22%; /* 2/9 of the table (2/3 ÷ 3) */
+	}
+
+	.traditional-column {
+		width: 22.22%; /* 2/9 of the table (2/3 ÷ 3) */
 	}
 
 	.pinyin-column {
-		width: 30%;
+		width: 22.22%; /* 2/9 of the table (2/3 ÷ 3) */
 	}
 
 	.english-column {
-		width: 40%;
+		width: 33.33%; /* 1/3 of the table */
 	}
 
 	.chinese-cell {
-		font-size: 1.25em;
+		font-size: 1em;
+	}
+
+	.chinese-text {
+		font-family: 'Noto Sans SC', 'Noto Sans TC', sans-serif;
+		color: var(--color-charcoal, #33312e);
 	}
 
 	.pinyin-cell {
