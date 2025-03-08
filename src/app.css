@@ -1,4 +1,4 @@
-/* app.css or global.css */
+/* app.css */
 @import url('https://fonts.googleapis.com/css2?family=Arvo:wght@400;700&family=DM+Serif+Display&family=Work+Sans:wght@300;400;500;600;700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&family=Noto+Sans+TC:wght@400;500;700&display=swap');
 @import 'tailwindcss';
@@ -247,30 +247,51 @@ a:hover {
 	padding: var(--space-5);
 }
 
+/* CRT Effects - Retro screen styling */
+.crt-effect {
+	background: --color-cream-paper;
+	padding: 20px;
+	border-radius: 5px;
+	box-shadow:
+		inset 0 0 10px #0ff,
+		0 0 20px rgba(0, 255, 255, 0.5);
+}
 
 /* Scanlines overlay */
 .crt-effect::after {
-  content: "";
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(
-    rgba(18, 16, 16, 0) 50%,
-    rgba(0, 0, 0, 0.25) 50%
-  );
-  background-size: 100% 4px;
-  pointer-events: none;
-  z-index: 999;
+	content: '';
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%);
+	background-size: 100% 4px;
+	pointer-events: none;
+	z-index: 999;
 }
 
-/* CRT curvature effect */
-.crt-effect {
-  background: #000;
-  padding: 20px;
-  border-radius: 5px;
-  box-shadow: 
-    inset 0 0 10px #0ff,
-    0 0 20px rgba(0, 255, 255, 0.5);
+/* Additional CRT variant for local effects (doesn't overlay entire screen) */
+.crt-effect-local {
+	position: relative;
+	background: --color-cream-paper;
+	padding: 20px;
+	border-radius: 5px;
+	box-shadow:
+		inset 0 0 10px #0ff,
+		0 0 20px rgba(0, 255, 255, 0.5);
+	overflow: hidden;
+}
+
+.crt-effect-local::after {
+	content: '';
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%);
+	background-size: 100% 4px;
+	pointer-events: none;
+	z-index: 1;
 }
