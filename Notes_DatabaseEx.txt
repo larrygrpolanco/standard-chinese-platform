@@ -1,0 +1,271 @@
+Database sql files
+
+vocabulary_rows.sql
+
+INSERT INTO "public"."vocabulary" ("id", "unit_id", "chinese_simplified", "chinese_traditional", "pinyin", "english", "order_num") VALUES ('411', '41', '从', '從', 'cóng', 'from', '1'), ('412', '41', '到', '到', 'dào', 'to; towards', '2'), ('413', '41', '对', '對', 'duì', 'to be correct', '3'), ('414', '41', '饭馆儿', '飯館兒', 'fànguǎnr', 'restaurant (Běijīng)', '4'), ('415', '41', '饭馆子', '飯館子', 'fànguǎnzi', 'restaurant (Táiběi)', '5'), ('416', '41', '房子', '房子', 'fángzi', 'house', '6'), ('417', '41', '华美咖啡厅', '華美咖啡廳', 'Huáměi Kāfēiting', 'Huáměi Coffeehouse (Táiběi)', '7'), ('418', '41', '就', '就', 'jiù', 'then', '8'), ('419', '41', '咖啡厅', '咖啡廳', 'kāfēiting', 'coffeehouse', '9'), ('611', '61', '比', '比', 'bǐ', 'compared with; than', '1'), ('612', '61', '当面', '當面', 'dāngmiàn', 'in person; face to face', '2'), ('613', '61', '对', '對', 'duì', 'to; towards; with regard to; with respect to', '3'), ('614', '61', '功夫', '功夫', 'gōngfu', 'free time; spare time', '4'), ('615', '61', '合适', '合適', 'héshì', 'to be suitable; to be appropriate; to fit', '5'), ('616', '61', '回不来', '回不來', 'huíbulái', 'to be unable to get back', '6'), ('617', '61', '回得来', '回得來', 'huídelái', 'to be able to get back in time', '7'), ('618', '61', '会客室', '會客室', 'huìkèshì (huìkeshì)', 'reception room', '8'), ('619', '61', '科长', '科長', 'kēzhǎng', 'section chief', '9'), ('4110', '41', '路口', '路口', 'lùkǒu(r)', 'intersection', '10'), ('4111', '41', '铺子', '鋪子', 'pùzi', 'store; shop (Běijīng)', '11'), ('4112', '41', '去', '去', 'qù', 'to go', '12'), ('4113', '41', '然后', '然後', 'ránhòu', 'afterwards; after that', '13'), ('4114', '41', '商店', '商店', 'shāngdiàn', 'store; shop (Táiběi)', '14'), ('4115', '41', '往', '往', 'wǎng (wàng)', 'to; towards', '15'), ('4116', '41', '先', '先', 'xiān', 'first; ahead of time', '16'), ('4117', '41', '向', '向', 'xiàng', 'towards', '17'), ('4118', '41', '学校', '學校', 'xuéxiào', 'school', '18'), ('4119', '41', '一直', '一直', 'yīzhí', 'straight', '19'), ('4120', '41', '右', '右', 'yòu', 'right (direction)', '20'), ('4121', '41', '再', '再', 'zài', 'then (in commands)', '21'), ('4122', '41', '知道', '知道', 'zhīdào', 'to know', '22'), ('4123', '41', '走', '走', 'zǒu', 'to go', '23'), ('4124', '41', '左', '左', 'zuǒ', 'left (direction)', '24'), ('6110', '61', '空', '空', 'kòng(r)', 'free time; spare time', '10'), ('6111', '61', '楼上', '樓上', 'lóushàng', 'upstairs', '11'), ('6112', '61', '楼下', '樓下', 'lóuxià', 'downstairs', '12'), ('6113', '61', '那么', '那麼', 'nàme', 'well; then; in that case', '13'), ('6114', '61', '商量', '商量', 'shāngliang', 'to discuss; to talk over', '14'), ('6115', '61', '谈', '談', 'tán', 'to chat; to talk about', '15'), ('6116', '61', '喂', '喂', 'wéi', 'hello (telephone greeting)', '16'), ('6117', '61', '也许', '也許', 'yěxǔ', 'perhaps; maybe', '17'), ('6118', '61', '一会儿', '一會兒', 'yīhuìr', 'a moment', '18'), ('6119', '61', '有功夫', '有功夫', 'yǒu gōngfu', 'to have free time', '19'), ('6120', '61', '有空', '有空', 'yǒu kòng(r)', 'to have free time', '20');
+
+
+
+units_rows.sql
+
+INSERT INTO "public"."units" ("id", "module_id", "title", "description", "order_num") VALUES ('41', '4', 'Unit 1', 'The prepositional verbs dào, "to"; cóng, "from"; wàng, "towards"; and xiàng, "towards"', '1'), ('61', '6', 'Unit 1', 'Making an appointment', '1');
+
+
+
+tapes_rows.sql
+
+INSERT INTO "public"."tapes" ("id", "unit_id", "title", "tape_type", "audio_file", "order_num") VALUES ('411', '41', 'C-1', 'review', 'https://mgujzfobtdqargxdnaai.supabase.co/storage/v1/object/public/audio-tapes/module-4/unit-1/FSI%20-%20Standard%20Chinese%20-%20Module%2004%20DIR%20-%20Unit%2001%20-%20Tape%201C-1.mp3', '1'), ('412', '41', 'P-1', 'review', 'https://mgujzfobtdqargxdnaai.supabase.co/storage/v1/object/public/audio-tapes/module-4/unit-1/FSI%20-%20Standard%20Chinese%20-%20Module%2004%20DIR%20-%20Unit%2001%20-%20Tape%201P-1.mp3', '2'), ('611', '61', 'C-1', 'review', 'https://mgujzfobtdqargxdnaai.supabase.co/storage/v1/object/public/audio-tapes/module-6/unit-1/FSI%20-%20Standard%20Chinese%20-%20Module%2006%20MTG%20-%20Unit%2001%20-%20Tape%201C-1.mp3', '1'), ('612', '61', 'P-1', 'review', 'https://mgujzfobtdqargxdnaai.supabase.co/storage/v1/object/public/audio-tapes/module-6/unit-1/FSI%20-%20Standard%20Chinese%20-%20Module%2006%20MTG%20-%20Unit%2001%20-%20Tape%201P-1.mp3', '2'), ('4131', '41', 'C-2 Exercise 1', 'workbook', null, '1'), ('4132', '41', 'C-2 Exercise 2', 'workbook', null, '2'), ('4133', '41', 'C-2 Exercise 3', 'workbook', null, '3'), ('4134', '41', 'Dialect Listening Exercise', 'workbook', null, '4'), ('4141', '41', 'P-2 Exercise 1', 'workbook', null, '1'), ('4142', '41', 'P-2 Exercise 2', 'workbook', null, '2'), ('4143', '41', 'P-2 Exercise 3', 'workbook', null, '3'), ('6131', '61', 'C-2 Exercise 1', 'workbook', 'https://mgujzfobtdqargxdnaai.supabase.co/storage/v1/object/public/audio-tapes/module-6/unit-1/FSI%20-%20Standard%20Chinese%20-%20Module%2006%20MTG%20-%20Unit%2001%20-%20Tape%201C-2.mp3', '1'), ('6132', '61', 'C-2 Exercise 2', 'workbook', 'https://mgujzfobtdqargxdnaai.supabase.co/storage/v1/object/public/audio-tapes/module-6/unit-1/FSI%20-%20Standard%20Chinese%20-%20Module%2006%20MTG%20-%20Unit%2001%20-%20Tape%201C-2.mp3', '2'), ('6133', '61', 'C-2 Exercise 3', 'workbook', 'https://mgujzfobtdqargxdnaai.supabase.co/storage/v1/object/public/Audio%20Tapes/Module%206%20Unit%201/FSI%20-%20Standard%20Chinese%20-%20Module%2005%20TRN%20-%20Unit%2001%20-%20Tape%201C-2.mp3', '3'), ('6134', '61', 'C-2 Exercise 4', 'workbook', 'https://mgujzfobtdqargxdnaai.supabase.co/storage/v1/object/public/Audio%20Tapes/Module%206%20Unit%201/FSI%20-%20Standard%20Chinese%20-%20Module%2005%20TRN%20-%20Unit%2001%20-%20Tape%201C-2.mp3', '4'), ('6141', '61', 'P-2 Exercise 1', 'workbook', 'https://mgujzfobtdqargxdnaai.supabase.co/storage/v1/object/public/audio-tapes/module-6/unit-1/FSI%20-%20Standard%20Chinese%20-%20Module%2006%20MTG%20-%20Unit%2001%20-%20Tape%201P-2.mp3', '1'), ('6142', '61', 'P-2 Exercise 2', 'workbook', 'https://mgujzfobtdqargxdnaai.supabase.co/storage/v1/object/public/audio-tapes/module-6/unit-1/FSI%20-%20Standard%20Chinese%20-%20Module%2006%20MTG%20-%20Unit%2001%20-%20Tape%201P-2.mp3', '2'), ('6143', '61', 'P-2 Exercise 3', 'workbook', 'https://mgujzfobtdqargxdnaai.supabase.co/storage/v1/object/public/audio-tapes/module-6/unit-1/FSI%20-%20Standard%20Chinese%20-%20Module%2006%20MTG%20-%20Unit%2001%20-%20Tape%201P-2.mp3', '3');
+
+
+
+reference_list_rows.sql
+
+
+INSERT INTO "public"."reference_list" ("id", "unit_id", "number", "chinese_simplified", "chinese_traditional", "pinyin", "english", "notes", "order_num") VALUES ('611', '61', '1', 'B : 喂 。
+A : 喂 ， 你 是 朱 科 长 吗 ？
+B : 是 。 您 是 哪 位 ？
+A : 我 是 威 廉 马 丁 。
+B : 噢 ， 马 丁 先 生 ， 好 久 不 见 。 你 好 吗 ？
+A : 好 。 你 好 吗 ？', 'B : 喂 。
+A : 喂 ， 你 是 朱 科 長 嗎 ？
+B : 是 。 您 是 哪 位 ？
+A : 我 是 威 廉 馬 丁 。
+B : 噢 ， 馬 丁 先 生 ， 好 久 不 見 。 你 好 嗎 ？
+A : 好 。 你 好 嗎 ？', 'B : Wéi .
+A : Wài , nǐ shì Zhū Kēzhǎng ma ?
+B : Shì . Nín shì něiwèi ?
+A : Wǒ shì Wēilián Mǎdīng .
+B : Òu , Mǎdīng Xiānshēng , hǎo jiǔ bú jiàn . Nǐ hǎo a ?
+A : Hǎo . Nǐ hǎo a ?', 'B : Hello .
+A : Hello . Are you Section Chief Zhū ?
+B : Yes . Who is this , please ?
+A : I'm William Martin .
+B : Oh , Mr. Martin -- I haven't seen you for quite a while . How are you ?
+A : Fine . How are you ?', 'Wéi is a greeting used in telephone conversations for "hello." Some speakers pronounce this greeting as wái. Unlike most Chinese words, wèi has no fixed tone. The intonation varies according to the speaker's mood.
+
+Kēzhǎng: Kē means "section," and zhǎng means "head of an organization." Here are some examples of how -zhǎng, "chief," "head," is used:
+
+kē         section
+kēzhǎng   section chief
+
+chù        division
+chùzhǎng  division chief
+
+xuéxiào   school
+xiàozhǎng principal, headmaster
+
+Nín shì něiwèi? Note the use of the polite terms nín and něiwèi. In the English translation, politeness is expressed by the use of the more indirect "Who is this" instead of "Who are you" and also by "please."
+
+Hǎo jiǔ bú jiàn, "I haven't seen you for quite a while," is interchangeable with hǎo jiǔ méi jiàn.', '1'), ('612', '61', '2', 'A : 我 有 点 儿 事 想 跟 您 当 面 谈 谈 。', 'A : 我 有 點 兒 事 想 跟 您 當 面 談 談 。', 'A : Wǒ yǒu diǎnr shì xiǎng gēn nín dāngmiàn tántan .', 'A : I have something I would like to talk with you about in person .', 'Gēn: In No. 2 the word gēn is a prepositional verb translated as "with." The preposition gēn, "with," differs from the conjunction gēn, "and," in two important ways: a) where stress may be placed b) where the negative may be placed.
+
+(a) When gēn is used as the conjunction "and," both items being joined are stressed and keep their tones. When gēn is used as the prepositional verb "with," a pronoun which follows is unstressed and loses its tone. Notice the contrasting tones on tā in the following sentences:
+
+Wǒ gēn tā dōu lái le.      Both he and I came.
+
+Wǒ gēn ta lái.               I'll come with him.
+
+(b) To make negative a sentence containing the conjunction gēn, "and," the negative is placed with the main verb. In sentences containing the prepositional verb gēn, "with," the negative precedes the prepositional verb. (You have seen this pattern with other prepositional verbs, for example, zài [see BIO, Unit 2, notes on Nos. 8-11.]). Notice the contrasting positions of the negatives in the examples below:
+
+Wǒ gēn tā dōu méiyou qù.  Neither he nor I went.
+
+Wǒ méiyou gēn ta qù.        I didn't go with him.
+
+Dāngmiàn means "face-to-face." Literally, dāng means "in the presence of," and miàn means "face."', '2'), ('613', '61', '3', 'A : 不 知 道 您 有 工 夫 没 有 。
+B : 有 工 夫 。', 'A : 不 知 道 您 有 工 夫 沒 有 。
+B : 有 工 夫 。', 'A : Bù zhīdào nín yǒu gōngfu méiyou .
+B : Yǒu gōngfu .', 'A : I don't know whether you have the time or not .
+B : I have the time .', 'Gōngfu, "time," "free time," "leisure time," refers to a period of time during which a person is free, in the sense that his work may be interrupted.
+
+Now you know three words for "time": shíhou, shíjiān, gōngfu Shihou may be used for either a point in time or an amount of time.
+
+Nǐ shénme shíhou zǒu?      When are you leaving?
+
+Zuò huǒchē yào zǒu duō-   How long does it take to go by train?
+shao shíhou?
+
+Shíjiān refers to any amount of time, including the time when a person is free.
+
+Cóng zhèr dào fēijīchǎng  How long does it take from here to
+yào duōshao shíjiān?      the airport?
+
+Jīntiān méiyou shíjiān    There isn't time to go today.
+qù.
+
+Gōngfu, however, is used only for amounts of time which a person has available for his own use.
+
+Nǐ yǒu méiyou gōngfu gēn  Are you free to talk with me?
+wo tántan?', '3'), ('614', '61', '4', 'A : 什 么 时 候 对 您 合 适 ？
+B : 今 天 ， 明 天 都 可 以 。', 'A : 什 麼 時 候 對 您 合 適 ？
+B : 今 天 ， 明 天 都 可 以 。', 'A : Shénme shíhou duì nín héshì ?
+B : Jīntiān , míngtiān dōu kéyi .', 'A : What time would suit you ?
+B : Either today or tomorrow would be fine .', 'Duì, "to," "towards," "with regard to," "with respect to," is a prepositional verb which originally meant "facing." In modern Chinese, its object introduces either the target of the action or the thing concerned. Contrast this with gěi, "for": the object introduced by gěi receives the benefit of the action. These generalizations may help you sort out some of the differences between duì and gěi. You might find it helpful to memorize some examples, as well.
+
+duì INTRODUCING THE TARGET OF THE ACTION ("to")
+
+Nǐde huà shì duì shéi shuōde?    To whom were you speaking?
+Tā duì wo hěn kèqi.          He is very polite to me.
+Nǐ duì wo tài hǎo.          You are too good to me.
+
+duì INTRODUCING THE THING CONCERNED ("with regard to," "with respect to")
+
+Shénme shíhou duì nín héshì?    What time suits you?
+Shénme shíhou duì nín fāngbian?  What time is convenient for you?
+
+Notice that the English is "for you" in the last example, but in Chinese you must say "What time is convenient with regard to you?"
+
+gěi INTRODUCING THE BENEFICIARY
+
+Wǒ gěi tā xiěle xìn le.     I wrote him a letter.
+Zhè shì yìzhāng shíkuàide,   Here's a ten-dollar bill. Please
+qǐng nǐ gěi wo huànhuan.    change it for me.
+Qǐng nǐ gěi wo xiě nǐde dìzhǐ. Would you write down your address
+                            for me, please?
+
+Héshì is an adjectival verb meaning "to fit," "to suit," "to be suitable/appropriate." When trying on clothes in a store, you might say Zhèige bù héshì, "This doesn't fit." In another situation, héshì could be translated very freely as "best": Něitiān duì nín héshì? "What day would be best for you?"', '4'), ('615', '61', '5', 'A : 今 天 下 午 两 点 钟 方 便 吗 ？
+B : 三 点 比 两 点 方 便 一 点 儿 。', 'A : 今 天 下 午 兩 點 鐘 方 便 嗎 ？
+B : 三 點 比 兩 點 方 便 一 點 兒 。', 'A : Jīntiān xiàwǔ liǎngdiǎn zhōng fāngbiàn ma ?
+B : Sāndiǎn bǐ liǎngdiǎn fāngbiàn yīdiǎnr .', 'A : Would two o'clock today be convenient ?
+B : Three would be more convenient than two .', 'Sāndiǎn bǐ liǎngdiǎn fāngbian yīdiǎnr: Bǐ is a prepositional verb used to make comparisons between two things which are different. In translating, you may find it helpful to think of bǐ as the English "compared with" or "than." Notice that the bǐ phrase precedes the adjectival verb or another predicate in a sentence.
+
+| Sāndiǎn    | bǐ                 | liǎngdiǎn   | fāngbian yīdiǎnr.    |
+|------------|--------------------|------------|-----------------------|
+| (3 o'clock) | than compared with | 2 o'clock  | more convenient       |
+
+"Three is more convenient than two."
+
+| Tā  | bǐ                 | wo   | yǒu      | gōngfu.      |
+|-----|--------------------|------|----------|---------------|
+| (he) | than compared with | I    | have     | free time     |
+
+"He has more free time than I do."
+
+The two elements being compared may be nouns, pronouns, verb phrases, or even full sentences. Actually, all elements joined by bǐ act as nouns, as seen in the English translations of the examples below.
+
+| Zuò fēijī    | bǐ                 | zuò huǒchē   | kuài.  |
+|--------------|--------------------|--------------|-------|
+| (ride plane) | than compared with | ride train   | fast  |
+
+"Going by plane is faster than going by train."
+
+| Nǐ lái      | bǐ                 | wǒ qù     | fāngbian.     |
+|-------------|--------------------|-----------|---------------|
+| (you come)  | than compared with | I go      | convenient)   |
+
+"It's more convenient for you to come than for me to go."', '5'), ('616', '61', '6', 'B : 因 为 我 一 会 儿 出 去 ， 也 许 两 点 回 不 来 。
+A : 三 点 钟 也 好 。', 'B : 因 為 我 一 會 兒 出 去 ， 也 許 兩 點 回 不 來 。
+A : 三 點 鐘 也 好 。', 'B : Yīnwèi wǒ yìhuǐr chūqu , yěxǔ liǎng diǎn huíbulái .
+A : Sāndiǎn zhōng yě hǎo .', 'B : Since I'm going out in a little while , I might not be able to get back by two .
+A : Three is fine also .', 'Yīhuìr, "a little while": When r is added to a syllable ending in i, the pronunciation changes to /er/. Yīhuìr is actually pronounced yìhuǐr.
+…
+
+
+
+modules_rows.sql
+
+
+INSERT INTO "public"."modules" ("id", "title", "description", "module_type", "order_num") VALUES ('4', 'Module 4: Directions', 'The Directions Module will provide you with the skills needed to ask for and understand directions to any place indoors or outdoors, to give simple directions, to understand and give addresses, and to describe relative locations.', 'core', '4'), ('6', 'Module 6: Arranging a Meeting', 'The Meeting Module will provide you with the skills needed to arrange meetings or social gatherings, to greet people, to make introductions, and to accept or decline invitations in Chinese.', 'core', '6');
+
+
+
+exercises_rows.sql
+
+INSERT INTO "public"."exercises" ("id", "tape_id", "title", "exercise_type", "instructions", "display_url", "order_num") VALUES ('4131', '4131', 'Understanding Directions in Taipei', 'comprehension', 'In this exercise you will work on your comprehension of directions
+involving the words for "right," "left," and "intersection."
+
+In this conversation, an American student and a Chinese student are
+standing across the street from their boardinghouse in Taipei. The
+American student learned some Chinese in the United States. He has just
+arrived in Taipei for further study.
+
+You will hear the conversation three times. As you listen to it for
+the third time, answer the questions on the next page.
+
+You need to know four new expressions for this exercise:
+
+zuõbianr             (left side)
+
+shudiền             (bookstore)
+
+Zhongguo Wenxue Shĩ  (A History of Chinese Literature)
+
+shāngdian            (store, shop)
+
+Dàole lùkǒu means "having REACHED the intersection." The expression
+does not mean "having CROSSED the intersection."', 'https://mgujzfobtdqargxdnaai.supabase.co/storage/v1/object/public/exercise-displays/module-4/unit-1/display-c-1.png', '1'), ('4132', '4132', 'Understanding "From," "To," and "By Way Of"', 'comprehension', 'In this exercise you will work on your comprehension of the words for
+"from," "to," and "by way of." Mr. Randolph, an American businessman, is
+talking with his friend Mrs. Zhāng, a Chinese woman living abroad.
+
+You will hear the conversation three times. As you listen to it for
+the third time, answer the questions on the next page.
+
+Here are three new words you need to know for this exercise:
+
+Jingguo   (by way of, via)
+jìn       (to be close, to be near)
+fāngbian  (to be convenient)', 'https://mgujzfobtdqargxdnaai.supabase.co/storage/v1/object/public/exercise-displays/module-4/unit-1/display-c-2.png', '2'), ('4133', '4133', 'Recognizing "dào" and "qù"', 'comprehension', 'This exercise will give you practice in recognizing the prepositional
+verb dào and the full verb qù in different situations. In this conversa-
+tion two Chinese students are talking about their study plans at Taiwan
+University.
+
+You will hear the conversation three times. As you listen to it for
+the third time, answer the questions below.
+
+Here are two expressions you need for this exercise:
+
+kāi xué           (school starts [literally, "open school"])
+hái bù yīdìng    (not yet certain)
+
+This conversation contains a number of sentences involving the purpose
+of an action. You have already learned sentences involving the purpose of
+someone's "coming":
+
+Nǐ lái zuò shénme?  (What did you come to do?)
+
+Here you will find sentences about the purpose of studying and going:
+
+Nǐ xué Rìwén zuò shénme?     (Why are you studying Japanese?)
+Wǒ xiǎng dào Rìběn qù niàn shū. (I'm thinking of going to Japan to study.)', null, '3'), ('4134', '4134', 'Dialect Listening Exercise', 'comprehension', 'A Dialect Listening Exercise is a conversation from a preceding
+exercise spoken with a different pronunciation.  You will learn to under-
+stand Chinese as pronounced by speakers of Chinese languages who have
+learned Standard Chinese as a second language.
+
+One common characteristic of dialect speech is that words which would
+start with the sounds /zh/, /ch/, and /sh/ (i.e., retroflex, or /r/-
+position, sounds) in Standard Chinese are pronounced with the sounds /z/,
+/c/, and /s/ (i.e., dental, or /s/-position, sounds). Also, initial /r/
+may be pronounced like an English 1, y, or z.
+
+Remember the current location is Wanhua District, Taipei City, Taiwan.', null, '4'), ('4141', '4141', 'Asking for, Giving, and Breaking Down Directions', 'production', 'In this exercise you will ask for directions. You will also practice a technique that will help you understand directions: breaking down the directions into steps.
+
+Using the "maps" of Taipei in Display I, ask directions to the place named at the top of each map. For instance, the first place you are looking for is the bank. So your conversation starts out like this:
+
+Example 1
+
+YOU:  Qǐngwèn, dào yínháng qù, zěnme zǒu?
+      [Repeat confirmation.]
+TAPE: Cóng zhèli wàng zuǒ zǒu. Dàole lùkǒu, zài wàng yǒu zǒu,
+      jiù dào le.
+
+Your second task in this exercise is to listen to the directions given and to indicate the route by drawing a line on the appropriate map. (The directions will be repeated.)
+
+Now your third task: breaking down the directions into steps. Using the route you have just mapped out, take the first step of the directions and ask if that is what you do first. Then ask what comes after that.
+For instance:
+
+Example 2
+
+YOU: Wǒ xiān wàng zuǒ zǒu, duì bu duì?
+TAPE: Duì le.
+YOU: Ránhòu ne?
+TAPE: Ránhòu, dàole lùkǒu, zài wàng you zǒu.
+YOU: Hǎo.  Xièxie.
+
+For this exercise you need to know the word xiǎoxué, "grade school," "primary school."', 'https://mgujzfobtdqargxdnaai.supabase.co/storage/v1/object/public/exercise-displays/module-4/unit-1/display-1.png', '1'), ('4142', '4142', 'Sequences of Actions', 'production', 'In this exercise you will talk about sequences of actions. You are to describe where you went yesterday, where you are going today, where you will go tomorrow, and so on.
+
+Looking at Display II on the next page, you will see three lists showing places you went or will go to. Using this information, answer the recorded questions. (When taking your answers from a list, assume that today's date is the date given at the top of that list.)
+…
+
+
+
+exercise_questions_rows.sql
+
+INSERT INTO "public"."exercise_questions" ("id", "exercise_id", "question_text", "question_type", "options", "order_num") VALUES ('41311', '4131', 'How do you get to Taiwan University from "here" (i.e., where the students are standing)? (For the route, draw a line from the students to the university. For Taiwan University, draw a circle on the map.)', 'short_answer', null, '1'), ('41312', '4131', 'How do you get to the Student Bookstore (Xuéshēng Shūdiàn) from Taiwan University? (Show the route and mark an X on the map for the bookstore.)', 'display_only', null, '2'), ('41313', '4131', 'In which direction is the small shop where you can buy soap? (Indicate the direction by an arrow beginning where the students are and pointing towards the shop.)', 'display_only', null, '3'), ('41321', '4132', 'Was it last year that Mr. Randolph went to China through Europe?', 'multiple_choice', 'Yes|No', '1'), ('41322', '4132', 'Is it cheaper to go to China via San Francisco?', 'multiple_choice', 'Yes|No', '2'), ('41331', '4133', 'Indicate checkmarks where each item is sold', 'table_row', 'Inside the park|Outside the park', '1');

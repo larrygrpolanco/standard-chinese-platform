@@ -23,8 +23,8 @@
 			label: 'Core Modules',
 			dropdown: true 
 		},
-		{ href: '/pronunciation', label: 'Pronunciation' },
-		{ href: '/extra-modules', label: 'Extra Modules' }
+		// { href: '/pronunciation', label: 'Pronunciation' }, // Coming Soon!
+		// { href: '/extra-modules', label: 'Extra Modules' } // Coming Soon!
 	];
 
 	// UI state

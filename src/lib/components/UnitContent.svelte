@@ -3,6 +3,7 @@
 	import { fade } from 'svelte/transition';
 	import { createEventDispatcher, onMount } from 'svelte';
 	import { getUnitExercisesData } from '$lib/supabase/client';
+	import { supabase } from '$lib/supabase/client';
 	import TabSelector from './TabSelector.svelte';
 	import ReviewTab from './ReviewTab.svelte';
 	import ExercisesTab from './ExercisesTab.svelte';
@@ -24,6 +25,11 @@
 	let directExercises = [];
 	let isLoadingExercisesData = false;
 	let hasFetchedExercisesData = false;
+	
+	// Direct data for vocabulary tab
+	let directVocabulary = [];
+	let isLoadingVocabulary = false;
+	let hasFetchedVocabulary = false;
 
 	$: reviewTapes = tapes.filter((tape) => tape.tape_type === 'review');
 	$: workbookTapes = tapes.filter((tape) => tape.tape_type === 'workbook');
@@ -36,6 +42,16 @@
 		!isLoadingExercisesData
 	) {
 		fetchExercisesData(unit.id);
+	}
+	
+	// Fetch vocabulary data when tab changes or on initial load
+	$: if (
+		activeTab === 'vocabulary' &&
+		unit?.id &&
+		!hasFetchedVocabulary &&
+		!isLoadingVocabulary
+	) {
+		fetchVocabularyDirectly(unit.id);
 	}
 
 	// Tab data for easier management
@@ -91,6 +107,32 @@
 			isLoadingExercisesData = false;
 		}
 	}
+	
+	// Fetch vocabulary data directly from Supabase
+	async function fetchVocabularyDirectly(unitId) {
+		console.log('Directly fetching vocabulary for unit:', unitId);
+		isLoadingVocabulary = true;
+		
+		try {
+			const { data, error } = await supabase
+				.from('vocabulary')
+				.select('*')
+				.eq('unit_id', unitId)
+				.order('order_num');
+				
+			if (error) {
+				console.error('Error fetching vocabulary:', error);
+			} else {
+				directVocabulary = data || [];
+				hasFetchedVocabulary = true;
+				console.log('Directly fetched vocabulary:', directVocabulary.length);
+			}
+		} catch (error) {
+			console.error('Error directly fetching vocabulary data:', error);
+		} finally {
+			isLoadingVocabulary = false;
+		}
+	}
 
 	// Forward exercise change event from ExercisesTab
 	function handleExerciseChange(event) {
@@ -121,7 +163,13 @@
 					{/if}
 				{:else if activeTab === 'vocabulary'}
 					<h3 class="section-header">Vocabulary List</h3>
-					<VocabularyTab {vocabulary} />
+					{#if isLoadingVocabulary}
+						<div class="loading-state p-4 text-center">
+							<p>Loading vocabulary...</p>
+						</div>
+					{:else}
+						<VocabularyTab vocabulary={directVocabulary.length > 0 ? directVocabulary : vocabulary} />
+					{/if}
 				{:else if activeTab === 'ai-practice'}
 					<AIPracticeTab />
 				{/if}

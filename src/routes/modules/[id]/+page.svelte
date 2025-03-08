@@ -3,7 +3,7 @@
 	import { page } from '$app/stores';
 	import { onMount } from 'svelte';
 	import { getModuleById, getUnitsByModuleId } from '$lib/supabase/client';
-	import Breadcrumb from '$lib/components/Breadcrumb.svelte';
+
 	import UnitCard from '$lib/components/UnitCard.svelte';
 	import Loader from '$lib/components/Loader.svelte';
 
@@ -29,8 +29,6 @@
 	<!-- Loading animation with spinning cassette reels -->
 	<Loader />
 {:else if module}
-	<Breadcrumb moduleName={`Module ${module.id}: ${module.title}`} />
-
 	<div class="container mx-auto max-w-4xl px-4">
 		<header class="mb-10">
 			<div class="mb-4 flex items-center">

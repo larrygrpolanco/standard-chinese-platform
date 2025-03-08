@@ -1,3 +1,4 @@
+<!-- src/routes/+page.svelte -->
 <script>
 	import { onMount } from 'svelte';
 	import { getModules } from '$lib/supabase/client';
@@ -124,7 +125,7 @@
 					</div>
 				{:else}
 					<!-- True centered grid -->
-					<div class="mx-auto grid w-full grid-cols-1 gap-6 md:grid-cols-2">
+					<div class="mx-auto grid w-full grid-cols-1 gap-4 md:grid-cols-2">
 						{#each modules.filter((module) => featuredModules.includes(module.id)) as module}
 							{@const colors = getModuleColors(module.id)}
 							<a
@@ -134,18 +135,18 @@
 							>
 								<!-- Left color bar with Robocop-style scan line -->
 								<div
-									class="relative h-full w-3 {colors.bg} overflow-hidden border-r-2 border-[#33312E]"
+									class="relative h-full w-2 {colors.bg} overflow-hidden border-r-2 border-[#33312E]"
 								>
 									<div
 										class="absolute top-0 left-0 h-2 w-full animate-[scanDown_4s_ease-in-out_infinite] bg-[#DDB967]/20"
 									></div>
 								</div>
 
-								<div class="flex flex-grow p-5">
+								<div class="flex flex-grow p-3">
 									<!-- Module number badge with OCP-inspired styling -->
-									<div class="mr-4 flex-shrink-0">
+									<div class="mr-3 flex-shrink-0">
 										<div
-											class="relative flex h-14 w-14 items-center justify-center rounded-full border-2 border-[#33312E] {colors.bg}"
+											class="relative flex h-10 w-10 items-center justify-center rounded-full border-2 border-[#33312E] {colors.bg}"
 											style="transform: rotate(-5deg); box-shadow: 1px 1px 0 #826D5B;"
 										>
 											<!-- Terminal-like screen effect -->
@@ -153,36 +154,35 @@
 												class="absolute inset-0 rounded-full opacity-30"
 												style="background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0) 70%);"
 											></div>
-											<span class="relative font-['Arvo',serif] text-xl font-bold text-[#33312E]">
+											<span class="relative font-['Arvo',serif] text-lg font-bold text-[#33312E]">
 												{module.id}
 											</span>
 										</div>
 									</div>
 
 									<div class="flex-grow">
-										<h3 class="mb-2 font-['Arvo',serif] text-xl font-semibold text-[#33312E]">
+										<h3 class=" mb-1 font-['Arvo',serif] text-base font-semibold text-[#33312E]">
 											{module.title}
 										</h3>
-										<p class="mb-4 line-clamp-2 font-['Work_Sans',sans-serif] text-sm">
+										<p class="mb-2 line-clamp-2 font-['Work_Sans',sans-serif] text-xs">
 											{module.description}
 										</p>
 
 										<!-- Mechanical button with ROBOCOP-inspired highlights -->
 										<span
-											class="relative inline-flex items-center overflow-hidden rounded-full border border-[#33312E] bg-white px-4 py-1.5 text-sm font-medium text-[#33312E] transition-all group-hover:bg-[#F9F4E8] group-hover:shadow-[2px_2px_0_#826D5B]"
+											class="relative inline-flex items-center overflow-hidden rounded-full border border-[#33312E] bg-white px-3 py-1 text-xs font-medium text-[#33312E] transition-all group-hover:bg-[#F9F4E8] group-hover:shadow-[2px_2px_0_#826D5B]"
 											style="box-shadow: 1px 1px 0 #826D5B; transition: all 0.15s ease-out;"
 										>
 											<!-- Button highlight (like Robocop's visor) -->
 											<div
-												class="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-0 group-hover:opacity-30 crt-effect-local"
+												class="crt-effect-local absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-0 group-hover:opacity-30"
 												style="transform: skew(-45deg) translateX(-100%); transition: transform 0.5s ease-out;"
 											></div>
 
-											<span class="relative mr-1.5 text-xs" style="color: {colors.accent};">▶</span
-											>
+											<span class="relative mr-1 text-xs" style="color: {colors.accent};">▶</span>
 											<span class="relative">Start Module {module.id}</span>
 											<svg
-												class="relative ml-1.5 h-4 w-4 transition-transform group-hover:translate-x-1"
+												class="relative ml-1 h-3 w-3 transition-transform group-hover:translate-x-1"
 												fill="none"
 												viewBox="0 0 24 24"
 												stroke="currentColor"
@@ -227,7 +227,7 @@
 					<div class="mt-6 flex w-full justify-center">
 						<a
 							href="/modules"
-							class="relative inline-flex items-center justify-center overflow-hidden rounded-full border-2 border-[#33312E] bg-[#C17C74] px-6 py-3 text-lg font-bold text-white transition-all hover:-translate-y-1 hover:shadow-[4px_4px_0_#826D5B] crt-effect-local"
+							class="crt-effect-local relative inline-flex items-center justify-center overflow-hidden rounded-full border-2 border-[#33312E] bg-[#C17C74] px-6 py-3 text-lg font-bold text-white transition-all hover:-translate-y-1 hover:shadow-[4px_4px_0_#826D5B]"
 							style="box-shadow: inset 0 1px 20px rgba(255, 255, 255, 0.2), 2px 2px 0 #826D5B;"
 						>
 							<!-- ROBOCOP visor-like scan effect -->
@@ -269,7 +269,7 @@
 						class="absolute left-0 h-32 w-48 translate-x-[-20%] rotate-[-8deg] transform md:h-40 md:w-56"
 					>
 						<div
-							class="relative h-full w-full overflow-hidden rounded-lg border-2 border-[#33312E] bg-[#E8E5D7] shadow-[4px_4px_0_#826D5B] crt-effect-local"
+							class="crt-effect-local relative h-full w-full overflow-hidden rounded-lg border-2 border-[#33312E] bg-[#E8E5D7] shadow-[4px_4px_0_#826D5B]"
 						>
 							<!-- Metallic sheen effect -->
 							<div
@@ -314,7 +314,7 @@
 						class="absolute right-0 h-32 w-48 translate-x-[20%] rotate-[8deg] transform md:h-40 md:w-56"
 					>
 						<div
-							class="relative h-full w-full overflow-hidden rounded-lg border-2 border-[#33312E] bg-[#E8E5D7] shadow-[4px_4px_0_#826D5B] crt-effect-local"
+							class="crt-effect-local relative h-full w-full overflow-hidden rounded-lg border-2 border-[#33312E] bg-[#E8E5D7] shadow-[4px_4px_0_#826D5B]"
 						>
 							<!-- Metallic sheen effect -->
 							<div
@@ -458,7 +458,7 @@
 						<!-- Stacked books with tech enhancements -->
 						<div class="absolute bottom-0 left-4 h-36 w-48 rotate-[-8deg]">
 							<div
-								class="relative h-full w-full overflow-hidden rounded-sm border-2 border-[#33312E] bg-[#F9F4E8] crt-effect-local"
+								class="crt-effect-local relative h-full w-full overflow-hidden rounded-sm border-2 border-[#33312E] bg-[#F9F4E8]"
 							>
 								<!-- Robocop-style scan line -->
 								<div
@@ -480,7 +480,7 @@
 						<!-- Cassette tape on top with Robocop-inspired data readout -->
 						<div class="absolute top-0 right-0 h-28 w-44 rotate-[5deg]">
 							<div
-								class="relative h-full w-full overflow-hidden rounded-md border-2 border-[#33312E] bg-[#E8E5D7] crt-effect-local"
+								class="crt-effect-local relative h-full w-full overflow-hidden rounded-md border-2 border-[#33312E] bg-[#E8E5D7]"
 							>
 								<!-- Terminal-like readout line -->
 								<div class="absolute top-2 right-4 left-4 flex h-2 items-center bg-[#33312E]/10">

@@ -1,0 +1,185 @@
+Updated FSI Chinese Learning Platform Style Guide
+🎭 Brand Personality
+"The charming vintage professor with impeccable style" - friendly, reliable, and knowledgeable with a touch of nostalgic warmth. The platform embraces retro aesthetics with modern usability, centered around the cassette tape motif that honors the original FSI audio materials.
+🎨 Color Palette
+Primary Colors
+* Terracotta: #C17C74 (primary actions, emphasis)
+* Terracotta Hover: #AD6C66 (hover states)
+* Green: #7D8C5C (secondary elements)
+* Gold: #DDB967 (highlights, accents, active states)
+* Navy: #34667F (tertiary elements)
+Neutrals
+* Cream Paper: #F4F1DE (background)
+* Charcoal: #33312E (text)
+* Beige: #E8E5D7 (cards, containers)
+* Warm Gray: #A0998A (secondary text, borders)
+* Button Shadow: #826D5B (mechanical effects)
+📝 Typography
+Font Families
+* Headings: 'Arvo' or 'DM Serif Display'
+* Body Text: 'Work Sans'
+* Chinese Text: 'Noto Sans TC', 'Noto Sans SC'
+* Monospace: 'Courier New' (for counters and technical elements)
+Text Hierarchy
+* H1: 2.5rem (40px), bold
+* H2: 2rem (32px), bold
+* H3: 1.5rem (24px), semibold
+* Body: 1rem (16px), regular
+* Small/Caption: 0.875rem (14px)
+🧩 Components
+Buttons & Tabs
+Standard Pill Buttons/Tabs
+html
+Copy
+<button class="tape-tab {isActive ? 'active' : ''}">
+  <svg class="mr-2 h-4 w-4" viewBox="0 0 24 24"><!-- icon --></svg>
+  Button Label
+</button>
+css
+Copy
+.tape-tab {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 12px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-charcoal);
+  background-color: var(--color-cream-paper);
+  border: 1px solid var(--color-warm-gray);
+  border-radius: 16px;
+  transition: all 0.2s;
+}
+
+.tape-tab:hover:not(.active) {
+  background-color: rgba(221, 185, 103, 0.2);
+}
+
+.tape-tab.active {
+  background-color: var(--color-gold);
+  color: var(--color-charcoal);
+}
+Vintage Toggle Switch
+css
+Copy
+.vintage-switch {
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.compact .vintage-switch button {
+  padding: 2px 6px;
+  font-size: 0.75rem;
+}
+
+@media (max-width: 640px) {
+  .vintage-switch button {
+    padding: 2px 6px;
+    font-size: 0.75rem;
+  }
+}
+Cards & Containers
+* Use rounded corners (8px standard, 16px for pills)
+* Thin borders (1px) in warm gray
+* Apply subtle inset shadows for depth: Copybox-shadow: inset 0 1px 3px rgba(51, 49, 46, 0.1);
+* Background colors should be beige or cream paper
+Audio Player
+Feature this component as the centerpiece of the retro design, with:
+* Realistic cassette tape visualization
+* Animated tape spools that respond to playback state
+* Mechanical play/pause button with pressed state
+* Vintage-style counter display
+* Tape-like progress indicator
+Section Containers
+html
+Copy
+<section class="section-container">
+  <h3 class="section-header">Section Title</h3>
+  <div class="content-area bg-beige border-warm-gray rounded-lg border">
+    <!-- Content -->
+  </div>
+</section>
+📊 Layout & Spacing
+Containers
+* Max width: 1200px
+* Readable content width: 680px
+* Section padding: 16px (mobile), 24px (desktop)
+Spacing Scale
+* Use consistent spacing with Tailwind classes:
+* gap-2 (8px), gap-4 (16px), gap-6 (24px)
+* p-4 (padding 16px), m-4 (margin 16px)
+* space-y-6 for vertical spacing between elements
+Responsive Patterns
+* Use flex-direction column on mobile, row on desktop:
+html
+Copy
+<div class="flex flex-col sm:flex-row">
+  <!-- Content -->
+</div>
+* Stack elements on smaller screens:
+html
+Copy
+<div class="mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between">
+  <h3 class="section-header">Element Title</h3>
+  <div class="mt-2 sm:mt-0">
+    <!-- Controls -->
+  </div>
+</div>
+🇨🇳 Language Display
+Chinese Text Display
+* Characters: Larger size (1.25em relative to English)
+* Pinyin: Positioned above characters, lighter color
+* English: Regular size, placed below
+* Toggle between simplified/traditional characters using font toggle
+Font Preferences
+Use stores to manage font display preferences:
+javascript
+Copy
+// lib/stores/fontPreferences.js
+export const fontPreferences = writable({
+  showPinyin: true,
+  showEnglish: true,
+  simplified: true
+});
+🖼️ UI Elements
+Textures & Effects
+* Apply subtle textures to backgrounds to emulate paper
+* Use inset shadows to create depth: cssCopybox-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
+* Avoid glossy or overly digital effects
+Borders & Shadows
+* Use thin borders (1px) in warm gray
+* Apply subtle shadows for depth
+* Avoid harsh or modern drop shadows
+Icons
+* Use simple line-based icons with vintage theme
+* Incorporate cassette-related imagery (reels, buttons, etc.)
+* Match stroke width and style to maintain consistency
+💻 Code Standards
+CSS Approach
+* Use custom CSS with a <style> block for complex components
+* Use Tailwind utility classes for easy stylings
+* Avoid @apply directive
+* Define global variables in :root for colors and other design tokens
+Component Structure
+* Keep components focused and single-purpose
+* Use props for configurability
+* Extract reusable CSS into dedicated styles
+* Maintain consistent BEM-like naming in custom CSS
+🎬 Animation & Interaction
+Transitions
+* Keep transitions subtle and natural (0.2s duration standard)
+* Use easing functions that mimic physical objects
+* Apply motion sparingly, focusing on meaningful feedback
+Hover States
+* Subtle background changes for basic elements
+* Mechanical/physical responses for interactive elements
+Playback Controls
+* Animate tape spools during audio playback
+* Use directional movement for seek operations
+* Design controls with mechanical feeling (springs, presses)
+📱 Responsive Design
+* Mobile-first approach with Tailwind's responsive prefixes
+* Stack elements vertically on small screens
+* Adjust font sizes and padding proportionally
+* Handle complex interactions with appropriate mobile alternatives
+* Use compact versions of components when space is limited: htmlCopy<div class="compact md:full-size">
+*   <!-- Component content -->
+* </div>

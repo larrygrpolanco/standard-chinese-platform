@@ -2,7 +2,6 @@
 <script>
 	import { onMount } from 'svelte';
 	import { getModules } from '$lib/supabase/client';
-	import Breadcrumb from '$lib/components/Breadcrumb.svelte';
 	import Loader from '$lib/components/Loader.svelte';
 
 	let modules = [];
@@ -38,8 +37,6 @@
 	class="min-h-screen bg-[#F4F1DE] pb-12"
 	style="background-image: url('/textures/subtle-paper.png'); background-repeat: repeat; background-blend-mode: overlay;"
 >
-	<Breadcrumb />
-
 	<section class="container mx-auto px-4">
 		<!-- Vintage-inspired header -->
 		<header class="relative mb-10 pt-6">
@@ -75,7 +72,7 @@
 
 		{#if loading}
 			<!-- Loading animation with spinning cassette reels -->
-				<Loader />
+			<Loader />
 		{:else}
 			<!-- Module cards grid -->
 			<div class="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">

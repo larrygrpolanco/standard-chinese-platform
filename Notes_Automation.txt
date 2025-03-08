@@ -1,0 +1,204 @@
+Database Automation Prompts 
+Standard Chinese Learning Platform
+
+Data base Prompts:
+Fuck me. I have changed the databases for reference lists so that needs to be updated, but this probably for the better I need something that works with many refrence sentences and it needs to be tested that is fine.The only thing I worry about is that the schema is slightly off, but it is what is. I can figure it out when/if it becomes a problem
+
+VOCABULARY Database trascription:
+I need these vocabulary words from this textbook screenshot transcribed for my Supabase vocab table in CSV format. Enclose any definitions containing commas in double quotes and replace the commas within these fields with semicolons so that it causes no issues with CSV format, but keep the commas between columns. The table has these columns: 
+id, unit_id, chinese_simplified, chinese_traditional, pinyin, english, and order_num. Important detials for this datasetModule: #Unit: ##Vocabulary id will start with: ##X
+Please follow these guidelines: **id:** Should start from (Module #)(unit  #)(Vocabulary 1) and increment for each new word. **unit_id:** Should be formatted as (module number)(unit number). For example, if it's module 6, unit 1, the unit_id would be 61. **chinese_simplified:** Translate the pinyin into simplified Chinese characters.**chinese_traditional:** Translate the pinyin into traditional Chinese characters. **pinyin:** Transcribe the pinyin as it appears in the image, including any tone marks or special characters. **english:** Transcribe the English definition. If the definition contains commas, enclose the entire definition in double quotes. **order_num:** Should start at 1 and then move up incrementallyHere is an example of the CSV output format from module 6 unit 1 vocabulary 1: id,unit_id,chinese_simplified,chinese_traditional,pinyin,english,order_num
+611,61,比,比,bǐ,compared with; than,1
+612,61,当面,當面,dāngmiàn,in person; face to face,2
+613,61,对,對,duì,to; towards; with regard to; with respect to,3
+614,61,功夫,功夫,gōngfu,free time; spare time,4
+615,61,合适,合適,héshì,to be suitable; to be appropriate; to fit,5
+616,61,回不来,回不來,huíbulái,to be unable to get back,6
+617,61,回得来,回得來,huídelái,to be able to get back in time,7
+618,61,会客室,會客室,huìkèshì (huìkeshì),reception room,8
+619,61,科长,科長,kēzhǎng,section chief,9
+6110,61,空,空,kòng(r),free time; spare time,10
+6111,61,楼上,樓上,lóushàng,upstairs,11
+6112,61,楼下,樓下,lóuxià,downstairs,12
+6113,61,那么,那麼,nàme,well; then; in that case,13
+6114,61,商量,商量,shāngliang,to discuss; to talk over,14
+6115,61,谈,談,tán,to chat; to talk about,15
+6116,61,喂,喂,wéi,hello (telephone greeting),16
+6117,61,也许,也許,yěxǔ,perhaps; maybe,17
+6118,61,一会儿,一會兒,yīhuìr,a moment,18
+6119,61,有功夫,有功夫,yǒu gōngfu,to have free time,19
+6120,61,有空,有空,yǒu kòng(r),to have free time,20
+
+
+REFERENCE LIST Database transcription:
+I need these dialogue references from this textbook screenshot transcribed for my Supabase `reference_list` table in CSV format. Enclose any definitions containing commas in double quotes and replace the commas within these fields with semicolons so that it causes no issues with CSV format, but keep the commas between columns. The table has these columns:
+id, unit_id, number, chinese_simplified, chinese_traditional, pinyin, english, notes, order_num.
+
+Important detials for this datasetModule: #Unit: ##Sentence id will start with: ##X
+
+Please follow these guidelines:
+**id:**  Generate a combined ID using the format (unit_id)(number). For example, if unit_id is 1 and reference number is 1, the id should be 11.  This ID is for your reference and does not need to be a database-generated ID.
+**unit_id:** This is the unit identifier. Please provide the unit_id for the current screenshot. Assume this is a single integer (e.g., 1, 2, 3, etc.).
+**number:** The reference number shown in the textbook.
+**chinese_simplified:** Transcribe the complete dialogue in simplified characters, preserving all speaker labels (A:, B:) and line breaks.
+**chinese_traditional:** Same for traditional characters. If unavailable, leave blank.
+**pinyin:** Transcribe the complete pinyin with tone marks, preserving speaker labels and line breaks.
+**english:** Transcribe the complete English translation, preserving speaker labels and line breaks.
+**notes:** Leave blank for now.
+**order_num:** Same as the reference number.
+
+Enclose all multi-line text fields in double quotes. Do not use Unicode escape sequences - use actual Chinese characters.
+
+Example output (assuming unit_id = 1):
+id,unit_id,number,chinese_simplified,chinese_traditional,pinyin,english,notes,order_num
+11,1,1,"B：为
+A：为，你是朱可彰吗？
+B：是。您是内部人吗？
+A：我是威廉马丁。
+B：噢，马丁先生，好久不见。你好吗？","B：為
+A：為，你是朱可彰嗎？
+B：是。您是內部人嗎？
+A：我是威廉馬丁。
+B：噢，馬丁先生，好久不見。你好嗎？","B: Wéi
+A: Wài, nǐ shì Zhū Kēzhǎng ma?
+B: Shì. Nín shì nǎiwèi?
+A: Wǒ shì Wēilián Mǎdīng.
+B: Òu, Mǎdīng Xiānshēng, hǎo jiǔ bú jiàn. Nǐ hǎo a?","B: Hello.
+A: Hello. Are you Section Chief Zhū?
+B: Yes. Who is this, please?
+A: I'm William Martin.
+B: Oh, Mr. Martin—I haven't seen you for quite a while. How are you?",,1
+
+
+Refrence List Notes transciption instuctions:
+Transcribe this and make it easy to read and reference while keeping it close to the original. I will copy an paste this into a supabase database field.
+
+NOTE: Some of these notes have tables which need a consistant way of being transcibed for parsing or whatever I need to do with them see how they are displayed
+
+
+EXERCISE Database transcription:
+
+I need exercise details from this textbook screenshot transcribed for my Supabase `exercises` table in CSV format. Enclose any fields containing commas or multi-line text in double quotes.
+
+The table has these columns:
+id, tape_id, title, exercise_type, instructions, display_url, order_num
+
+Important details for this dataset:
+id: # 
+order_num: # 
+exercise_type: comprehension OR production
+
+Please follow these guidelines:
+**id:** given above
+**tape_id:**  Same value as id. This is the identifier of the tape this exercise belongs to.
+**title:** Give a descriptive title based on the instructions in the textbook.
+**exercise_type:** given above; enum values (“comprehension" or “pronunciation”)
+**instructions:** Transcribe the instructions for the exercise. This might be multi-line text. Preserve line breaks and any formatting present in the textbook screenshot.
+**display_url:** leave blank.
+**order_num:**  This is the exercise number given above
+
+Enclose all multi-line text fields and fields containing commas in double quotes. Do not use Unicode escape sequences - use actual Chinese characters if they appear in the title or instructions.
+
+Example output:
+id,tape_id,title,exercise_type,instructions,display_url,order_num
+6131,6131,Understanding Directions,comprehension,"In this exercise you will work on your comprehension of directions
+involving the words for ""right,"" ""left,"" and ""intersection.""
+
+In this conversation, an American student and a Chinese student are
+standing across the street from their boardinghouse in Taipei. The
+American student learned some Chinese in the United States. He has just
+arrived in Taipei for further study.
+
+You will hear the conversation three times. As you listen to it for
+the third time, answer the questions on the next page.
+
+You need to know four new expressions for this exercise:
+
+zuõbianr             (left side)
+
+shudiền             (bookstore)
+
+Zhongguo Wenxue Shĩ  (A History of Chinese Literature)
+
+shāngdian            (store, shop)
+
+Dàole lùkǒu means ""having REACHED the intersection."" The expression
+does not mean ""having CROSSED the intersection."" (See map below. The X
+represents dàole dièrge lūkǒu.)",,6131
+
+
+TAPE Database automation
+Generate CSV data for a database table named "tapes" based on the following information. The CSV should have the columns: id,unit_id,title,tape_type,audio_file,order_num.
+
+Follow these rules to generate the data:
+
+*   **Input Information Format:** You will provide input in the following format:
+    ```
+    Relevant info:
+    Module: X
+    Unit: X
+    C-2 Exercise #s: X
+    P-2 Exercise #s:  X
+    ```
+    Where 'X' represents the numerical value for Module, Unit, and the number of exercises for C-2 and P-2 tapes.
+
+*   **Unit ID Generation:** The `unit_id` is created by concatenating the Module and Unit numbers. For example, Module 6 and Unit 1 becomes `61`.
+
+*   **ID Generation:** The `id` is generated using the following convention: `[Module][Unit][Tape Type Code][Exercise Number (if applicable)]`.
+    *   `[Module][Unit]` is the `unit_id` calculated above.
+    *   `[Tape Type Code]` is:
+        *   `1` for C-1 tapes
+        *   `2` for P-1 tapes
+        *   `3` for C-2 tapes
+        *   `4` for P-2 tapes
+    *   `[Exercise Number (if applicable)]` is appended only for C-2 and P-2 exercises and represents the exercise number within that tape type, starting from 1.
+    *   Examples:
+        *   Module 6, Unit 1, C-1 -> `611`
+        *   Module 6, Unit 1, P-1 -> `612`
+        *   Module 6, Unit 1, C-2 Exercise 1 -> `6131`
+        *   Module 6, Unit 1, P-2 Exercise 3 -> `6143`
+
+*   **Title Generation:** The `title` is generated as follows:
+    *   C-1 tapes: "C-1"
+    *   P-1 tapes: "P-1"
+    *   C-2 exercises: "C-2 Exercise [Exercise Number]" (e.g., "C-2 Exercise 1", "C-2 Exercise 2")
+    *   P-2 exercises: "P-2 Exercise [Exercise Number]" (e.g., "P-2 Exercise 1", "P-2 Exercise 2")
+
+*   **Tape Type:** The `tape_type` is determined by the tape code:
+    *   C-1 and P-1 tapes are always `review`.
+    *   C-2 and P-2 tapes are always `workbook`.
+
+*   **Audio File:**  Leave the `audio_file` column empty (or with an empty string "") for now.
+
+*   **Order Number:** The `order_num` is assigned sequentially:
+    *   C-1 tapes get `1`.
+    *   P-1 tapes get `2`.
+    *   C-2 exercises are numbered sequentially starting from `1` within the C-2 set.
+    *   P-2 exercises are numbered sequentially starting from `1` within the P-2 set.
+
+**Example Input:**Relevant info:
+Module: 6
+Unit: 1
+C-2 Exercise #s: 4
+P-2 Exercise #s: 3**Desired CSV Output:**
+
+```csv
+id,unit_id,title,tape_type,audio_file,order_num
+611,61,C-1,review,,1
+612,61,P-1,review,,2
+6131,61,C-2 Exercise 1,workbook,,1
+6132,61,C-2 Exercise 2,workbook,,2
+6133,61,C-2 Exercise 3,workbook,,3
+6134,61,C-2 Exercise 4,workbook,,4
+6141,61,P-2 Exercise 1,workbook,,1
+6142,61,P-2 Exercise 2,workbook,,2
+6143,61,P-2 Exercise 3,workbook,,3
+
+Now, generate the CSV data based on the following input:
+Relevant info:
+Module: 
+Unit: 
+C-2 Exercise #s:
+P-2 Exercise #s: 
+
+

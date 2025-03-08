@@ -3,6 +3,31 @@
 	import Header from '$lib/components/Header.svelte';
 </script>
 
+<style>
+    /* Custom CSS for proper footer centering */
+    .footer-content {
+        text-align: center;
+    }
+    
+    .cassette-container {
+        max-width: 28rem; /* Equivalent to max-w-md */
+        margin-left: auto;
+        margin-right: auto;
+    }
+    
+    .svg-container {
+        display: flex;
+        justify-content: center;
+        width: 100%;
+    }
+    
+    .footer-text {
+        text-align: center;
+        margin-left: auto;
+        margin-right: auto;
+    }
+</style>
+
 <div class="flex min-h-screen flex-col bg-[#F4F1DE] font-['Work_Sans',sans-serif] text-[#33312E]">
 	<Header />
 
@@ -12,9 +37,9 @@
 
 	<footer class="border-t border-[#A0998A] bg-[#E8E5D7] py-8">
 		<div class="mx-auto max-w-5xl px-4">
-			<div class="flex flex-col items-center justify-center">
+			<div class="footer-content">
 				<!-- Main footer content -->
-				<div class="relative mb-8 inline-block max-w-md">
+				<div class="cassette-container mb-8">
 					<!-- Top line with retro-tech styling -->
 					<div class="relative">
 						<div class="absolute left-0 right-0 top-0 h-px bg-gradient-to-r from-transparent via-[#33312E] to-transparent"></div>
@@ -22,12 +47,12 @@
 					</div>
 					
 					<!-- Vintage style message -->
-					<div class="my-5 text-center font-['Courier_New',monospace] text-xs uppercase tracking-wider text-[#33312E] opacity-70">
+					<div class="my-5 font-['Courier_New',monospace] text-xs uppercase tracking-wider text-[#33312E] opacity-70">
 						ORIGINALLY RECORDED ON CASSETTE TAPES
 					</div>
 					
 					<!-- Cassette illustration with Robocop-inspired enhancements -->
-					<div class="mx-auto mt-4 inline-block opacity-60">
+					<div class="svg-container mt-4 opacity-60">
 						<svg width="100" height="60" viewBox="0 0 100 60" fill="none" xmlns="http://www.w3.org/2000/svg">
 							<!-- Cassette body with metallic effect -->
 							<rect x="5" y="5" width="90" height="50" rx="4" stroke="#33312E" stroke-width="2" />
@@ -53,9 +78,9 @@
 				</div>
 				
 				<!-- Credits and modernization info -->
-				<p class="text-sm text-[#33312E]">© {new Date().getFullYear()} Taped Chinese</p>
-				<p class="mt-2 text-sm text-[#33312E]">Based on materials from the Foreign Service Institute</p>
-				<p class="mt-3 max-w-md text-center text-xs text-[#A0998A]">
+				<p class="footer-text text-sm text-[#33312E]">© {new Date().getFullYear()} Taped Chinese</p>
+				<p class="footer-text mt-2 text-sm text-[#33312E]">Based on materials from the Foreign Service Institute</p>
+				<p class="footer-text mt-3 max-w-md text-xs text-[#A0998A]">
 					Modernized and digitized by a language researcher and teacher to preserve this valuable resource
 				</p>
 			</div>
