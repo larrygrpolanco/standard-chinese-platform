@@ -107,7 +107,7 @@
 					</div>
 				{:else}
 					<!-- Module cards grid -->
-					<div class="mx-auto grid w-full grid-cols-1 gap-4 md:grid-cols-2">
+					<div class="mx-auto mb-2 grid w-full grid-cols-1 gap-4 md:grid-cols-2">
 						{#each modules.filter((module) => featuredModules.includes(module.id)) as module}
 							{@const colors = getModuleColors(module.id)}
 							<a
@@ -168,9 +168,9 @@
 
 					<!-- Beta testing disclaimer - simplified -->
 					<div class="mt-6 flex w-full justify-center">
-						<div class="rounded-lg border border-[#A0998A] bg-[#F9F4E8] px-4 py-2">
-							<p class="font-['Work_Sans',sans-serif] text-sm text-[#33312E]">
-								<span class="font-bold">Beta Testing:</span> Currently only Modules 4 and 6 have content.
+						<div class="rounded-lg border border-[#C17C74] bg-[#F9F4E8] px-4 py-2">
+							<p class="font-['Work_Sans',sans-serif] p-2 text-center text-sm text-[#33312E]">
+								<span class="font-bold">Beta Testing:</span> <br>Currently only Modules 4 and 6 have content.
 								More modules coming soon!
 							</p>
 						</div>
@@ -180,7 +180,7 @@
 					<div class="mt-6 flex w-full justify-center p-2">
 						<a
 							href="/modules"
-							class="inline-flex items-center justify-center rounded-full border-2 border-[#33312E] bg-[#DDB967] px-6 py-3 text-lg font-bold text-[#33312E] transition-all hover:-translate-y-1 hover:shadow-[4px_4px_0_#826D5B]"
+							class="inline-flex items-center justify-center rounded-full border-2 p-2 border-[#33312E] bg-[#DDB967] px-6 py-3 text-lg font-bold text-[#33312E] transition-all hover:-translate-y-1 hover:shadow-[4px_4px_0_#826D5B]"
 							style="box-shadow: 2px 2px 0 #826D5B;"
 						>
 							<span>Browse All 9 Modules</span>

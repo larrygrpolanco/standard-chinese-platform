@@ -20,20 +20,15 @@
 <div class="chinese-content">
 	<div class="content-layout">
 		<div class="chinese-section">
-			{#if $fontPreferences.displayMode === 'pinyin'}
-				<!-- Pinyin-only mode -->
-				<p class="pinyin-large whitespace-pre-line">{displayPinyin}</p>
-			{:else}
-				<!-- Pinyin above characters when enabled -->
-				{#if $fontPreferences.showPinyin && pinyin}
-					<p class="pinyin whitespace-pre-line">{displayPinyin}</p>
-				{/if}
-
-				<!-- Chinese characters -->
-				<p class="chinese-text whitespace-pre-line" lang="zh">
-					{displayText}
-				</p>
+			<!-- Pinyin above characters when enabled -->
+			{#if $fontPreferences.showPinyin && pinyin}
+				<p class="pinyin whitespace-pre-line">{displayPinyin}</p>
 			{/if}
+
+			<!-- Chinese characters -->
+			<p class="chinese-text whitespace-pre-line" lang="zh">
+				{displayText}
+			</p>
 		</div>
 
 		<!-- English translation -->

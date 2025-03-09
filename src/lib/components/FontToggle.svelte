@@ -37,10 +37,10 @@
 				繁體字
 			</button>
 			<button
-				class="{buttonBaseClasses} {$fontPreferences.displayMode === 'pinyin'
+				class="{buttonBaseClasses} {$fontPreferences.showPinyin
 					? buttonActiveClasses
 					: buttonInactiveClasses}"
-				on:click={() => fontPreferences.update((p) => ({ ...p, displayMode: 'pinyin' }))}
+				on:click={() => fontPreferences.update((p) => ({ ...p, showPinyin: !p.showPinyin }))}
 			>
 				Pīnyīn
 			</button>

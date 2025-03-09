@@ -35,7 +35,7 @@
 		<slot />
 	</main>
 
-	<footer class="border-t border-[#A0998A] bg-[#E8E5D7] py-8">
+	<footer class="border-t border-[#A0998A] bg-[#E8E5D7] pb-8">
 		<div class="mx-auto px-4">
 			<div class="footer-content">
 				<!-- Main footer content -->
