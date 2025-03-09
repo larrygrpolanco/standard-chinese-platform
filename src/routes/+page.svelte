@@ -144,7 +144,6 @@
 											class="inline-flex items-center rounded-full border border-[#33312E] bg-amber-50 px-3 py-1 text-xs font-medium text-[#33312E] transition-all group-hover:bg-[#F9F4E8] group-hover:shadow-[2px_2px_0_#826D5B]"
 											style="box-shadow: 1px 1px 0 #826D5B; transition: all 0.15s ease-out;"
 										>
-											<span class="mr-1 text-xs bg-amber-50" style="color: {colors.accent};">▶</span>
 											<span>Start Module {module.id}</span>
 											<svg
 												class="ml-1 h-3 w-3 transition-transform group-hover:translate-x-1"
@@ -169,9 +168,9 @@
 					<!-- Beta testing disclaimer - simplified -->
 					<div class="mt-6 flex w-full justify-center">
 						<div class="rounded-lg border border-[#C17C74] bg-[#F9F4E8] px-4 py-2">
-							<p class="font-['Work_Sans',sans-serif] p-2 text-center text-sm text-[#33312E]">
-								<span class="font-bold">Beta Testing:</span> <br>Currently only Modules 4 and 6 have content.
-								More modules coming soon!
+							<p class="p-2 text-center font-['Work_Sans',sans-serif] text-sm text-[#33312E]">
+								<span class="font-bold">Beta Testing:</span> <br />Currently only Modules 4 and 6
+								have content. More modules coming soon!
 							</p>
 						</div>
 					</div>
@@ -180,7 +179,7 @@
 					<div class="mt-6 flex w-full justify-center p-2">
 						<a
 							href="/modules"
-							class="inline-flex items-center justify-center rounded-full border-2 p-2 border-[#33312E] bg-[#DDB967] px-6 py-3 text-lg font-bold text-[#33312E] transition-all hover:-translate-y-1 hover:shadow-[4px_4px_0_#826D5B]"
+							class="inline-flex items-center justify-center rounded-full border-2 border-[#33312E] bg-[#DDB967] p-2 px-6 py-3 text-lg font-bold text-[#33312E] transition-all hover:-translate-y-1 hover:shadow-[4px_4px_0_#826D5B]"
 							style="box-shadow: 2px 2px 0 #826D5B;"
 						>
 							<span>Browse All 9 Modules</span>
@@ -211,8 +210,6 @@
 			}
 		}
 	</style>
-
-
 
 	<!-- Stats Section with true center -->
 	<section class="flex w-full justify-center rounded-xl bg-[#F4F1DE] py-10">

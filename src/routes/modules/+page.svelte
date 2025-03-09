@@ -197,8 +197,6 @@
 									class="inline-flex items-center rounded-full border border-[#33312E] bg-[#F4F1DE] px-4 py-1.5 text-sm font-medium text-[#33312E] transition-all group-hover:-translate-y-0.5 group-hover:shadow-[2px_2px_0_#826D5B] active:translate-y-0.5 active:shadow-none"
 									style="box-shadow: 1px 1px 0 #826D5B; transition: all 0.15s ease-out;"
 								>
-									<!-- Play icon -->
-									<span class="mr-1.5 text-xs" style="color: {colors.accent};">▶</span>
 									Start learning
 									<svg
 										class="ml-1.5 h-4 w-4 transition-transform group-hover:translate-x-1"
