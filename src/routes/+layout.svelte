@@ -81,7 +81,7 @@
 				<p class="footer-text text-sm text-[#33312E]">© {new Date().getFullYear()} Taped Chinese</p>
 				<p class="footer-text mt-2 text-sm text-[#33312E]">Based on materials from the Foreign Service Institute</p>
 				<p class="footer-text mt-3 max-w-md text-xs text-[#A0998A]">
-					Modernized and digitized by a language researcher and teacher to preserve this valuable resource
+					Modernized and digitized to preserve and share this open source resource
 				</p>
 			</div>
 		</div>
