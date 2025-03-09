@@ -51,7 +51,7 @@
 
 		<!-- Tape path with movement -->
 		<div class="absolute top-[60%] right-0 left-0 h-[1px] bg-[#33312E] opacity-20"></div>
-		<div class="absolute top-[calc(60%-1px)] right-[25%] left-[25%] h-[2px]">
+		<div class="absolute top-[calc(70%+1px)] right-[25%] left-[25%] h-[2px]">
 			<div class="tape-movement h-full w-full"></div>
 		</div>
 
@@ -59,7 +59,7 @@
 		<div class="absolute top-[60%] left-[28%] h-4 w-4 -translate-x-1/2 -translate-y-1/2">
 			<div
 				class="h-full w-full animate-spin rounded-full border border-[#33312E] opacity-60"
-				style="animation-duration: 1.7s; animation-direction: reverse;"
+				style="animation-duration: 1.8s;;"
 			>
 				<div class="m-auto mt-[30%] h-[40%] w-[40%] rounded-full border border-[#33312E]">
 					<div class="m-auto mt-[20%] h-[60%] w-[60%] rounded-full bg-[#33312E]"></div>

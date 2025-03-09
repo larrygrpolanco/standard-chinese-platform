@@ -2,132 +2,332 @@
 <script>
 	export let unit;
 	export let index;
+	export let isCompleted = false;
 
-	// Generate an icon for each unit type with vintage styling
-	function getUnitIcon(index) {
-		// Set of different icons for variety with vintage styling
-		const icons = [
-			// Book icon
-			`<svg class="w-6 h-6 text-navy" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" 
-          d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-      </svg>`,
-
-			// Speech bubble icon
-			`<svg class="w-6 h-6 text-avocado" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" 
-          d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
-      </svg>`,
-
-			// Cassette tape icon (modified for vintage feel)
-			`<svg class="w-6 h-6 text-terracotta" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" 
-          d="M7 4v16M17 4v16M3 8h18M3 16h18" />
-        <circle cx="8.5" cy="12" r="1.5" />
-        <circle cx="15.5" cy="12" r="1.5" />
-      </svg>`,
-
-			// Document icon
-			`<svg class="w-6 h-6 text-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" 
-          d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-      </svg>`
+	// Generate colors based on unit number to keep consistency
+	function getUnitColors(unitNumber) {
+		const colors = [
+			{ border: '#C17C74', bg: '#F8EBE8', accent: '#C17C74' }, // Terracotta
+			{ border: '#7D8C5C', bg: '#EBEEE7', accent: '#7D8C5C' }, // Avocado
+			{ border: '#DDB967', bg: '#F9F4E8', accent: '#DDB967' }, // Gold
+			{ border: '#34667F', bg: '#EAF0F3', accent: '#34667F' } // Navy
 		];
-
-		return icons[index % icons.length];
+		return colors[(unitNumber - 1) % colors.length];
 	}
+
+	const colors = getUnitColors(unit.id);
+
+	// Colors for completion status
+	const notCompletedColor = '#A0998A'; // Grey terracotta
+	const completedColor = '#7D8C5C'; // Muted avocado
 </script>
 
 <a
 	href="/units/{unit.id}"
-	class="border-warm-gray bg-beige hover:border-terracotta block rounded-lg border p-4 font-sans transition-all hover:-translate-y-1 active:translate-y-0 sm:p-6"
+	class="unit-card"
+	style="box-shadow: inset 0 1px 10px rgba(255, 255, 255, 0.3), 1px 1px 0 #826D5B;"
+	aria-label="Unit {unit.id}: {unit.title} - {isCompleted ? 'Complete' : 'Ready'}"
 >
-	<div class="flex items-start">
-		<div class="mr-4 flex-shrink-0 sm:mr-6" style="transform: rotate(-2deg);">
-			<!-- SVG Icon with slight rotation for vintage feel -->
-			{@html getUnitIcon(index)}
+	<!-- Left color bar with unit number (styled as cassette spine) -->
+	<div class="unit-number-container" style="background-color: {colors.bg};">
+		<!-- Cassette tape texture pattern -->
+		<div class="tape-texture"></div>
+
+		<!-- Scan line animation (matches retro theme) -->
+		<div class="scan-line"></div>
+
+		<span class="unit-number">{unit.id}</span>
+	</div>
+
+	<div class="content-container">
+		<!-- Title and description section -->
+		<div class="title-description-container">
+			<div class="title-description-inner">
+				<h3 class="unit-title">
+					{unit.title}
+				</h3>
+
+				<!-- Unit description -->
+				{#if unit.description}
+					<p class="unit-description">
+						{unit.description}
+					</p>
+				{/if}
+			</div>
 		</div>
-		<div class="flex-grow">
-			<div class="mb-2 flex items-center justify-between">
-				<h3 class="text-charcoal font-serif text-lg font-bold">{unit.title}</h3>
-				<span
-					class="bg-cream-paper text-charcoal border-warm-gray ml-2 rounded-full border px-3 py-1 text-xs font-medium"
-					style="transform: rotate(-2deg);"
-				>
-					Unit {index + 1}
-				</span>
-			</div>
-			<p class="text-charcoal mb-3 text-sm">
-				{unit.description || 'Learn key language skills and vocabulary in this unit.'}
-			</p>
 
-			<!-- Unit content preview - styled as vintage badges -->
-			<div class="mb-3 flex flex-wrap gap-2">
-				<span
-					class="border-navy bg-cream-paper text-navy inline-flex items-center rounded-sm border px-2 py-1 text-xs"
-					style="transform: rotate(-1deg);"
+		<!-- Enhanced cassette tape reel visual as completion indicator -->
+		<div class="completion-indicator">
+			<div class="reels-container">
+				<!-- Left reel -->
+				<div
+					class="reel"
+					style="background-color: {isCompleted ? completedColor : notCompletedColor}30;"
 				>
-					<svg class="mr-1 h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-						<path
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							stroke-width="1.5"
-							d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"
-						/>
-					</svg>
-					Audio Dialogues
-				</span>
-				<span
-					class="border-avocado bg-cream-paper text-avocado inline-flex items-center rounded-sm border px-2 py-1 text-xs"
-					style="transform: rotate(1deg);"
+					<!-- Inner reel detail -->
+					<div class="reel-inner"></div>
+					<!-- Rotation indicator line -->
+					<div class="reel-rotation">
+						<div
+							class="reel-line"
+							style="background-color: {isCompleted ? completedColor : notCompletedColor};"
+						></div>
+					</div>
+				</div>
+
+				<!-- Right reel -->
+				<div
+					class="reel"
+					style="background-color: {isCompleted ? completedColor : notCompletedColor}30;"
 				>
-					<svg class="mr-1 h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-						<path
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							stroke-width="1.5"
-							d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"
-						/>
-					</svg>
-					Vocabulary
-				</span>
-				<span
-					class="border-terracotta bg-cream-paper text-terracotta inline-flex items-center rounded-sm border px-2 py-1 text-xs"
-					style="transform: rotate(-1deg);"
-				>
-					<svg class="mr-1 h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-						<path
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							stroke-width="1.5"
-							d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
-						/>
-					</svg>
-					Exercises
-				</span>
+					<!-- Inner reel detail -->
+					<div class="reel-inner"></div>
+					<!-- Rotation indicator line (counter-rotation) -->
+					<div class="reel-rotation reverse">
+						<div
+							class="reel-line"
+							style="background-color: {isCompleted ? completedColor : notCompletedColor};"
+						></div>
+					</div>
+				</div>
 			</div>
 
-			<!-- Call to action - styled with subtle vintage interaction -->
-			<div class="flex justify-end">
-				<span
-					class="text-navy hover:text-terracotta group inline-flex items-center text-sm font-medium transition-colors"
-				>
-					Start unit
-					<svg
-						class="ml-1 h-4 w-4 transition-transform group-hover:translate-x-1"
-						fill="none"
-						viewBox="0 0 24 24"
-						stroke="currentColor"
-					>
-						<path
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							stroke-width="1.5"
-							d="M9 5l7 7-7 7"
-						/>
-					</svg>
-				</span>
-			</div>
+			<!-- Status text -->
+			<span class="status-text" style="color: {isCompleted ? completedColor : notCompletedColor};">
+				{isCompleted ? 'Complete' : 'Ready'}
+			</span>
 		</div>
 	</div>
+
+	<!-- Side tape indicator (subtle design element) -->
+	<div
+		class="tape-indicator"
+		style="background: repeating-linear-gradient(90deg, transparent, transparent 2px, {colors.accent}20 2px, {colors.accent}20 4px);"
+	></div>
 </a>
+
+<style>
+	/* Main card styling */
+	.unit-card {
+		position: relative;
+		display: flex;
+		height: 4rem;
+		align-items: center;
+		overflow: hidden;
+		border-radius: 0.5rem;
+		border: 2px solid #33312e;
+		background-color: #f4f1de;
+		transition: all 0.2s;
+	}
+
+	.unit-card:hover {
+		transform: translateY(-0.25rem);
+		box-shadow: 3px 3px 0 #826d5b !important;
+	}
+
+	.unit-card:focus {
+		outline: none;
+		box-shadow:
+			0 0 0 2px #ddb967,
+			0 0 0 4px white;
+	}
+
+	/* Unit number container */
+	.unit-number-container {
+		position: relative;
+		display: flex;
+		height: 100%;
+		width: 4rem;
+		flex-shrink: 0;
+		align-items: center;
+		justify-content: center;
+		overflow: hidden;
+		border-right: 2px solid #33312e;
+	}
+
+	.tape-texture {
+		position: absolute;
+		inset: 0;
+		opacity: 0.1;
+		background-image:
+			linear-gradient(45deg, #33312e 25%, transparent 25%, transparent 75%, #33312e 75%, #33312e),
+			linear-gradient(45deg, #33312e 25%, transparent 25%, transparent 75%, #33312e 75%, #33312e);
+		background-size: 4px 4px;
+		background-position:
+			0 0,
+			2px 2px;
+	}
+
+	.scan-line {
+		position: absolute;
+		top: 0;
+		left: 0;
+		height: 0.25rem;
+		width: 100%;
+		background-color: rgba(255, 255, 255, 0.3);
+		animation: scanDown 3s ease-in-out infinite;
+	}
+
+	.unit-number {
+		position: relative;
+		z-index: 10;
+		font-family: 'Arvo', serif;
+		font-size: 1rem;
+		font-weight: bold;
+		color: #33312e;
+	}
+
+	/* Content container */
+	.content-container {
+		display: flex;
+		flex-grow: 1;
+		align-items: center;
+		justify-content: space-between;
+		padding-left: 0.75rem;
+		padding-right: 0.75rem;
+	}
+
+	.title-description-container {
+		flex-grow: 1;
+		padding-right: 0.5rem;
+	}
+
+	.title-description-inner {
+		display: flex;
+		flex-direction: column;
+	}
+
+	.unit-title {
+		max-width: 200px;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		font-family: 'Arvo', serif;
+		font-size: 0.875rem;
+		font-weight: 500;
+		color: #33312e;
+		margin: 0;
+	}
+
+	.unit-card:hover .unit-title {
+		color: #c17c74;
+	}
+
+	.unit-description {
+		font-size: 0.75rem;
+		color: rgba(51, 49, 46, 0.8);
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		max-width: 200px;
+		margin: 0;
+	}
+
+	/* Completion indicator */
+	.completion-indicator {
+		flex-shrink: 0;
+		display: flex;
+		align-items: center;
+	}
+
+	.reels-container {
+		display: flex;
+		align-items: center;
+		gap: 0.375rem;
+	}
+
+	.reel {
+		position: relative;
+		height: 1.5rem;
+		width: 1.5rem;
+		overflow: hidden;
+		border-radius: 9999px;
+		border: 2px solid #33312e;
+	}
+
+	.reel-inner {
+		position: absolute;
+		inset: 0.25rem;
+		border-radius: 9999px;
+		border: 1px solid rgba(51, 49, 46, 0.3);
+	}
+
+	.reel-rotation {
+		position: absolute;
+		inset: 0;
+		transform-origin: center;
+		animation: spin 15s linear infinite;
+		opacity: 0.9;
+	}
+
+	.reel-rotation.reverse {
+		animation: spin-reverse 15s linear infinite;
+	}
+
+	.reel-line {
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		height: 2px;
+		width: 100%;
+		transform: translate(-50%, -50%);
+	}
+
+	.status-text {
+		margin-left: 0.5rem;
+		font-size: 0.75rem;
+		font-weight: 500;
+		display: none;
+	}
+
+	/* Tape indicator at bottom */
+	.tape-indicator {
+		position: absolute;
+		right: 0;
+		bottom: 0;
+		left: 50%;
+		height: 2px;
+		background-color: rgba(51, 49, 46, 0.1);
+	}
+
+	/* Animations */
+	@keyframes scanDown {
+		0%,
+		100% {
+			transform: translateY(-100%);
+		}
+		50% {
+			transform: translateY(100%);
+		}
+	}
+
+	@keyframes spin {
+		from {
+			transform: rotate(0deg);
+		}
+		to {
+			transform: rotate(360deg);
+		}
+	}
+
+	@keyframes spin-reverse {
+		from {
+			transform: rotate(360deg);
+		}
+		to {
+			transform: rotate(0deg);
+		}
+	}
+
+	/* Media queries */
+	@media (min-width: 640px) {
+		.unit-title,
+		.unit-description {
+			max-width: calc(100vw - 20rem);
+		}
+
+		.status-text {
+			display: inline;
+		}
+	}
+</style>

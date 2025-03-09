@@ -179,7 +179,14 @@
 					<div class="tape-path">
 						<div class="tape-top"></div>
 						<div class="tape-roller tape-roller-left"></div>
-
+						{#key isMovingForward + tapeAnimationDuration}
+							<div
+								class="tape-middle"
+								class:move-left={(playing || scrubbing) && isMovingForward}
+								class:move-right={(playing || scrubbing) && !isMovingForward}
+								style="--tape-duration: {tapeAnimationDuration}s;"
+							></div>
+						{/key}
 						<div class="tape-roller tape-roller-right"></div>
 						<div class="tape-bottom"></div>
 					</div>
@@ -306,7 +313,7 @@
 		flex-direction: column;
 		gap: 8px;
 		/* background-color: var(--color-cream-paper); */
-		background-color: #c5b59051;
+        background-color: #c5b59051;
 		border-radius: 6px;
 		padding: 12px;
 		box-shadow: inset 0 1px 3px rgba(51, 49, 46, 0.1);
@@ -437,6 +444,43 @@
 		position: relative;
 		top: 1px;
 		transform: translateY(-50%);
+		/* Base pattern for both directions */
+		background: repeating-linear-gradient(
+			90deg,
+			var(--color-charcoal),
+			var(--color-charcoal) 8px,
+			transparent 8px,
+			transparent 12px
+		);
+		background-size: 20px 100%;
+	}
+
+	/* Left-moving animation (forward playback) */
+	.tape-middle.move-left {
+		animation: tape-move-left var(--tape-duration, 2s) infinite linear;
+	}
+
+	/* Right-moving animation (backward playback/scrubbing) */
+	.tape-middle.move-right {
+		animation: tape-move-right var(--tape-duration, 2s) infinite linear;
+	}
+
+	@keyframes tape-move-left {
+		from {
+			background-position: 0 0;
+		}
+		to {
+			background-position: -20px 0;
+		} /* Move left */
+	}
+
+	@keyframes tape-move-right {
+		from {
+			background-position: 0 0;
+		}
+		to {
+			background-position: 20px 0;
+		} /* Move right */
 	}
 
 	.tape-roller {

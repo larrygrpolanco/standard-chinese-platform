@@ -142,7 +142,6 @@
 </div>
 
 <style>
-	/* CSS remains mostly unchanged, just a few optimizations */
 	.dialogue-card {
 		position: relative;
 		overflow: hidden;

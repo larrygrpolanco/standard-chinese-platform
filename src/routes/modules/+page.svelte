@@ -219,41 +219,6 @@
 					</a>
 				{/each}
 			</div>
-
-			<!-- Vintage footer with tape decoration -->
-			<div class="mt-16 text-center">
-				<div class="relative mx-auto inline-block w-full max-w-md">
-					<div class="h-px w-full bg-[#33312E] opacity-30"></div>
-					<div class="mt-3 font-['Courier_New',monospace] text-xs text-[#33312E] opacity-50">
-						© FOREIGN SERVICE INSTITUTE - ORIGINALLY RECORDED ON CASSETTE TAPES
-					</div>
-
-					<!-- Cassette tape illustration -->
-					<div class="mt-6 inline-block opacity-30">
-						<svg
-							width="80"
-							height="48"
-							viewBox="0 0 80 48"
-							fill="none"
-							xmlns="http://www.w3.org/2000/svg"
-						>
-							<rect x="2" y="2" width="76" height="44" rx="4" stroke="#33312E" stroke-width="2" />
-							<circle cx="24" cy="24" r="8" stroke="#33312E" stroke-width="2" />
-							<circle cx="56" cy="24" r="8" stroke="#33312E" stroke-width="2" />
-							<line x1="32" y1="24" x2="48" y2="24" stroke="#33312E" stroke-width="2" />
-							<rect
-								x="14"
-								y="6"
-								width="52"
-								height="12"
-								rx="2"
-								stroke="#33312E"
-								stroke-width="1.5"
-							/>
-						</svg>
-					</div>
-				</div>
-			</div>
 		{/if}
 	</section>
 </div>

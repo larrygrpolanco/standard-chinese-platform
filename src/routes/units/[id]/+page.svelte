@@ -7,7 +7,6 @@
 		getUnitExercisesData,
 		getUnitVocabularyData
 	} from '$lib/supabase/client';
-	import Breadcrumb from '$lib/components/Breadcrumb.svelte';
 	import UnitContent from '$lib/components/UnitContent.svelte';
 	import Loader from '$lib/components/Loader.svelte';
 
@@ -106,11 +105,6 @@
 				</a>
 			</div>
 		{:else}
-			<Breadcrumb
-				moduleName={`Module ${unitData.module.id}: ${unitData.module.title}`}
-				moduleId={unitData.module.id}
-				unitName={unitData.title}
-			/>
 
 			<header class="border-warm-gray mb-6 border-b pb-4">
 				<div class="mb-2 flex flex-wrap items-center gap-3">
