@@ -37,7 +37,7 @@
 <div class="flex min-h-screen flex-col items-center justify-center bg-[#F4F1DE]">
 	<!-- src/routes/+page.svelte -->
 	<!-- Hero Section -->
-	<section class="flex w-full justify-center py-12 md:py-16">
+	<section class="flex w-full justify-center py-2 md:py-2">
 		<!-- Centered container with fixed width -->
 		<div class="w-full max-w-4xl px-4">
 			<!-- Title area - simplified and refined -->
@@ -221,7 +221,7 @@
 				<div class="relative flex h-44 w-full max-w-md justify-center md:h-48">
 					<!-- Left tape with Robocop-inspired details -->
 					<div
-						class="absolute left-0 h-32 w-48 translate-x-[-20%] rotate-[-8deg] transform md:h-40 md:w-56"
+						class="absolute left-0 h-32 w-48 translate-x-[-10%] rotate-[-8deg] transform md:h-40 md:w-56"
 					>
 						<div
 							class=" relative h-full w-full overflow-hidden rounded-lg border-2 border-[#33312E] bg-[#E8E5D7] shadow-[4px_4px_0_#826D5B]"
@@ -229,11 +229,6 @@
 							<!-- Metallic sheen effect -->
 							<div
 								class="absolute inset-0 bg-gradient-to-br from-white via-transparent to-transparent opacity-20"
-							></div>
-
-							<!-- Scan line (Robocop HUD) -->
-							<div
-								class="absolute top-0 left-0 h-1 w-full animate-[scanDown_2.5s_ease-in-out_infinite] bg-[#34667F]/30"
 							></div>
 
 							<!-- Tape label -->
@@ -276,11 +271,6 @@
 							<!-- Metallic sheen effect -->
 							<div
 								class="absolute inset-0 bg-gradient-to-bl from-white via-transparent to-transparent opacity-20"
-							></div>
-
-							<!-- Scan line (Robocop HUD) -->
-							<div
-								class="absolute bottom-0 left-0 h-1 w-full animate-[scanUp_2.5s_ease-in-out_infinite] bg-[#34667F]/30"
 							></div>
 
 							<!-- Tape label -->
@@ -395,7 +385,7 @@
 								<!-- Underline with ROBOCOP-style scan animation -->
 								<span class="absolute -bottom-1 left-0 h-[2px] w-full bg-[#33312E]/20"></span>
 								<span
-									class="absolute -bottom-1 left-0 h-[2px] w-8 animate-[scanRight_2s_ease-in-out_infinite] bg-[#C17C74]"
+									class="absolute -bottom-1 left-0 h-[2px] w-8 translate-x-8 animate-[scanRight_2s_ease-in-out_infinite] bg-[#C17C74]"
 								></span>
 							</span>
 						</h2>
