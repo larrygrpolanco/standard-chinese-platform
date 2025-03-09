@@ -62,19 +62,20 @@
 		<Loader />
 	{:else if module}
 		<div in:fade={{ duration: 300 }}>
-
 			<div class="mb-6 flex items-center gap-3">
-				<div
-					class="flex h-12 w-12 items-center justify-center rounded-full bg-[#C17C74] text-white shadow-sm"
+				<a
+					href="/modules"
+					class="flex h-12 w-12 items-center justify-center rounded-full bg-[#C17C74] text-white shadow-sm transition-transform hover:scale-105"
+					title="Back to All Modules"
 				>
 					<span class="font-['Arvo',serif] text-xl font-bold">{module.id}</span>
-				</div>
+				</a>
 				<h1 class="font-['Arvo',serif] text-2xl font-bold text-[#33312E] md:text-3xl">
 					{module.title}
 				</h1>
 			</div>
 
-            <!-- Units section -->
+			<!-- Units section -->
 			<section>
 				<h2 class="mb-4 font-['Arvo',serif] text-xl font-semibold text-[#33312E]">Choose a Unit</h2>
 
@@ -137,8 +138,6 @@
 					</div>
 				</div>
 			</div>
-
-			
 		</div>
 	{:else}
 		<div class="py-16 text-center">
