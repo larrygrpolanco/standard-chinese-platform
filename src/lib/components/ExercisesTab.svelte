@@ -1,3 +1,31 @@
+<script context="module">
+	// Helper function to format instructions with proper HTML
+	function formatInstructions(text) {
+		if (!text) return '';
+
+		// Replace line breaks with proper HTML
+		let formatted = text
+			.replace(/\n\n/g, '</p><p>') // Double line breaks become new paragraphs
+			.replace(/\n/g, '<br>'); // Single line breaks become <br>
+
+		// Wrap in paragraph tags if not already
+		if (!formatted.startsWith('<p>')) {
+			formatted = `<p>${formatted}</p>`;
+		}
+
+		// Format QUESTIONS section with bold header
+		formatted = formatted.replace(
+			/QUESTIONS/g,
+			'<strong class="questions-header">QUESTIONS</strong>'
+		);
+
+		// Format multiple choice options
+		formatted = formatted.replace(/\(\s*\)\s/g, '<span class="choice-option">( ) </span>');
+
+		return formatted;
+	}
+</script>
+
 <!-- ExercisesTab.svelte -->
 <script>
 	import { onMount } from 'svelte';
@@ -167,8 +195,10 @@
 						<h4 class="exercise-title">{currentExercise.title}</h4>
 
 						<!-- Exercise Instructions -->
-						<div class="exercise-instructions">
-							<p class="whitespace-pre-line">{currentExercise.instructions}</p>
+						<div class="exercise-instructions-container">
+							<div class="exercise-instructions">
+								{@html formatInstructions(currentExercise.instructions)}
+							</div>
 						</div>
 
 						<!-- Display Image (if available) -->
@@ -182,22 +212,7 @@
 							</div>
 						{/if}
 
-						<!-- Questions Section -->
-						<div class="questions-container mt-4">
-							{#if isLoadingQuestions}
-								<div class="loading-questions py-4 text-center">
-									<p class="text-warm-gray italic">Loading questions...</p>
-								</div>
-							{:else if currentQuestions && currentQuestions.length > 0}
-								{#each currentQuestions.sort((a, b) => a.order_num - b.order_num) as question (question.id)}
-									<!-- Your existing question rendering code -->
-								{/each}
-							{:else}
-								<div class="empty-questions py-4 text-center">
-									<p class="text-warm-gray italic">No questions available for this exercise.</p>
-								</div>
-							{/if}
-						</div>
+						<!-- Questions will be added later, no empty state message shown -->
 					</div>
 				</div>
 			{:else}
@@ -271,31 +286,46 @@
 		margin-bottom: 0.75rem;
 	}
 
+	.exercise-instructions-container {
+		margin-bottom: 1.5rem;
+	}
+
 	.exercise-instructions {
+		font-family: inherit;
 		font-size: 1rem;
-		line-height: 1.5;
+		line-height: 1.6;
 		color: var(--color-charcoal);
-		background-color: rgba(245, 242, 235, 0.7);
-		padding: 0.75rem;
-		border-radius: 0.25rem;
+		background-color: #fcf9f0;
+		padding: 1.25rem;
+		border-radius: 0.375rem;
 		border-left: 3px solid var(--color-gold);
+		box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+	}
+
+	.exercise-instructions p {
 		margin-bottom: 1rem;
 	}
 
-	/* Add this to your global CSS or component styles */
-	.exercise-instructions p {
-		white-space: pre-line;
-		line-height: 1.6;
+	.exercise-instructions p:last-child {
+		margin-bottom: 0;
+	}
+
+	.exercise-instructions .questions-header {
+		display: block;
+		margin: 1.25rem 0 0.75rem;
+		font-size: 1.1rem;
+		border-bottom: 1px solid rgba(160, 153, 138, 0.3);
+		padding-bottom: 0.375rem;
+	}
+
+	.exercise-instructions .choice-option {
+		font-family: monospace;
+		margin-right: 0.25rem;
 	}
 
 	.exercise-display-image {
 		margin: 1rem 0;
 		text-align: center;
-	}
-
-	.questions-container {
-		border-top: 1px solid rgba(160, 153, 138, 0.3);
-		padding-top: 1rem;
 	}
 
 	.empty-state {

@@ -1,6 +1,7 @@
+<!-- Update your +page.svelte file -->
 <script>
 	import { page } from '$app/stores';
-	import { onMount } from 'svelte';
+	import { onMount, afterUpdate } from 'svelte';
 	import {
 		getUnitBasicInfo,
 		getUnitReviewData,
@@ -9,11 +10,13 @@
 	} from '$lib/supabase/client';
 	import UnitContent from '$lib/components/UnitContent.svelte';
 	import Loader from '$lib/components/Loader.svelte';
+	import UnitDropdown from '$lib/components/UnitDropdown.svelte';
 
 	let unitData = null;
 	let loading = true;
 	let error = null;
 	let activeTab = 'review'; // Default tab
+	let currentUnitId = '';
 
 	// Tab data holders
 	let tabData = {
@@ -49,9 +52,12 @@
 		loadTabData(activeTab);
 	}
 
-	onMount(async () => {
+	// Load all unit data
+	async function loadUnitData(unitId) {
+		loading = true;
+		error = null;
+		
 		try {
-			const unitId = $page.params.id;
 			unitData = await getUnitBasicInfo(unitId);
 
 			if (!unitData) {
@@ -66,59 +72,67 @@
 		} finally {
 			loading = false;
 		}
+	}
+
+	// Watch for URL changes and reload data when unit ID changes
+	$: if ($page.params.id && $page.params.id !== currentUnitId) {
+		currentUnitId = $page.params.id;
+		loadUnitData(currentUnitId);
+	}
+
+	onMount(async () => {
+		const unitId = $page.params.id;
+		currentUnitId = unitId;
+		await loadUnitData(unitId);
 	});
 
 	function getAllTapes() {
 		// Safe access to ensure we don't try to use properties of undefined
 		const reviewTapes = tabData.review?.reviewTapes || [];
 		const workbookTapes = tabData.exercises?.workbookTapes || [];
-		console.log('getAllTapes called with:', {
-			reviewLoaded: !!tabData.review,
-			exercisesLoaded: !!tabData.exercises,
-			reviewTapesCount: reviewTapes.length,
-			workbookTapesCount: workbookTapes.length
-		});
 		return [...reviewTapes, ...workbookTapes];
 	}
 </script>
 
 <svelte:head>
-	<title>{unitData ? `${unitData.title} | ${unitData.module.title}` : 'Unit'} | FSI Chinese</title>
+	<title>{unitData ? `${unitData.title} | ${unitData.module.title}` : 'Unit'} | Taped Chinese</title>
 </svelte:head>
 
 <!-- New outer flex container to center everything -->
 <div class="flex w-full justify-center">
-	<div class="w-full max-w-6xl px-4 py-8 font-sans sm:px-6 lg:px-8">
+	<div class="container mx-auto max-w-4xl px-4 py-4">
 		{#if loading}
 			<Loader />
 		{:else if error}
-			<div class="py-20 text-center">
-				<h1 class="text-terracotta mb-4 font-serif text-xl">{error}</h1>
-				<p class="text-charcoal mb-4">
+			<div class="py-16 text-center">
+				<h1 class="mb-4 font-['Arvo',serif] text-xl text-[#C17C74]">{error}</h1>
+				<p class="mb-4 text-[#33312E]">
 					The unit you're looking for doesn't exist or has been removed.
 				</p>
 				<a
 					href="/modules"
-					class="bg-terracotta text-cream-paper border-terracotta/50 inline-block rounded-lg border px-4 py-2 font-medium transition-all hover:-translate-y-1 active:translate-y-0"
+					class="inline-block rounded-lg bg-[#C17C74] px-4 py-2 font-medium text-white transition-all hover:bg-[#aa6b64]"
 				>
 					Browse All Modules
 				</a>
 			</div>
 		{:else}
-
-			<header class="border-warm-gray mb-6 border-b pb-4">
-				<div class="mb-2 flex flex-wrap items-center gap-3">
-					<h1 class="text-2.5rem text-charcoal font-serif font-bold">{unitData.title}</h1>
-					<span
-						class="bg-beige border-warm-gray text-charcoal rounded-lg border px-3 py-1 text-sm"
-						style="transform: rotate(-1deg);"
+			<header class="mb-6 border-b border-[#A0998A] pb-4">
+				<div class="mb-2 flex items-center gap-3">
+					<!-- Module badge that links back to module page -->
+					<a
+						href={`/modules/${unitData.module.id}`}
+						class="flex h-12 w-12 items-center justify-center rounded-full bg-[#C17C74] text-white shadow-sm transition-transform hover:scale-105"
+						title="Go to Module {unitData.module.id}"
 					>
-						Module {unitData.module.id}
-					</span>
+						<span class="font-['Arvo',serif] text-xl font-bold">{unitData.module.id}</span>
+					</a>
+
+					<UnitDropdown {currentUnitId} currentUnit={unitData} />
 				</div>
 
 				{#if unitData.description}
-					<p class="text-charcoal mt-2 text-lg">{unitData.description}</p>
+					<p class="mt-2 text-lg text-[#33312E]">{unitData.description}</p>
 				{/if}
 			</header>
 
@@ -131,6 +145,24 @@
 				{activeTab}
 				on:tabChange={handleTabChange}
 			/>
+
+			<!-- Navigation footer -->
+			<div class="mt-8 flex justify-between border-t border-[#A0998A] pt-4">
+				<a
+					href={`/modules/${unitData.module.id}`}
+					class="flex items-center text-[#34667F] hover:text-[#C17C74]"
+				>
+					<svg class="mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							stroke-width="2"
+							d="M15 19l-7-7 7-7"
+						></path>
+					</svg>
+					Back to Module {unitData.module.id}
+				</a>
+			</div>
 		{/if}
 	</div>
 </div>

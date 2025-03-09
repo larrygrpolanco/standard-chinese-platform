@@ -144,7 +144,7 @@
 											class="inline-flex items-center rounded-full border border-[#33312E] bg-amber-50 px-3 py-1 text-xs font-medium text-[#33312E] transition-all group-hover:bg-[#F9F4E8] group-hover:shadow-[2px_2px_0_#826D5B]"
 											style="box-shadow: 1px 1px 0 #826D5B; transition: all 0.15s ease-out;"
 										>
-											<span class="mr-1 text-xs" style="color: {colors.accent};">▶</span>
+											<span class="mr-1 text-xs bg-amber-50" style="color: {colors.accent};">▶</span>
 											<span>Start Module {module.id}</span>
 											<svg
 												class="ml-1 h-3 w-3 transition-transform group-hover:translate-x-1"

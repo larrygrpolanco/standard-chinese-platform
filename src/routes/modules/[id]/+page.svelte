@@ -54,7 +54,7 @@
 </script>
 
 <svelte:head>
-	<title>{module?.title || 'Module'} | FSI Chinese</title>
+	<title>{module?.title || 'Module'} | Taped Chinese</title>
 </svelte:head>
 
 <div class="container mx-auto max-w-4xl px-4 py-4">

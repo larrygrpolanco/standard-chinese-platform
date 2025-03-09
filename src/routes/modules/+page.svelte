@@ -25,7 +25,7 @@
 </script>
 
 <svelte:head>
-	<title>Modules | FSI Chinese</title>
+	<title>Modules | Taped Chinese</title>
 	<meta
 		name="description"
 		content="Explore the FSI Standard Chinese course modules with authentic vintage audio recordings originally developed for U.S. diplomats."
