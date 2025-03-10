@@ -5,11 +5,6 @@
 	// Optional props for customization
 	export let compact = false;
 	export let label = 'Character Style:';
-
-	// Common button classes to improve maintainability
-	const buttonBaseClasses = 'relative rounded px-3 py-1 text-sm transition-all';
-	const buttonActiveClasses = 'bg-gold text-charcoal shadow-inner';
-	const buttonInactiveClasses = 'text-warm-gray';
 </script>
 
 <div class={compact ? 'compact' : ''}>
@@ -21,25 +16,23 @@
 			class="vintage-switch bg-cream-paper border-warm-gray flex rounded-md border p-1 shadow-inner"
 		>
 			<button
-				class="{buttonBaseClasses} {$fontPreferences.displayMode === 'simplified'
-					? buttonActiveClasses
-					: buttonInactiveClasses}"
+				class="button-base {$fontPreferences.displayMode === 'simplified'
+					? 'button-active'
+					: 'button-inactive'}"
 				on:click={() => fontPreferences.update((p) => ({ ...p, displayMode: 'simplified' }))}
 			>
 				简体字
 			</button>
 			<button
-				class="{buttonBaseClasses} {$fontPreferences.displayMode === 'traditional'
-					? buttonActiveClasses
-					: buttonInactiveClasses}"
+				class="button-base {$fontPreferences.displayMode === 'traditional'
+					? 'button-active'
+					: 'button-inactive'}"
 				on:click={() => fontPreferences.update((p) => ({ ...p, displayMode: 'traditional' }))}
 			>
 				繁體字
 			</button>
 			<button
-				class="{buttonBaseClasses} {$fontPreferences.showPinyin
-					? buttonActiveClasses
-					: buttonInactiveClasses}"
+				class="button-base {$fontPreferences.showPinyin ? 'button-active' : 'button-inactive'}"
 				on:click={() => fontPreferences.update((p) => ({ ...p, showPinyin: !p.showPinyin }))}
 			>
 				Pīnyīn
@@ -49,6 +42,25 @@
 </div>
 
 <style>
+	/* Moved button classes from script to style block */
+	.button-base {
+		position: relative;
+		border-radius: 0.25rem;
+		padding: 0.25rem 0.75rem;
+		font-size: 0.875rem;
+		transition: all;
+	}
+
+	.button-active {
+		/* background-color: var(--color-gold, gold); */
+		color: var(--color-charcoal, #333);
+		box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06);
+	}
+
+	.button-inactive {
+		color: var(--color-warm-gray, #8a8a8a);
+	}
+
 	.vintage-switch {
 		box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
 	}
