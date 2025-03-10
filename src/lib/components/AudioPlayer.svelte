@@ -417,7 +417,7 @@
 		width: 44px;
 		height: 44px;
 		border-radius: 50%;
-		background-color: var(--color-charcoal);
+		background-color: var(--color-warm-gray); /* Changed from charcoal to warm-gray */
 		position: relative;
 		box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 	}
@@ -426,23 +426,25 @@
 		position: absolute;
 		top: 50%;
 		left: 50%;
-		width: 12px;
-		height: 12px;
+		width: 10px;
+		height: 10px;
 		background-color: var(--color-beige);
-		border-radius: 50%;
+		border-radius: 45%;
 		transform: translate(-50%, -50%);
 		box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.3);
+         z-index: 1;
 	}
 
 	.spool-hole {
 		position: absolute;
 		top: 50%;
 		left: 50%;
-		width: 4px;
-		height: 4px;
-		background-color: #000;
-		border-radius: 50%;
+		width: 5px;
+		height: 5px;
+		background-color: var(--color-warm-gray);
+		border-radius: 40%;
 		transform: translate(-50%, -50%);
+        z-index: 2;
 	}
 
 	.spool-tape {
@@ -451,7 +453,7 @@
 		left: 50%;
 		width: var(--tape-fill, 50%);
 		height: var(--tape-fill, 50%);
-		background-color: var(--color-warm-gray);
+		background-color: var(--color-charcoal); /* Changed from warm-gray to charcoal */
 		border-radius: 50%;
 		transform: translate(-50%, -50%);
 		transition:
