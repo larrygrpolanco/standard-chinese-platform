@@ -44,7 +44,7 @@
           <button class="nav-button" aria-label="previous button" class:disabled={isFirst} on:click={onPrevious} disabled={isFirst}>
             <svg
 							xmlns="http://www.w3.org/2000/svg"
-							class="svg h-4 w-4"
+							class="h-4 w-4"
 							viewBox="0 0 24 24"
 							fill="none"
 						>
@@ -61,7 +61,7 @@
           <button class="nav-button" aria-label="next button" class:disabled={isLast} on:click={onNext} disabled={isLast}>
             <svg
 							xmlns="http://www.w3.org/2000/svg"
-							class="nav-button svg h-4 w-4"
+							class="svg h-4 w-4"
 							viewBox="0 0 24 24"
 							fill="none"
 						>
