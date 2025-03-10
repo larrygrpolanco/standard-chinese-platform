@@ -104,13 +104,6 @@
 </script>
 
 <section class="section-container">
-	<!-- Debug info (can be removed later) -->
-	{#if tapes.length === 0}
-		<div class="debug-info mb-2 rounded bg-yellow-100 p-2 text-sm text-gray-700">
-			No tapes received by CassetteTapeSelector
-		</div>
-	{/if}
-
 	<!-- Tape Selection Tabs -->
 	<div class="tape-tabs-container mb-4 flex flex-wrap gap-2">
 		{#each filteredTapes as tape}
