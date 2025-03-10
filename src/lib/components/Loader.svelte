@@ -51,7 +51,7 @@
 
 		<!-- Tape path with movement -->
 		<div class="absolute top-[60%] right-0 left-0 h-[1px] bg-[#33312E] opacity-20"></div>
-		<div class="absolute top-[calc(70%+1px)] right-[25%] left-[25%] h-[2px]">
+		<div class="absolute top-[calc(70%+1px)] right-[30%] left-[30%] h-[2px]">
 			<div class="tape-movement h-full w-full"></div>
 		</div>
 

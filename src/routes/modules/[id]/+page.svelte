@@ -27,46 +27,40 @@
 			'Ask and answer questions about travel in China and work or study details.'
 		],
 		'3': [
-			'Translate Chinese sentences from target lists to English and vice versa.',
-			'Learn Chinese names for fifteen items and discuss shopping scenarios.',
-			'Role-play making a purchase: inquire about items, prices, and availability.',
-			'Handle basic money transactions: ask for change and exchange currency.'
+			'Learn Chinese names for 15 shopping items.',
+			'Conduct basic shopping conversations (availability, price, purchase).',
+			'Describe items bought (quantity, size, color, price).',
+			'Manage currency exchange and ask for specific change.'
 		],
 		'4': [
-			'Understand and translate key shopping phrases.',
-			'Learn essential shopping vocabulary (15 items).',
-			'Practice basic conversations for shopping scenarios.',
-			'Handle shopping transactions and currency exchange.'
+			'Translate direction-related sentences between English and Chinese.',
+			'Ask for and understand directions in various locations (city, building, address).',
+			'Recognize differences between Beijing and Taipei direction expressions.',
+			'Give directions using single sentences based on floor plans.'
 		],
 		'5': [
-			'Understand and translate key shopping phrases.',
-			'Learn essential shopping vocabulary (15 items).',
-			'Practice basic conversations for shopping scenarios.',
-			'Handle shopping transactions and currency exchange.'
+			'Navigate bus and train systems for transportation.',
+			'Utilize taxis effectively for local travel.',
+			'Arrange for air travel including booking and airport logistics.',
+			'Describe detailed travel experiences and plans.'
 		],
 		'6': [
-			'Understand and translate key shopping phrases.',
-			'Learn essential shopping vocabulary (15 items).',
-			'Practice basic conversations for shopping scenarios.',
-			'Handle shopping transactions and currency exchange.'
+			'Understand and translate basic Chinese sentences.',
+			'Respond to and initiate introductions in Chinese.',
+			'Arrange and manage meetings and social events.',
+			'Handle phone calls and invitations politely.'
 		],
 		'7': [
-			'Understand and translate key shopping phrases.',
-			'Learn essential shopping vocabulary (15 items).',
-			'Practice basic conversations for shopping scenarios.',
-			'Handle shopping transactions and currency exchange.'
+			'Discuss Chinese family size and members',
+			'Apply social visit etiquette in China',
+			'Analyze traditional family roles and relationships',
+			'Explain the significance of extended families'
 		],
 		'8': [
-			'Understand and translate key shopping phrases.',
-			'Learn essential shopping vocabulary (15 items).',
-			'Practice basic conversations for shopping scenarios.',
-			'Handle shopping transactions and currency exchange.'
-		],
-		'9': [
-			'Understand and translate key shopping phrases.',
-			'Learn essential shopping vocabulary (15 items).',
-			'Practice basic conversations for shopping scenarios.',
-			'Handle shopping transactions and currency exchange.'
+			'Plan travel arrangements in Chinese',
+			'Discuss transportation options within China',
+			'Learn vocabulary for travel-related situations',
+			'Practice dialogues for booking and travel activities'
 		],
 		default: [
 			'Master key vocabulary and phrases for this topic',
@@ -157,11 +151,28 @@
 			<h2 class="mb-4 font-['Arvo',serif] text-xl font-semibold text-[#33312E]">Choose a Unit</h2>
 
 			{#if units.length > 0}
-				<div class="grid grid-cols-1 gap-3">
+				<div class="grid grid-cols-1 gap-2 mb-4">
 					{#each units as unit, index}
 						<UnitCard {unit} {index} />
 					{/each}
 				</div>
+                <!-- Navigation footer -->
+			<div class="mt-8 flex justify-between border-t border-[#A0998A] pt-4">
+				<a
+					href={`/modules`}
+					class="flex items-center text-[#34667F] hover:text-[#C17C74]"
+				>
+					<svg class="mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							stroke-width="2"
+							d="M15 19l-7-7 7-7"
+						></path>
+					</svg>
+					Back to Modules
+				</a>
+			</div>
 			{:else}
 				<div class="rounded-lg border border-[#A0998A] bg-[#E8E5D7] p-6 text-center">
 					<p class="mb-2 text-[#33312E]">No units found in this module.</p>
@@ -174,6 +185,7 @@
 				</div>
 			{/if}
 		</section>
+        
 	{:else}
 		<div class="py-16 text-center">
 			<h1 class="mb-4 font-['Arvo',serif] text-xl text-[#C17C74]">Module Not Found</h1>

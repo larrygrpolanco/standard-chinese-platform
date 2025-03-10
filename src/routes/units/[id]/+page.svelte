@@ -56,7 +56,7 @@
 	async function loadUnitData(unitId) {
 		loading = true;
 		error = null;
-		
+
 		try {
 			unitData = await getUnitBasicInfo(unitId);
 
@@ -95,7 +95,8 @@
 </script>
 
 <svelte:head>
-	<title>{unitData ? `${unitData.title} | ${unitData.module.title}` : 'Unit'} | Taped Chinese</title>
+	<title>{unitData ? `${unitData.title} | ${unitData.module.title}` : 'Unit'} | Taped Chinese</title
+	>
 </svelte:head>
 
 <!-- New outer flex container to center everything -->
@@ -117,7 +118,7 @@
 				</a>
 			</div>
 		{:else}
-			<header class="mb-6 border-b border-[#A0998A] pb-4">
+			<header class="mb-4 border-b border-[#A0998A] pb-2">
 				<div class="mb-2 flex items-center gap-3">
 					<!-- Module badge that links back to module page -->
 					<a
@@ -130,6 +131,11 @@
 
 					<UnitDropdown {currentUnitId} currentUnit={unitData} />
 				</div>
+
+				<!-- Module title at bottom of header -->
+				<p class=" text-base font-medium text-[#A0998A] italic"> Module:
+					<span class="text-[#C17C74]">{unitData.module.title}</span>
+				</p>
 
 				{#if unitData.description}
 					<p class="mt-2 text-lg text-[#33312E]">{unitData.description}</p>

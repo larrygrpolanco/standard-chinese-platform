@@ -29,8 +29,6 @@
 
 	/**
 	 * Format seconds to MM:SS display format
-	 * @param {number} seconds - Time in seconds
-	 * @returns {string} Formatted time as MM:SS
 	 */
 	function formatTime(seconds) {
 		if (!seconds || isNaN(seconds)) return '00:00';
@@ -43,6 +41,8 @@
 	 * Toggle audio playback state
 	 */
 	function togglePlay() {
+		if (!loaded) return;
+
 		if (playing) {
 			audio.pause();
 		} else {
@@ -54,7 +54,6 @@
 
 	/**
 	 * Update audio playback speed
-	 * @param {number} rate - Playback rate (0.75, 1, 1.25, etc.)
 	 */
 	function setPlaybackRate(rate) {
 		playbackRate = rate;
@@ -63,7 +62,6 @@
 
 	/**
 	 * Handle seeking when user moves the progress slider
-	 * @param {Event} e - Input event
 	 */
 	function handleSeek(e) {
 		if (audio) {
@@ -72,14 +70,9 @@
 
 			// Determine direction and speed for animation
 			if (newTime !== prevTime) {
-				// Update movement direction flag based on scrub direction
 				isMovingForward = newTime > prevTime;
-
-				// Set animation speed based on scrubbing intensity
 				const difference = Math.abs(newTime - prevTime);
 				tapeAnimationDuration = difference > 3 ? 0.5 : difference > 0.5 ? 1 : 2;
-
-				// Set rotation speed based on scrubbing direction
 				leftRotationSpeed = isMovingForward ? '0.5s' : '0.3s';
 				rightRotationSpeed = isMovingForward ? '0.3s' : '0.5s';
 			}
@@ -98,7 +91,6 @@
 			audio.pause();
 		}
 		scrubbing = true;
-		// Direction will be determined when the user actually drags
 	}
 
 	/**
@@ -115,10 +107,15 @@
 
 		// Reset animation properties for normal playback
 		tapeAnimationDuration = 2;
-
-		// Reset rotation speeds
 		leftRotationSpeed = '3s';
 		rightRotationSpeed = '3s';
+	}
+
+	/**
+	 * Prevent event propagation for controls within the cassette
+	 */
+	function handleControlClick(e) {
+		e.stopPropagation();
 	}
 
 	// Setup event listeners when component mounts
@@ -159,8 +156,17 @@
 			</div>
 		{/if}
 
-		<!-- Cassette visualization -->
-		<div class="cassette-tape">
+		<!-- Cassette visualization - now clickable with mechanical styling -->
+		<div
+			class="cassette-tape"
+			class:pressed={playing}
+			class:disabled={!loaded}
+			on:click={togglePlay}
+			role="button"
+			tabindex="0"
+			aria-label={playing ? 'Pause audio' : 'Play audio'}
+			on:keydown={(e) => e.key === ' ' && togglePlay()}
+		>
 			<div class="cassette-window">
 				<div class="spool-container">
 					<!-- Left tape spool -->
@@ -175,10 +181,24 @@
 						<div class="spool-tape"></div>
 					</div>
 
-					<!-- Tape path visualization -->
+					<!-- Tape path visualization with integrated play button -->
 					<div class="tape-path">
 						<div class="tape-top"></div>
 						<div class="tape-roller tape-roller-left"></div>
+
+						<!-- Integrated play button face -->
+						<div class="play-button-face">
+							{#if playing}
+								<svg viewBox="0 0 24 24" aria-hidden="true">
+									<rect x="7" y="6" width="3" height="12" rx="0.5"></rect>
+									<rect x="14" y="6" width="3" height="12" rx="0.5"></rect>
+								</svg>
+							{:else}
+								<svg viewBox="0 0 24 24" aria-hidden="true">
+									<polygon points="7,6 7,18 17,12" fill="currentColor"></polygon>
+								</svg>
+							{/if}
+						</div>
 
 						<div class="tape-roller tape-roller-right"></div>
 						<div class="tape-bottom"></div>
@@ -208,30 +228,10 @@
 			</div>
 		</div>
 
-		<!-- Controls -->
-		<div class="player-controls">
-			<!-- Play button with mechanical styling -->
-			<button
-				on:click={togglePlay}
-				class="play-button"
-				class:pressed={playing}
-				aria-label={playing ? 'Pause' : 'Play'}
-				disabled={!loaded}
-			>
-				<div class="button-face">
-					{#if playing}
-						<svg viewBox="0 0 24 24" aria-hidden="true">
-							<rect x="7" y="6" width="3" height="12" rx="0.5"></rect>
-							<rect x="14" y="6" width="3" height="12" rx="0.5"></rect>
-						</svg>
-					{:else}
-						<svg viewBox="0 0 24 24" aria-hidden="true">
-							<polygon points="7,6 7,18 17,12" fill="currentColor"></polygon>
-						</svg>
-					{/if}
-				</div>
-			</button>
-
+		<!-- Controls (without play button now) -->
+		<!-- svelte-ignore a11y_no_static_element_interactions -->
+		<!-- svelte-ignore a11y_click_events_have_key_events -->
+		<div class="player-controls" on:click|stopPropagation>
 			<!-- Progress bar -->
 			<div class="progress-bar">
 				<input
@@ -248,9 +248,20 @@
 					aria-label="Seek audio position"
 				/>
 				<div class="progress-track">
+					<!-- Add tick marks like on old hardware -->
+					<div class="tick-marks">
+						{#each Array(20) as _, i}
+							<div class="tick-mark" style="left: {i * 5}%"></div>
+						{/each}
+					</div>
 					<div
 						class="progress-indicator"
 						style="width: {duration > 0 ? (currentTime / duration) * 100 : 0}%"
+					></div>
+					<!-- Add visible slider head -->
+					<div
+						class="slider-knob"
+						style="left: {duration > 0 ? (currentTime / duration) * 100 : 0}%"
 					></div>
 				</div>
 			</div>
@@ -262,11 +273,11 @@
 					on:change={() => setPlaybackRate(playbackRate)}
 					aria-label="Playback speed"
 				>
-					<option value={0.75}>0.75×</option>
-					<option value={1}>1×</option>
-					<option value={1.25}>1.25×</option>
-					<option value={1.5}>1.5×</option>
-					<option value={2}>2×</option>
+					<option value={0.7}>70%</option>
+					<option value={0.8}>80%</option>
+					<option value={0.9}>90%</option>
+					<option value={1}>100%</option>
+					<option value={1.2}>120%</option>
 				</select>
 			</div>
 		</div>
@@ -298,18 +309,20 @@
 		width: 100%;
 		max-width: 400px;
 		margin: 0 auto;
-		box-shadow: 0 2px 8px rgba(51, 49, 46, 0.08);
+		box-shadow:
+			2px 2px 0 rgba(0, 0, 0, 0.2),
+			0 4px 6px rgba(51, 49, 46, 0.15),
+			inset 1px 1px 0 rgba(255, 255, 255, 0.2);
 	}
 
 	.cassette-body {
 		display: flex;
 		flex-direction: column;
 		gap: 8px;
-		/* background-color: var(--color-cream-paper); */
-		background-color: #c5b59051;
+		background-color: var(--color-beige);
 		border-radius: 6px;
 		padding: 12px;
-		box-shadow: inset 0 1px 3px rgba(51, 49, 46, 0.1);
+		box-shadow: inset 1px 1px 3px 0 rgba(51, 49, 46, 0.1);
 	}
 
 	/* Cassette label */
@@ -319,6 +332,7 @@
 		border-radius: 4px;
 		padding: 2px;
 		box-shadow: 0 1px 2px rgba(51, 49, 46, 0.15);
+		margin-bottom: 4px;
 	}
 
 	.label-text {
@@ -335,16 +349,51 @@
 		box-shadow: inset 0 1px 2px rgba(51, 49, 46, 0.05);
 	}
 
-	/* Cassette visualization */
+	/* Cassette visualization - with mechanical styling */
 	.cassette-tape {
-		background-color: var(--color-beige);
+		position: relative;
+		/* background-color: var(--color-beige); */
+		/* background-color: #e6cc91; */
+		background-image: radial-gradient(circle, #ffeeca, #f9e5bc, #f3ddad, #ecd49f, #e6cc91);
 		border: 1px solid var(--color-warm-gray);
 		border-radius: 6px;
 		display: flex;
 		flex-direction: column;
 		gap: 12px;
 		padding: 12px;
-		box-shadow: inset 0 1px 4px rgba(51, 49, 46, 0.1);
+		cursor: pointer;
+		/* Apply mechanical styling */
+		box-shadow:
+			inset 0 -1px 0 rgba(0, 0, 0, 0.2),
+			inset 0 1px 0 rgba(255, 255, 255, 0.7),
+			0 5px 0 0 var(--color-button-shadow),
+			0 6px 4px rgba(0, 0, 0, 0.15);
+		transform: translateY(0);
+		transition:
+			transform 0.1s ease,
+			box-shadow 0.1s ease;
+	}
+
+	.cassette-tape:hover {
+		/* background-image: radial-gradient(circle, #e8e5d7, #e6dfc5, #e6d9b4, #e5d3a2, #e6cc91); */
+	}
+
+	.cassette-tape:active,
+	.cassette-tape.pressed {
+		transform: translateY(5px);
+		/* background-color: #ddb967; */
+		background-image: radial-gradient(circle, #e8e5d7, #e6dfc5, #e6d9b4, #e5d3a2, #e6cc91);
+		box-shadow:
+			inset 0 -1px 0 rgba(0, 0, 0, 0.2),
+			inset 0 1px 0 rgba(255, 255, 255, 0.7),
+			0 0 0 0 var(--color-button-shadow),
+			0 1px 2px rgba(0, 0, 0, 0.1);
+	}
+
+	.cassette-tape.disabled {
+		opacity: 0.6;
+		cursor: not-allowed;
+		pointer-events: none;
 	}
 
 	.cassette-window {
@@ -430,15 +479,6 @@
 		margin: 7px 60px;
 	}
 
-	.tape-middle {
-		height: 2px;
-		background-color: var(--color-charcoal);
-		margin: 0 62px;
-		position: relative;
-		top: 1px;
-		transform: translateY(-50%);
-	}
-
 	.tape-roller {
 		position: absolute;
 		width: 6px;
@@ -455,6 +495,41 @@
 
 	.tape-roller-right {
 		right: 56px;
+	}
+
+	/* Integrated play button face */
+	.play-button-face {
+		position: absolute;
+		width: 51.777px;
+		height: 32px;
+		background-color: var(--color-terracotta);
+		border-radius: 4px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		box-shadow:
+			inset 0 1px 2px rgba(255, 255, 255, 0.3),
+			inset 0 -1px 2px rgba(0, 0, 0, 0.2);
+		z-index: 1;
+		color: white;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+		transition:
+			transform 0.1s ease,
+			background-color 0.1s ease;
+	}
+
+	.cassette-tape:active .play-button-face,
+	.cassette-tape.pressed .play-button-face {
+		transform: translate(-50%, -45%);
+		background-color: var(--color-terracotta-hover);
+	}
+
+	.play-button-face svg {
+		width: 24px;
+		height: 24px;
+		fill: currentColor;
 	}
 
 	/* Spinning animations */
@@ -515,103 +590,15 @@
 		display: flex;
 		align-items: center;
 		gap: 12px;
-	}
-
-	/* Play button with mechanical styling */
-	.play-button {
-		position: relative;
-		flex-shrink: 0;
-		width: 48px;
-		height: 48px;
-		background: none;
-		border: none;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		cursor: pointer;
-		padding: 0;
-		outline: none;
-	}
-
-	.play-button::before {
-		content: '';
-		position: absolute;
-		top: 0;
-		left: 0;
-		width: 100%;
-		height: 100%;
-		background-color: var(--color-beige);
-		border-radius: 6px;
-		box-shadow:
-			inset 0 -1px 0 rgba(0, 0, 0, 0.2),
-			inset 0 1px 0 rgba(255, 255, 255, 0.7),
-			0 5px 0 0 var(--color-button-shadow),
-			0 6px 4px rgba(0, 0, 0, 0.15);
-		transition:
-			transform 0.1s ease,
-			box-shadow 0.1s ease;
-		z-index: 0;
-	}
-
-	.play-button.pressed .button-face {
-		transform: translateY(5px);
-	}
-
-	.play-button:active .button-face {
-		transform: translateY(5px);
-	}
-
-	.button-face {
-		position: relative;
-		width: 38px;
-		height: 38px;
-		background-color: var(--color-terracotta);
-		border-radius: 4px;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		box-shadow:
-			inset 0 1px 2px rgba(255, 255, 255, 0.3),
-			inset 0 -1px 2px rgba(0, 0, 0, 0.2);
-		z-index: 1;
-		transition: transform 0.1s ease;
-		color: white;
-	}
-
-	.play-button.pressed::before {
-		transform: translateY(5px);
-		box-shadow:
-			inset 0 -1px 0 rgba(0, 0, 0, 0.2),
-			inset 0 1px 0 rgba(255, 255, 255, 0.7),
-			0 0 0 0 var(--color-button-shadow),
-			0 1px 2px rgba(0, 0, 0, 0.1);
-	}
-
-	.play-button:active::before {
-		transform: translateY(5px);
-		box-shadow:
-			inset 0 -1px 0 rgba(0, 0, 0, 0.2),
-			inset 0 1px 0 rgba(255, 255, 255, 0.7),
-			0 0 0 0 var(--color-button-shadow),
-			0 1px 2px rgba(0, 0, 0, 0.1);
-	}
-
-	.play-button:disabled {
-		opacity: 0.6;
-		cursor: not-allowed;
-	}
-
-	.play-button svg {
-		width: 24px;
-		height: 24px;
-		fill: currentColor;
+		margin-top: 8px;
 	}
 
 	/* Progress bar */
+	/* Progress bar - taller and more mechanical */
 	.progress-bar {
 		position: relative;
 		flex-grow: 1;
-		height: 20px;
+		height: 36px; /* Taller for easier interaction */
 	}
 
 	.progress-track {
@@ -619,13 +606,23 @@
 		top: 50%;
 		left: 0;
 		right: 0;
-		height: 12px;
-		background-color: var(--color-beige);
+		height: 22px; /* Significantly taller */
+		background-color: #e0ddd0;
+		/* Add subtle "grooved" texture */
+		background-image: repeating-linear-gradient(
+			90deg,
+			rgba(0, 0, 0, 0.02),
+			rgba(0, 0, 0, 0.02) 1px,
+			transparent 1px,
+			transparent 5px
+		);
 		border: 1px solid var(--color-warm-gray);
-		border-radius: 2px;
+		border-radius: 3px;
 		transform: translateY(-50%);
-		overflow: hidden;
-		box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+		overflow: visible; /* Allow knob to extend outside */
+		box-shadow:
+			inset 0 2px 4px rgba(0, 0, 0, 0.2),
+			inset 0 -1px 0 rgba(255, 255, 255, 0.5);
 	}
 
 	.progress-bar input {
@@ -644,6 +641,7 @@
 		cursor: not-allowed;
 	}
 
+	/* Make the progress indicator look more vintage */
 	.progress-indicator {
 		position: absolute;
 		top: 0;
@@ -652,10 +650,62 @@
 		background-color: var(--color-gold);
 		background-image: linear-gradient(
 			to bottom,
-			rgba(255, 255, 255, 0.2) 0%,
-			rgba(255, 255, 255, 0) 100%
+			rgba(255, 255, 255, 0.3) 0%,
+			rgba(255, 255, 255, 0) 50%,
+			rgba(0, 0, 0, 0.1) 100%
 		);
 		transition: width 0.1s linear;
+		border-radius: 0 2px 2px 0;
+	}
+
+	/* Tick marks for that analog feeling */
+	.tick-marks {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		z-index: 2;
+	}
+
+	.tick-mark {
+		position: absolute;
+		top: 0;
+		height: 100%;
+		width: 1px;
+		background-color: rgba(51, 49, 46, 0.1);
+	}
+	/* Add a physical slider knob like on real equipment */
+	.slider-knob {
+		position: absolute;
+		top: 50%;
+		width: 10px;
+		height: 30px; /* Taller than the track */
+		background-color: #a8a196; /* Metallic look */
+		background-image: linear-gradient(
+			to right,
+			rgba(255, 255, 255, 0.4) 0%,
+			rgba(255, 255, 255, 0.2) 40%,
+			rgba(0, 0, 0, 0.2) 60%,
+			rgba(0, 0, 0, 0.4) 100%
+		);
+		border: 1px solid #706a61;
+		border-radius: 2px;
+		transform: translate(-50%, -50%);
+		z-index: 3;
+		box-shadow:
+			0 2px 4px rgba(0, 0, 0, 0.2),
+			0 0 0 1px rgba(255, 255, 255, 0.1);
+		transition: all 0.05s ease;
+	}
+
+	/* Give visual feedback when dragging */
+	input:active ~ .progress-track .slider-knob {
+		background-color: #bfb7a7;
+		transform: translate(-50%, -48%); /* Slight pushed down effect */
+		box-shadow:
+			0 1px 2px rgba(0, 0, 0, 0.3),
+			0 0 0 1px rgba(255, 255, 255, 0.1);
 	}
 
 	/* Speed control */
@@ -676,6 +726,11 @@
 		box-shadow:
 			inset 0 1px 2px rgba(0, 0, 0, 0.05),
 			0 1px 0 rgba(255, 255, 255, 0.7);
+	}
+
+	.speed-control select {
+		padding: 4px 22px 4px 8px;
+		font-size: 0.75rem;
 	}
 
 	.speed-control select:hover {
@@ -716,10 +771,6 @@
 			margin: 6px 50px;
 		}
 
-		.tape-middle {
-			margin: 0 50px;
-		}
-
 		.tape-roller-left {
 			left: 46px;
 		}
@@ -728,17 +779,12 @@
 			right: 46px;
 		}
 
-		.play-button {
-			width: 42px;
-			height: 42px;
+		.play-button-face {
+			width: 28px;
+			height: 28px;
 		}
 
-		.button-face {
-			width: 34px;
-			height: 34px;
-		}
-
-		.play-button svg {
+		.play-button-face svg {
 			width: 20px;
 			height: 20px;
 		}
@@ -747,11 +793,6 @@
 			font-size: 0.85rem;
 			letter-spacing: 0.5px;
 			padding: 5px 6px;
-		}
-
-		.speed-control select {
-			padding: 4px 22px 4px 8px;
-			font-size: 0.75rem;
 		}
 	}
 </style>
