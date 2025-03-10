@@ -1,6 +1,17 @@
 Database Automation Prompts 
 Standard Chinese Learning Platform
 
+
+module 1 = 4 units
+module 2 = 8 units
+module 3 = 6 units
+module 4 = 5 units
+module 5 = 8 units
+module 6 = 8 units
+module 7 = 8 units
+module 8 = 8 units
+module 9 = 8 units
+
 Data base Prompts:
 Fuck me. I have changed the databases for reference lists so that needs to be updated, but this probably for the better I need something that works with many refrence sentences and it needs to be tested that is fine.The only thing I worry about is that the schema is slightly off, but it is what is. I can figure it out when/if it becomes a problem
 

@@ -15,24 +15,59 @@
 	// Learning objectives by module ID - customize these later
 	const moduleObjectives = {
 		'1': [
-			'Greet people and introduce yourself in Chinese',
-			'Master essential pronunciation patterns',
-			'Navigate basic conversations with confidence',
-			'Count from 1-10 and ask simple questions'
+			'Understand Chinese personal name structure and titles (Mr., Mrs., Miss, Comrade).',
+			"Ask and answer questions about someone's origin and location.",
+			'Translate between English and Chinese expressions from the target list.',
+			'Participate in short conversations about identity and origin.'
 		],
 		'2': [
-			'Talk about your nationality and occupation',
-			'Ask and answer questions about personal details',
-			'Describe your work environment',
-			'Use directional vocabulary for locations'
+			'Use polite Chinese to ask about identity, health, age, and other basic information.',
+			'Respond to questions using Chinese equivalents for "yes" and "no".',
+			'Discuss family, including members, ages, and locations in Chinese.',
+			'Ask and answer questions about travel in China and work or study details.'
 		],
 		'3': [
-			'Discuss your daily schedule and routines',
-			'Tell time and talk about calendar events',
-			'Make appointments and arrangements',
-			'Express preferences and make simple plans'
+			'Translate Chinese sentences from target lists to English and vice versa.',
+			'Learn Chinese names for fifteen items and discuss shopping scenarios.',
+			'Role-play making a purchase: inquire about items, prices, and availability.',
+			'Handle basic money transactions: ask for change and exchange currency.'
 		],
-		// Add more modules as needed
+		'4': [
+			'Understand and translate key shopping phrases.',
+			'Learn essential shopping vocabulary (15 items).',
+			'Practice basic conversations for shopping scenarios.',
+			'Handle shopping transactions and currency exchange.'
+		],
+		'5': [
+			'Understand and translate key shopping phrases.',
+			'Learn essential shopping vocabulary (15 items).',
+			'Practice basic conversations for shopping scenarios.',
+			'Handle shopping transactions and currency exchange.'
+		],
+		'6': [
+			'Understand and translate key shopping phrases.',
+			'Learn essential shopping vocabulary (15 items).',
+			'Practice basic conversations for shopping scenarios.',
+			'Handle shopping transactions and currency exchange.'
+		],
+		'7': [
+			'Understand and translate key shopping phrases.',
+			'Learn essential shopping vocabulary (15 items).',
+			'Practice basic conversations for shopping scenarios.',
+			'Handle shopping transactions and currency exchange.'
+		],
+		'8': [
+			'Understand and translate key shopping phrases.',
+			'Learn essential shopping vocabulary (15 items).',
+			'Practice basic conversations for shopping scenarios.',
+			'Handle shopping transactions and currency exchange.'
+		],
+		'9': [
+			'Understand and translate key shopping phrases.',
+			'Learn essential shopping vocabulary (15 items).',
+			'Practice basic conversations for shopping scenarios.',
+			'Handle shopping transactions and currency exchange.'
+		],
 		default: [
 			'Master key vocabulary and phrases for this topic',
 			'Practice essential grammar patterns and structures',
@@ -57,7 +92,7 @@
 	<title>{module?.title || 'Module'} | Taped Chinese</title>
 </svelte:head>
 
-<div class="container mx-auto max-w-4xl px-4 py-4">
+<div class="container mx-auto max-w-4xl px-4 py-2">
 	{#if loading}
 		<Loader />
 	{:else if module}
@@ -74,29 +109,6 @@
 					{module.title}
 				</h1>
 			</div>
-
-			<!-- Units section -->
-			<section>
-				<h2 class="mb-4 font-['Arvo',serif] text-xl font-semibold text-[#33312E]">Choose a Unit</h2>
-
-				{#if units.length > 0}
-					<div class="grid grid-cols-1 gap-3">
-						{#each units as unit, index}
-							<UnitCard {unit} {index} />
-						{/each}
-					</div>
-				{:else}
-					<div class="rounded-lg border border-[#A0998A] bg-[#E8E5D7] p-6 text-center">
-						<p class="mb-2 text-[#33312E]">No units found in this module.</p>
-						<a
-							href="/modules"
-							class="inline-block font-medium text-[#34667F] hover:text-[#C17C74] hover:underline"
-						>
-							Return to all modules
-						</a>
-					</div>
-				{/if}
-			</section>
 
 			<!-- Compact info section with description and objectives -->
 			<div class="mb-8 rounded-lg border border-[#A0998A] bg-[#E8E5D7] p-4 shadow-sm">
@@ -139,6 +151,29 @@
 				</div>
 			</div>
 		</div>
+
+		<!-- Units section -->
+		<section>
+			<h2 class="mb-4 font-['Arvo',serif] text-xl font-semibold text-[#33312E]">Choose a Unit</h2>
+
+			{#if units.length > 0}
+				<div class="grid grid-cols-1 gap-3">
+					{#each units as unit, index}
+						<UnitCard {unit} {index} />
+					{/each}
+				</div>
+			{:else}
+				<div class="rounded-lg border border-[#A0998A] bg-[#E8E5D7] p-6 text-center">
+					<p class="mb-2 text-[#33312E]">No units found in this module.</p>
+					<a
+						href="/modules"
+						class="inline-block font-medium text-[#34667F] hover:text-[#C17C74] hover:underline"
+					>
+						Return to all modules
+					</a>
+				</div>
+			{/if}
+		</section>
 	{:else}
 		<div class="py-16 text-center">
 			<h1 class="mb-4 font-['Arvo',serif] text-xl text-[#C17C74]">Module Not Found</h1>
