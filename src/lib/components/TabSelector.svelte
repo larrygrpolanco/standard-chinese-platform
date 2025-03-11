@@ -92,29 +92,27 @@
 			</span>
 
 			<!-- Vintage Dropdown Arrow -->
-			<svg 
-				class="vintage-selector-icon {showMobileMenu ? 'rotate-180' : ''}" 
-				viewBox="0 0 24 24" 
+			<svg
+				class="vintage-selector-icon {showMobileMenu ? 'rotate-180' : ''}"
+				width="24"
+				height="24"
+				viewBox="0 0 24 24"
 				xmlns="http://www.w3.org/2000/svg"
 			>
-				<circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1" fill="none" />
 				<path
-					d="M8 11L12 15L16 11"
+					d="M7 10L12 15L17 10"
 					stroke="currentColor"
 					stroke-width="2"
 					stroke-linecap="round"
 					stroke-linejoin="round"
+					fill="none"
 				/>
 			</svg>
 		</button>
 
 		<!-- Mobile Dropdown Menu -->
 		{#if showMobileMenu}
-			<div 
-				id="mobileTabs" 
-				class="vintage-selector-menu" 
-				transition:slide={{ duration: 300 }}
-			>
+			<div id="mobileTabs" class="vintage-selector-menu" transition:slide={{ duration: 300 }}>
 				{#each tabs as tab}
 					<button
 						class="vintage-selector-option {activeTab === tab.id ? 'active' : ''} {tab.disabled
@@ -222,11 +220,11 @@
 		width: 24px;
 		height: 24px;
 		transition: transform 0.3s ease;
-		color: var(--color-warm-gray, #a0998a);
+		color: var(--color-charcoal);
 	}
-	
+
 	.rotate-180 {
-		transform: rotate(180deg);
+		transform: rotate(-360deg);
 	}
 
 	.vintage-selector-menu {
