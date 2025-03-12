@@ -89,16 +89,30 @@
 	function getTapeDisplayTitle(tape) {
 		if (!tape) return '';
 
-		// Extract the number from the tape title (e.g., "C-1" -> "1")
-		const tapeNumber = tape.title.split('-')[1] || '';
-
-		if (tape.title.includes('C-')) {
-			return `Comprehension Tape-${tapeNumber}`;
-		} else if (tape.title.includes('P-')) {
-			return `Production Tape-${tapeNumber}`;
-
+		// Check if this is a module 7-9 tape (has simple "Tape X" format)
+		// Module 7-9 tapes have IDs starting with 7, 8, or 9
+		const moduleNumber = Math.floor(parseInt(tape.id.toString()) / 100);
+		
+		if (moduleNumber >= 7) {
+			// Handle modules 7-9 with different format
+			if (tape.tape_type === 'review') {
+				return `Review ${tape.title}`;
+			} else if (tape.tape_type === 'workbook') {
+				return `Workbook ${tape.title}`;
+			} else {
+				return tape.title;
+			}
 		} else {
-			return tape.title; // Fallback to original title
+			// Original behavior for modules 1-6
+			const tapeNumber = tape.title.split('-')[1] || '';
+
+			if (tape.title.includes('C-')) {
+				return `Comprehension Tape-${tapeNumber}`;
+			} else if (tape.title.includes('P-')) {
+				return `Production Tape-${tapeNumber}`;
+			} else {
+				return tape.title; // Fallback to original title
+			}
 		}
 	}
 </script>

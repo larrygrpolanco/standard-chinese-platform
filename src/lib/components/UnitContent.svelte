@@ -145,6 +145,7 @@
 					<h3 class="section-header">Listening & Speaking Tapes</h3>
 					<ReviewTab {dialogues} tapes={reviewTapes} />
 				{:else if activeTab === 'exercises'}
+                <h3 class="section-header">Exercise Tapes</h3>
 					{#if isLoadingExercisesData}
 						<div class="loading-state p-4 text-center">
 							<p>Loading workbook tapes and exercises...</p>
