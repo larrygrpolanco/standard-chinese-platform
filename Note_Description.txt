@@ -3,7 +3,7 @@
 
 I'm developing a web-based language learning platform that modernizes the Foreign Service Institute's "Standard Chinese: A Modular Approach" course materials. Built with SvelteKit, Tailwind CSS, and Supabase, this application digitizes textbook content and audio recordings from the comprehensive FSI course used to train diplomats. The content follows the original structure of 9 core modules, but I want it presented in an accessible, interactive format. Key features include toggling between simplified/traditional Chinese characters, integrated audio playback for dialogues and exercises, and eventually user accounts to track progress. I'm prioritizing a clean, intuitive UI that allows users to navigate freely between modules. As a solo developer learning fullstack development, I'm focusing on a few modules as my MVP before expanding to complete modules, with a philosophy of releasing early with core functionality to gather feedback. The platform will always maintain free access to the core FSI materials, with potential premium features like AI-generated personalized exercises added later.
 
-Crazy idea: Use the word “tapes” don’t shy away from the fact that this is an old resource! Play into it. I want the UI and aestetic to be old too with that Y2K aesthetic or even older. I want a cute audio tape player for the UI audio player. I love retro aestetics find some good examples. I am so tired of modern shit. Make it simple, old, but updated.
+
 
 
 

@@ -210,6 +210,7 @@ background-color: var(--color-cream-paper, #f5f2e8);
 		padding: 8px 12px;
 		font-size: 0.875rem;
 		font-weight: 600;
+        width:auto;
 		color: var(--color-charcoal);
 		background-color: var(--color-cream-paper);
 		border: 1px solid var(--color-warm-gray);
