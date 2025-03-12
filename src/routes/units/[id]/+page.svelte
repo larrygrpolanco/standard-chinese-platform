@@ -1,4 +1,4 @@
-<!-- Update your +page.svelte file -->
+<!-- +page.svelte file -->
 <script>
 	import { page } from '$app/stores';
 	import { onMount, afterUpdate } from 'svelte';
@@ -128,12 +128,14 @@
 					>
 						<span class="font-['Arvo',serif] text-xl font-bold">{unitData.module.id}</span>
 					</a>
-
-					<UnitDropdown {currentUnitId} currentUnit={unitData} />
+					<div class="relative z-[9999]">
+						<UnitDropdown {currentUnitId} currentUnit={unitData} />
+					</div>
 				</div>
 
 				<!-- Module title at bottom of header -->
-				<p class=" text-base font-medium text-[#A0998A] italic"> Module:
+				<p class=" text-base font-medium text-[#A0998A] italic">
+					Module:
 					<span class="text-[#C17C74]">{unitData.module.title}</span>
 				</p>
 

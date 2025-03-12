@@ -46,6 +46,25 @@
 		window.removeEventListener('resize', handleResize);
 	});
 
+    	// Inside your script tag
+	function handleTabToggle(e) {
+		e.stopPropagation();
+		showMobileMenu = !showMobileMenu;
+
+		// Force refresh of dropdown position after rendering
+		if (showMobileMenu) {
+			setTimeout(() => {
+				const dropdown = document.getElementById('mobileTabs');
+				if (dropdown) {
+					dropdown.style.zIndex = '10';
+				}
+			}, 10);
+		}
+	}
+
+	// Then update your button's on:click to use this handler
+	// <button on:click={handleTabToggle} ... >
+
 	// Get current tab info
 	$: currentTab = tabs.find((tab) => tab.id === activeTab) || tabs[0] || {};
 </script>
@@ -78,10 +97,7 @@
 	<div class="mobile-tab-selector block md:hidden" bind:this={mobileSelector}>
 		<button
 			class="vintage-selector-button"
-			on:click={(e) => {
-				e.stopPropagation(); // Prevent click from bubbling to document
-				showMobileMenu = !showMobileMenu;
-			}}
+			on:click={handleTabToggle}
 			aria-expanded={showMobileMenu}
 			aria-controls="mobileTabs"
 		>
@@ -112,7 +128,12 @@
 
 		<!-- Mobile Dropdown Menu -->
 		{#if showMobileMenu}
-			<div id="mobileTabs" class="vintage-selector-menu" transition:slide={{ duration: 300 }}>
+			<div
+				id="mobileTabs"
+				class="vintage-selector-menu"
+				transition:slide={{ duration: 200 }}
+				style="position: absolute; top: 100%; left: 0; width: 100%; z-index: 10;"
+			>
 				{#each tabs as tab}
 					<button
 						class="vintage-selector-option {activeTab === tab.id ? 'active' : ''} {tab.disabled
@@ -199,21 +220,21 @@
 	.mobile-tab-selector {
 		position: relative;
 		border-bottom: 1px solid var(--color-warm-gray, #a0998a);
-		z-index: 20; /* Ensure dropdown shows above content */
+		z-index: 10; 
 	}
 
-	.vintage-selector-button {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
+	.vintage-selector-menu {
+		position: absolute;
+		top: 100%; /* Ensures it's positioned right below the button */
+		left: 0;
 		width: 100%;
-		padding: 12px 16px;
-		font-family: 'Work Sans', sans-serif;
-		font-weight: 600;
+		z-index: 10; 
 		background-color: var(--color-cream-paper, #f4f1de);
-		border: none;
-		text-align: left;
-		color: var(--color-charcoal, #33312e);
+		border: 1px solid var(--color-warm-gray, #a0998a);
+		border-top: none;
+		box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+		max-height: 300px;
+		overflow-y: auto;
 	}
 
 	.vintage-selector-icon {
@@ -229,7 +250,7 @@
 
 	.vintage-selector-menu {
 		position: absolute;
-		z-index: 50;
+		z-index: 10;
 		width: 100%;
 		background-color: var(--color-cream-paper, #f4f1de);
 		border: 1px solid var(--color-warm-gray, #a0998a);
