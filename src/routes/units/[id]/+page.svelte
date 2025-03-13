@@ -128,7 +128,7 @@
 					>
 						<span class="font-['Arvo',serif] text-xl font-bold">{unitData.module.id}</span>
 					</a>
-					<div class="relative z-[9999]">
+					<div class="relative z-[20]">
 						<UnitDropdown {currentUnitId} currentUnit={unitData} />
 					</div>
 				</div>

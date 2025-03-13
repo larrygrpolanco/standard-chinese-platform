@@ -87,7 +87,7 @@
 
 	{#if isOpen}
 		<div
-			class="relative left-0 z-[51] mt-1 w-full max-w-[260px] border-r border-b border-l border-[#C17C74]/30 bg-[#F4F1DE]/95 shadow-[0_3px_6px_rgba(130,109,91,0.15)] backdrop-blur-sm"
+			class="relative left-0 z-[20] mt-1 w-full max-w-[260px] border-r border-b border-l border-[#C17C74]/30 bg-[#F4F1DE]/95 shadow-[0_3px_6px_rgba(130,109,91,0.15)] backdrop-blur-sm"
 			transition:slide={{ duration: 120, axis: 'y' }}
 			role="listbox"
 		>
