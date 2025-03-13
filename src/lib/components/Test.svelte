@@ -1,3 +1,4 @@
+
 <script>
 	import { onMount } from 'svelte';
 	import { fade } from 'svelte/transition';
@@ -202,17 +203,21 @@
 				<div class="md:w-3/5 md:pr-8">
 					<div class="relative mb-4 inline-block">
 						<h2 class="font-['Arvo',serif] text-2xl font-bold text-[#33312E]">
-							What is RWP?
+							Relevant World Practice
 						</h2>
 						<div class="absolute -bottom-2 left-0 h-1 w-2/3 bg-[#34667F]"></div>
 					</div>
 
 					<p class="mb-4 font-['Work_Sans',sans-serif] leading-relaxed text-[#33312E]">
-						Relevant World Practice (RWP) brings language learning into your everyday life. Instead of generic textbook examples, we create practice materials based on what matters to you - your job, hobbies, travel plans, or whatever you're passionate about. 
+						Relevant World Practice (RWP) brings language learning into your everyday life. Instead of
+						generic textbook examples, we create practice materials based on what matters to you - your
+						job, hobbies, travel plans, or whatever you're passionate about.
 					</p>
 
 					<p class="mb-6 font-['Work_Sans',sans-serif] leading-relaxed text-[#33312E]">
-						Tell us your context, and we'll build personalized quizzes, reading passages, and listening exercises that help you learn the language you'll actually use. Because the best way to learn is through examples that feel relevant to your world.
+						Tell us your context, and we'll build personalized quizzes, reading passages, and
+						listening exercises that help you learn the language you'll actually use. Because the best
+						way to learn is through examples that feel relevant to your world.
 					</p>
 
 					<a
@@ -463,4 +468,13 @@
 			</div>
 		</div>
 	</section>
+
+	<!-- Footer -->
+	<footer class="border-t border-[#A0998A] bg-[#F4F1DE] py-8">
+		<div class="container mx-auto px-4 text-center">
+			<p class="text-sm text-[#33312E] opacity-70">
+				These FSI materials are in the public domain. This is not an official government website.
+			</p>
+		</div>
+	</footer>
 </div>

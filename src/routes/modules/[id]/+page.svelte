@@ -6,7 +6,6 @@
 	import { getModuleById, getUnitsByModuleId } from '$lib/supabase/client';
 	import UnitCard from '$lib/components/UnitCard.svelte';
 	import Loader from '$lib/components/Loader.svelte';
-	import Breadcrumb from '$lib/components/Breadcrumb.svelte';
 
 	let module = null;
 	let units = [];
