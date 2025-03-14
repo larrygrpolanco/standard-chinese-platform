@@ -6,7 +6,8 @@
 		getUnitBasicInfo,
 		getUnitReviewData,
 		getUnitExercisesData,
-		getUnitVocabularyData
+		getUnitVocabularyData,
+        getUserProgress
 	} from '$lib/supabase/client';
 	import UnitContent from '$lib/components/UnitContent.svelte';
 	import Loader from '$lib/components/Loader.svelte';
@@ -77,7 +78,7 @@
 
 				// Load user progress if logged in
 				if (user) {
-					userProgress = await getUserUnitProgress(unitId);
+					userProgress = await getUserProgress(unitId);
 				}
 			}
 		} catch (err) {
@@ -90,7 +91,7 @@
 
 	// Reload progress when authentication state changes
 	$: if (user && unitData?.id) {
-		getUserUnitProgress(unitData.id)
+		getUserProgress(unitData.id)
 			.then((progress) => {
 				userProgress = progress;
 			})
@@ -182,16 +183,8 @@
 
 						<a
 							href="/rwp/{unitData.id}"
-							class="inline-flex items-center rounded-md bg-[#34667F] px-4 py-2 text-white transition-colors hover:bg-[#295267]"
+							class="inline-flex items-center rounded-md bg-[#34667F] px-4 py-2 text-black transition-colors hover:bg-[#295267]"
 						>
-							<svg class="mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-								<path
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									stroke-width="2"
-									d="M13 10V3L4 14h7v7l9-11h-7z"
-								></path>
-							</svg>
 							Practice with RWP
 						</a>
 					{:else}

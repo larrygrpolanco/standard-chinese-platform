@@ -1,6 +1,7 @@
 <script>
 	import { onMount } from 'svelte';
 	import { page } from '$app/stores';
+	import { authStore } from '$lib/stores/authStore';
 	import ModuleDropdown from './UI/ModuleDropdown.svelte';
 	import NavigationItem from './UI/NavigationItem.svelte';
 	import MobileMenu from './UI/MobileMenu.svelte';
@@ -111,12 +112,18 @@
 				on:click={toggleModuleDropdown}
 			/>
 
-			<!-- Login button styled like a cassette control -->
-			<a href="/login" class="login-button">
-				<span>Login</span>
-				<!-- Button highlight effect -->
-				<div class="login-button-highlight"></div>
-			</a>
+			<!-- Conditional login/profile button -->
+			{#if $authStore}
+				<a href="/login/profile" class="login-button">
+					<span>Profile</span>
+					<div class="login-button-highlight"></div>
+				</a>
+			{:else}
+				<a href="/login" class="login-button">
+					<span>Login</span>
+					<div class="login-button-highlight"></div>
+				</a>
+			{/if}
 		</nav>
 
 		<!-- Mobile menu button and panel -->
@@ -126,6 +133,7 @@
 			{coreModules}
 			on:toggleMenu={toggleMobileMenu}
 			on:toggleModuleDropdown={toggleModuleDropdown}
+			isLoggedIn={$authStore !== null}
 		/>
 	</div>
 </header>

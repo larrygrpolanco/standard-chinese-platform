@@ -3,6 +3,7 @@
 	export let isOpen = false;
 	export let navItems = [];
 	export let coreModules = [];
+	export let isLoggedIn = false;
 
 	import { createEventDispatcher } from 'svelte';
 	const dispatch = createEventDispatcher();
@@ -95,9 +96,11 @@
 
 				<!-- Login button (future implementation) -->
 				<div class="login-section">
-					<a href="/login" class="nav-link">
-						<span class="login-text">Login</span>
-					</a>
+					{#if isLoggedIn}
+						<a href="/login/profile" class="mobile-nav-item">Profile</a>
+					{:else}
+						<a href="/login" class="mobile-nav-item">Login</a>
+					{/if}
 				</div>
 			</div>
 		</div>
@@ -177,8 +180,8 @@
 	.menu-panel {
 		position: fixed;
 		/* inset-y: 0; */
-        top: 0;
-        bottom: 0;
+		top: 0;
+		bottom: 0;
 		right: 0;
 		width: 18rem;
 		background-color: #f4f1de;
