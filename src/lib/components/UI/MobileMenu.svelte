@@ -1,3 +1,4 @@
+<!-- MobileMenu.svelte -->
 <script>
 	export let isOpen = false;
 	export let navItems = [];
