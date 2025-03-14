@@ -7,7 +7,7 @@
 		getUnitReviewData,
 		getUnitExercisesData,
 		getUnitVocabularyData,
-        getUserProgress
+		getUserProgress,
 	} from '$lib/supabase/client';
 	import UnitContent from '$lib/components/UnitContent.svelte';
 	import Loader from '$lib/components/Loader.svelte';
@@ -174,7 +174,7 @@
 				{/if}
 
 				<!-- Progress tracking and RWP practice area -->
-				<div class="mt-4 flex flex-wrap items-center gap-3">
+				<div class="mt-6 space-y-4 sm:flex sm:flex-wrap sm:items-center sm:gap-4 sm:space-y-0">
 					{#if user}
 						<UnitProgressButton
 							unitId={unitData.id}
@@ -183,16 +183,44 @@
 
 						<a
 							href="/rwp/{unitData.id}"
-							class="inline-flex items-center rounded-md bg-[#34667F] px-4 py-2 text-black transition-colors hover:bg-[#295267]"
+							class="inline-flex items-center justify-center rounded-2xl border border-[#295267] bg-[#34667F] px-4 py-2 text-sm font-semibold text-[#F4F1DE] transition-all hover:bg-[#295267] hover:shadow-md"
 						>
+							<svg
+								class="mr-2 h-4 w-4"
+								viewBox="0 0 24 24"
+								fill="none"
+								xmlns="http://www.w3.org/2000/svg"
+							>
+								<path
+									d="M8 12H8.01M12 12H12.01M16 12H16.01M21 12C21 16.418 16.97 20 12 20C10.5 20 9.25 19.75 8 19.25L3 20L4.5 15.5C3.5 14.5 3 13.25 3 12C3 7.582 7.03 4 12 4C16.97 4 21 7.582 21 12Z"
+									stroke="currentColor"
+									stroke-width="2"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+								/>
+							</svg>
 							Practice with RWP
 						</a>
 					{:else}
 						<a
 							href="/login?redirect=/units/{unitData.id}"
-							class="text-[#34667F] underline hover:text-[#C17C74]"
+							class="inline-flex items-center rounded-2xl border border-[#A0998A] bg-[#E8E5D7] px-4 py-2 text-sm font-medium text-[#33312E] transition-all hover:bg-[#F4F1DE] hover:text-[#C17C74]"
 						>
-							Sign in to track progress and practice with RWP
+							<svg
+								class="mr-2 h-4 w-4"
+								viewBox="0 0 24 24"
+								fill="none"
+								xmlns="http://www.w3.org/2000/svg"
+							>
+								<path
+									d="M15 3H19C19.5304 3 20.0391 3.21071 20.4142 3.58579C20.7893 3.96086 21 4.46957 21 5V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H15M10 17L15 12M15 12L10 7M15 12H3"
+									stroke="currentColor"
+									stroke-width="2"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+								/>
+							</svg>
+							Sign in to track progress
 						</a>
 					{/if}
 				</div>
