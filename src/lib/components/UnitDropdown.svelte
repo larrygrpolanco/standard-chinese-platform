@@ -1,6 +1,5 @@
-<!-- UnitDropdown.svelte -->
 <script>
-	import { slide } from 'svelte/transition';
+	import { fade, fly } from 'svelte/transition';
 	import { getUnitsByModuleId } from '$lib/supabase/client';
 
 	export let currentUnit;
@@ -31,8 +30,6 @@
 			isOpen = false;
 		}
 	}
-    
-
 
 	function handleKeydown(event) {
 		if (event.key === 'Enter' || event.key === ' ') {
@@ -58,24 +55,20 @@
 	});
 </script>
 
-<div class="unit-dropdown relative">
+<div class="unit-dropdown">
 	<button
 		type="button"
-		class="m-0 inline-flex cursor-pointer items-center border-none bg-transparent p-0"
+		class="dropdown-button"
 		on:click={toggleDropdown}
 		on:keydown={handleKeydown}
 		aria-expanded={isOpen}
 		aria-haspopup="listbox"
 	>
-		<h1 class="font-['Arvo',serif] text-2xl font-bold text-[#33312E] md:text-3xl">
-			<span class="border-b border-[#C17C74] pb-0.5 transition-all duration-200 hover:border-b-2">
-				{currentUnit.title}
-			</span>
+		<h1 class="unit-title">
+			<span class="title-text">{currentUnit.title}</span>
 		</h1>
 		<svg
-			class="ml-2 h-4 w-4 text-[#A0998A] transition-all duration-200 hover:text-[#C17C74] {isOpen
-				? 'rotate-180 text-[#C17C74]'
-				: ''}"
+			class="dropdown-icon {isOpen ? 'open' : ''}"
 			fill="none"
 			stroke="currentColor"
 			viewBox="0 0 24 24"
@@ -87,24 +80,22 @@
 
 	{#if isOpen}
 		<div
-			class="relative left-0 z-[20] mt-1 w-full max-w-[260px] border-r border-b border-l border-[#C17C74]/30 bg-[#F4F1DE]/95 shadow-[0_3px_6px_rgba(130,109,91,0.15)] backdrop-blur-sm"
-			transition:slide={{ duration: 120, axis: 'y' }}
+			class="dropdown-menu"
+			in:fly={{ y: -10, duration: 120 }}
+			out:fade={{ duration: 80 }}
 			role="listbox"
 		>
 			{#if loading}
-				<div class="p-3 text-[#A0998A] italic">Loading units...</div>
+				<div class="loading-text">Loading units...</div>
 			{:else if units.length === 0}
-				<div class="p-3 text-[#A0998A] italic">No units found</div>
+				<div class="empty-text">No units found</div>
 			{:else}
-				<ul class="max-h-[60vh] overflow-y-auto py-1">
+				<ul class="dropdown-list">
 					{#each units as unit}
 						<li role="option" aria-selected={unit.id.toString() === currentUnitId}>
 							<a
 								href="/units/{unit.id}"
-								class="block border-l-2 px-4 py-2 font-['Arvo',serif] text-lg text-[#33312E] no-underline transition-all duration-150
-                      {unit.id.toString() === currentUnitId
-									? 'border-l-[#C17C74] bg-[#C17C74]/5 font-semibold text-[#C17C74]'
-									: 'border-l-transparent hover:border-l-[#DDB967] hover:bg-[#DDB967]/5'}"
+								class="dropdown-item {unit.id.toString() === currentUnitId ? 'active' : ''}"
 							>
 								{unit.title}
 							</a>
@@ -115,3 +106,114 @@
 		</div>
 	{/if}
 </div>
+
+<style>
+	.unit-dropdown {
+		position: relative;
+	}
+
+	.dropdown-button {
+		margin: 0;
+		display: inline-flex;
+		align-items: center;
+		background-color: transparent;
+		border: none;
+		padding: 0;
+		cursor: pointer;
+	}
+
+	.unit-title {
+		font-family: 'Arvo', serif;
+		font-size: 1.5rem;
+		font-weight: bold;
+		color: #33312e;
+		margin: 0;
+	}
+
+	@media (min-width: 768px) {
+		.unit-title {
+			font-size: 1.875rem;
+		}
+	}
+
+	.title-text {
+		border-bottom: 1px solid #c17c74;
+		padding-bottom: 0.125rem;
+		transition: all 0.2s;
+	}
+
+	.title-text:hover {
+		border-bottom-width: 2px;
+	}
+
+	.dropdown-icon {
+		margin-left: 0.5rem;
+		height: 1rem;
+		width: 1rem;
+		color: #a0998a;
+		transition: all 0.2s;
+	}
+
+	.dropdown-icon:hover {
+		color: #c17c74;
+	}
+
+	.dropdown-icon.open {
+		transform: rotate(180deg);
+		color: #c17c74;
+	}
+
+	.dropdown-menu {
+		position: absolute;
+		top: 100%;
+		left: 0;
+		width: 100%;
+		max-width: 260px;
+		margin-top: 0.25rem;
+		border-right: 1px solid rgba(193, 124, 116, 0.3);
+		border-bottom: 1px solid rgba(193, 124, 116, 0.3);
+		border-left: 1px solid rgba(193, 124, 116, 0.3);
+		background-color: rgba(244, 241, 222, 0.95);
+		box-shadow: 0 3px 6px rgba(130, 109, 91, 0.15);
+		backdrop-filter: blur(4px);
+		z-index: 20;
+	}
+
+	.dropdown-list {
+		max-height: 60vh;
+		overflow-y: auto;
+		padding: 0.25rem 0;
+		margin: 0;
+		list-style-type: none;
+	}
+
+	.dropdown-item {
+		display: block;
+		padding: 0.5rem 1rem;
+		font-family: 'Arvo', serif;
+		font-size: 1.125rem;
+		color: #33312e;
+		text-decoration: none;
+		border-left: 2px solid transparent;
+		transition: all 0.15s;
+	}
+
+	.dropdown-item:hover {
+		border-left-color: #ddb967;
+		background-color: rgba(221, 185, 103, 0.05);
+	}
+
+	.dropdown-item.active {
+		border-left-color: #c17c74;
+		background-color: rgba(193, 124, 116, 0.05);
+		font-weight: 600;
+		color: #c17c74;
+	}
+
+	.loading-text,
+	.empty-text {
+		padding: 0.75rem;
+		color: #a0998a;
+		font-style: italic;
+	}
+</style>

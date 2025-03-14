@@ -1,179 +1,71 @@
 <!-- TabSelector.svelte -->
 <script>
-	import { slide } from 'svelte/transition';
-	import { createEventDispatcher, onMount, onDestroy } from 'svelte';
+	import { createEventDispatcher } from 'svelte';
 
 	// Props
-	export let tabs = []; // Array of tab objects with id, label, icon, disabled properties
+	export let tabs = []; // Array of tab objects with id, label, icon properties
 	export let activeTab = ''; // Currently active tab id
-
-	// Local state
-	let showMobileMenu = false;
-	let mobileSelector;
 
 	// Event dispatcher
 	const dispatch = createEventDispatcher();
 
-	// Function to change tabs and hide mobile menu
+	// Function to change tabs
 	function selectTab(tabId) {
 		activeTab = tabId;
-		showMobileMenu = false;
 		dispatch('tabChange', { tabId });
 	}
-
-	// Handle click outside to close dropdown
-	function handleClickOutside(event) {
-		if (mobileSelector && !mobileSelector.contains(event.target) && showMobileMenu) {
-			showMobileMenu = false;
-		}
-	}
-
-	// Handle window resize
-	function handleResize() {
-		if (window.innerWidth >= 768 && showMobileMenu) {
-			showMobileMenu = false;
-		}
-	}
-
-	// Lifecycle hooks
-	onMount(() => {
-		document.addEventListener('click', handleClickOutside);
-		window.addEventListener('resize', handleResize);
-	});
-
-	onDestroy(() => {
-		document.removeEventListener('click', handleClickOutside);
-		window.removeEventListener('resize', handleResize);
-	});
-
-    	// Inside your script tag
-	function handleTabToggle(e) {
-		e.stopPropagation();
-		showMobileMenu = !showMobileMenu;
-
-		// Force refresh of dropdown position after rendering
-		if (showMobileMenu) {
-			setTimeout(() => {
-				const dropdown = document.getElementById('mobileTabs');
-				if (dropdown) {
-					dropdown.style.zIndex = '10';
-				}
-			}, 10);
-		}
-	}
-
-	// Then update your button's on:click to use this handler
-	// <button on:click={handleTabToggle} ... >
 
 	// Get current tab info
 	$: currentTab = tabs.find((tab) => tab.id === activeTab) || tabs[0] || {};
 </script>
 
 <div class="tab-selector">
-	<!-- Tab Navigation - Desktop Version -->
-	<div class="tab-container hidden rounded-b-none md:block">
+	<div class="tab-container">
 		<nav class="vintage-toggle-switch" role="tablist">
 			{#each tabs as tab}
 				<button
 					role="tab"
 					id="tab-{tab.id}"
-					class="vintage-tab-button {activeTab === tab.id ? 'active' : ''} {tab.disabled
-						? 'disabled'
-						: ''}"
+					class="vintage-tab-button {activeTab === tab.id ? 'active' : ''}"
 					aria-selected={activeTab === tab.id}
 					aria-controls="panel-{tab.id}"
-					on:click={() => !tab.disabled && selectTab(tab.id)}
-					disabled={tab.disabled}
+					on:click={() => selectTab(tab.id)}
 				>
-					{@html tab.icon}
+					<span class="tab-icon">{@html tab.icon}</span>
 					<span class="tab-label">{tab.label}</span>
-					{#if tab.disabled}<span class="coming-soon">(Coming Soon)</span>{/if}
 				</button>
 			{/each}
 		</nav>
 	</div>
-
-	<!-- Tab Navigation - Mobile Version -->
-	<div class="mobile-tab-selector block md:hidden" bind:this={mobileSelector}>
-		<button
-			class="vintage-selector-button"
-			on:click={handleTabToggle}
-			aria-expanded={showMobileMenu}
-			aria-controls="mobileTabs"
-		>
-			<!-- Current Tab Display -->
-			<span class="flex items-center">
-				{@html currentTab.icon}
-				<span class="ml-2">{currentTab.label}</span>
-			</span>
-
-			<!-- Vintage Dropdown Arrow -->
-			<svg
-				class="vintage-selector-icon {showMobileMenu ? 'rotate-180' : ''}"
-				width="24"
-				height="24"
-				viewBox="0 0 24 24"
-				xmlns="http://www.w3.org/2000/svg"
-			>
-				<path
-					d="M7 10L12 15L17 10"
-					stroke="currentColor"
-					stroke-width="2"
-					stroke-linecap="round"
-					stroke-linejoin="round"
-					fill="none"
-				/>
-			</svg>
-		</button>
-
-		<!-- Mobile Dropdown Menu -->
-		{#if showMobileMenu}
-			<div
-				id="mobileTabs"
-				class="vintage-selector-menu"
-				transition:slide={{ duration: 200 }}
-				style="position: absolute; top: 100%; left: 0; width: 100%; z-index: 10;"
-			>
-				{#each tabs as tab}
-					<button
-						class="vintage-selector-option {activeTab === tab.id ? 'active' : ''} {tab.disabled
-							? 'disabled'
-							: ''}"
-						on:click={() => !tab.disabled && selectTab(tab.id)}
-						disabled={tab.disabled}
-					>
-						{@html tab.icon}
-						<span class="ml-2">{tab.label}</span>
-						{#if tab.disabled}<span class="ml-1 text-xs">(Coming Soon)</span>{/if}
-					</button>
-				{/each}
-			</div>
-		{/if}
-	</div>
 </div>
 
 <style>
-	/* Tab Styles */
+	/* Tab container */
 	.tab-container {
 		padding: 8px;
 		border-bottom: 1px solid var(--color-warm-gray, #a0998a);
 		background-color: var(--color-cream-paper, #f4f1de);
 	}
 
+	/* Vintage toggle switch */
 	.vintage-toggle-switch {
-		display: inline-flex;
+		display: flex;
+		width: 100%;
 		background-color: var(--color-cream-paper, #f4f1de);
 		border: 1px solid var(--color-warm-gray, #a0998a);
 		border-radius: 6px;
 		padding: 3px;
 		box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
-		position: relative;
 	}
 
+	/* Tab buttons */
 	.vintage-tab-button {
+		flex: 1;
 		display: flex;
+		flex-direction: column;
 		align-items: center;
-		padding: 6px 12px;
+		justify-content: center;
+		padding: 8px 4px;
 		font-family: 'Work Sans', sans-serif;
 		font-size: 0.9rem;
 		font-weight: 500;
@@ -183,15 +75,22 @@
 		border-radius: 4px;
 		cursor: pointer;
 		transition: all 0.2s ease;
-		position: relative;
-		z-index: 1;
-		white-space: nowrap;
+		text-align: center;
 	}
 
-	.vintage-tab-button :global(svg) {
+	.tab-icon :global(svg) {
 		width: 18px;
 		height: 18px;
-		margin-right: 6px;
+		margin-bottom: 4px;
+	}
+
+	.tab-label {
+		display: block;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		max-width: 100%;
+		font-size: 0.85rem;
 	}
 
 	.vintage-tab-button.active {
@@ -201,98 +100,25 @@
 		box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 	}
 
-	.vintage-tab-button:hover:not(.active):not(.disabled) {
+	.vintage-tab-button:hover:not(.active) {
 		background-color: rgba(221, 185, 103, 0.2);
 	}
 
-	.vintage-tab-button.disabled {
-		opacity: 0.5;
-		cursor: not-allowed;
-	}
+	/* Responsive adjustments */
+	@media (min-width: 768px) {
+		.vintage-tab-button {
+			flex-direction: row;
+			padding: 8px 16px;
+			justify-content: center;
+		}
 
-	.coming-soon {
-		font-size: 0.7rem;
-		opacity: 0.7;
-		margin-left: 4px;
-	}
+		.tab-icon :global(svg) {
+			margin-right: 8px;
+			margin-bottom: 0;
+		}
 
-	/* Mobile Selector Styles */
-	.mobile-tab-selector {
-		position: relative;
-		border-bottom: 1px solid var(--color-warm-gray, #a0998a);
-		z-index: 10; 
-	}
-
-	.vintage-selector-menu {
-		position: absolute;
-		top: 100%; /* Ensures it's positioned right below the button */
-		left: 0;
-		width: 100%;
-		z-index: 10; 
-		background-color: var(--color-cream-paper, #f4f1de);
-		border: 1px solid var(--color-warm-gray, #a0998a);
-		border-top: none;
-		box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-		max-height: 300px;
-		overflow-y: auto;
-	}
-
-	.vintage-selector-icon {
-		width: 24px;
-		height: 24px;
-		transition: transform 0.3s ease;
-		color: var(--color-charcoal);
-	}
-
-	.rotate-180 {
-		transform: rotate(-360deg);
-	}
-
-	.vintage-selector-menu {
-		position: absolute;
-		z-index: 10;
-		width: 100%;
-		background-color: var(--color-cream-paper, #f4f1de);
-		border: 1px solid var(--color-warm-gray, #a0998a);
-		border-top: none;
-		box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-		max-height: 300px; /* Limit height with many options */
-		overflow-y: auto; /* Enable scrolling for many options */
-	}
-
-	.vintage-selector-option {
-		display: flex;
-		align-items: center;
-		width: 100%;
-		padding: 12px 16px;
-		text-align: left;
-		background: transparent;
-		border: none;
-		border-bottom: 1px solid rgba(160, 153, 138, 0.2);
-		color: var(--color-charcoal, #33312e);
-		font-family: 'Work Sans', sans-serif;
-	}
-
-	.vintage-selector-option:last-child {
-		border-bottom: none;
-	}
-
-	.vintage-selector-option.active {
-		background-color: rgba(221, 185, 103, 0.15);
-		font-weight: 600;
-	}
-
-	.vintage-selector-option.disabled {
-		opacity: 0.5;
-		cursor: not-allowed;
-	}
-
-	.vintage-selector-option:hover:not(.active):not(.disabled) {
-		background-color: rgba(221, 185, 103, 0.05);
-	}
-
-	.vintage-selector-option :global(svg) {
-		width: 18px;
-		height: 18px;
+		.tab-label {
+			font-size: 0.9rem;
+		}
 	}
 </style>

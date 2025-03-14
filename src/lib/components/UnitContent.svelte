@@ -18,7 +18,7 @@
 	export let tapes = [];
 	export let dialogues = [];
 	export let exercises = [];
-	export let activeTab = 'review';
+	export let activeTab = 'vocabulary';
 
 	// Direct data for exercises tab
 	let directWorkbookTapes = [];
@@ -66,12 +66,6 @@
 			label: 'Exercises',
 			icon: `<svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>`
 		},
-		{
-			id: 'ai-practice',
-			label: 'AI Practice',
-			disabled: true,
-			icon: `<svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>`
-		}
 	];
 
 	// Handle tab change and dispatch event up to parent
@@ -168,8 +162,6 @@
 							vocabulary={directVocabulary.length > 0 ? directVocabulary : vocabulary}
 						/>
 					{/if}
-				{:else if activeTab === 'ai-practice'}
-					<AIPracticeTab />
 				{/if}
 			</div>
 		{/key}

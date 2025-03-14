@@ -176,7 +176,9 @@
 
 	.menu-panel {
 		position: fixed;
-		inset-y: 0;
+		/* inset-y: 0; */
+        top: 0;
+        bottom: 0;
 		right: 0;
 		width: 18rem;
 		background-color: #f4f1de;
@@ -205,8 +207,8 @@
 	.close-button {
 		position: relative;
 		display: inline-flex;
-		height: 2rem;
-		width: 2rem;
+		height: 2.5rem;
+		width: 2.5rem;
 		align-items: center;
 		justify-content: center;
 		border-radius: 0.375rem;
