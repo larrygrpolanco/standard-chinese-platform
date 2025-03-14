@@ -171,3 +171,81 @@ CREATE POLICY "Public read-only access" ON public.tapes FOR SELECT USING (true);
 CREATE POLICY "Public read-only access" ON public.reference_list FOR SELECT USING (true);
 CREATE POLICY "Public read-only access" ON public.exercises FOR SELECT USING (true);
 CREATE POLICY "Public read-only access" ON public.exercise_questions FOR SELECT USING (true);
+
+
+-- User progress tracking
+CREATE TABLE public.user_progress (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  unit_id INTEGER NOT NULL REFERENCES public.units(id) ON DELETE CASCADE,
+  status TEXT NOT NULL DEFAULT 'in_progress' CHECK (status IN ('in_progress', 'completed')),
+  last_accessed TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  UNIQUE (user_id, unit_id)
+);
+
+-- User preferences for RWP personalization
+CREATE TABLE public.user_preferences (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  full_name TEXT,
+  occupation TEXT,
+  location TEXT,
+  hobbies TEXT,
+  learning_context TEXT,
+  UNIQUE (user_id)
+);
+
+-- RWP generated content storage
+CREATE TABLE public.rwp_content (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  unit_id INTEGER NOT NULL REFERENCES public.units(id) ON DELETE CASCADE,
+  content JSONB NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  UNIQUE (user_id, unit_id)
+);
+
+-- Enable Row Level Security (RLS)
+ALTER TABLE public.user_progress ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.user_preferences ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.rwp_content ENABLE ROW LEVEL SECURITY;
+
+-- RLS policies for user_progress
+CREATE POLICY "Users can read their own progress" 
+  ON public.user_progress FOR SELECT 
+  USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can update their own progress" 
+  ON public.user_progress FOR INSERT 
+  WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can insert their own progress" 
+  ON public.user_progress FOR UPDATE 
+  USING (auth.uid() = user_id);
+
+-- RLS policies for user_preferences
+CREATE POLICY "Users can read their own progress" 
+  ON public.user_preferences FOR SELECT 
+  USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can update their own progress" 
+  ON public.user_preferences FOR INSERT 
+  WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can insert their own progress" 
+  ON public.user_preferences FOR UPDATE 
+  USING (auth.uid() = user_id);
+
+  -- RLS policies for rwp_content
+CREATE POLICY "Users can read their own progress" 
+  ON public.rwp_content FOR SELECT 
+  USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can update their own progress" 
+  ON public.rwp_content FOR INSERT 
+  WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can insert their own progress" 
+  ON public.rwp_content FOR UPDATE 
+  USING (auth.uid() = user_id);
+
