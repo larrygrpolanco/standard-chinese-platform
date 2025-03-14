@@ -1,4 +1,3 @@
-<!-- +page.svelte file -->
 <script>
 	import { page } from '$app/stores';
 	import { onMount, afterUpdate } from 'svelte';
@@ -7,7 +6,7 @@
 		getUnitReviewData,
 		getUnitExercisesData,
 		getUnitVocabularyData,
-		getUserProgress,
+		getUserProgress
 	} from '$lib/supabase/client';
 	import UnitContent from '$lib/components/UnitContent.svelte';
 	import Loader from '$lib/components/Loader.svelte';
@@ -126,101 +125,54 @@
 </svelte:head>
 
 <!-- New outer flex container to center everything -->
-<div class="flex w-full justify-center">
-	<div class="container mx-auto max-w-4xl px-4 py-4">
+<div class="page-container">
+	<div class="content-container">
 		{#if loading}
 			<Loader />
 		{:else if error}
-			<div class="py-16 text-center">
-				<h1 class="mb-4 font-['Arvo',serif] text-xl text-[#C17C74]">{error}</h1>
-				<p class="mb-4 text-[#33312E]">
-					The unit you're looking for doesn't exist or has been removed.
-				</p>
-				<a
-					href="/modules"
-					class="inline-block rounded-lg bg-[#C17C74] px-4 py-2 font-medium text-white transition-all hover:bg-[#aa6b64]"
-				>
-					Browse All Modules
-				</a>
+			<div class="error-container">
+				<h1 class="error-heading">{error}</h1>
+				<p class="error-text">The unit you're looking for doesn't exist or has been removed.</p>
+				<a href="/modules" class="error-button"> Browse All Modules </a>
 			</div>
 		{:else}
-			<header class="mb-4 border-b border-[#A0998A] pb-2">
-				<div class="mb-2 flex items-center gap-3">
+			<header class="unit-header">
+				<div class="module-nav">
 					<!-- Module badge that links back to module page -->
 					<a
 						href={`/modules/${unitData.module.id}`}
-						class="flex h-12 w-12 items-center justify-center rounded-full bg-[#C17C74] text-white shadow-sm transition-transform hover:scale-105"
+						class="module-badge"
 						title="Go to Module {unitData.module.id}"
 					>
-						<span class="font-['Arvo',serif] text-xl font-bold">{unitData.module.id}</span>
+						<span class="module-badge-text">{unitData.module.id}</span>
 					</a>
-					<div class="relative z-[20]">
+					<div class="dropdown-wrapper">
 						<UnitDropdown {currentUnitId} currentUnit={unitData} />
 					</div>
 				</div>
 
 				<!-- Module title at bottom of header -->
-				<p class=" text-base font-medium text-[#A0998A] italic">
+				<p class="module-title">
 					Module:
-					<span class="text-[#C17C74]">{unitData.module.title}</span>
+					<span class="module-title-highlight">{unitData.module.title}</span>
 				</p>
 
 				{#if unitData.description}
-					<p class="mt-2 text-lg text-[#33312E]">{unitData.description}</p>
-				{/if}
-				<!-- After unit description -->
-				{#if unitData.description}
-					<p class="mt-2 text-lg text-[#33312E]">{unitData.description}</p>
+					<p class="unit-description">{unitData.description}</p>
 				{/if}
 
 				<!-- Progress tracking and RWP practice area -->
-				<div class="mt-6 space-y-4 sm:flex sm:flex-wrap sm:items-center sm:gap-4 sm:space-y-0">
+				<div class="action-buttons">
 					{#if user}
 						<UnitProgressButton
 							unitId={unitData.id}
 							initialStatus={userProgress?.status || 'in_progress'}
 						/>
 
-						<a
-							href="/rwp/{unitData.id}"
-							class="inline-flex items-center justify-center rounded-2xl border border-[#295267] bg-[#34667F] px-4 py-2 text-sm font-semibold text-[#F4F1DE] transition-all hover:bg-[#295267] hover:shadow-md"
-						>
-							<svg
-								class="mr-2 h-4 w-4"
-								viewBox="0 0 24 24"
-								fill="none"
-								xmlns="http://www.w3.org/2000/svg"
-							>
-								<path
-									d="M8 12H8.01M12 12H12.01M16 12H16.01M21 12C21 16.418 16.97 20 12 20C10.5 20 9.25 19.75 8 19.25L3 20L4.5 15.5C3.5 14.5 3 13.25 3 12C3 7.582 7.03 4 12 4C16.97 4 21 7.582 21 12Z"
-									stroke="currentColor"
-									stroke-width="2"
-									stroke-linecap="round"
-									stroke-linejoin="round"
-								/>
-							</svg>
-							Practice with RWP
-						</a>
+						<a href="/rwp/{unitData.id}" class="rwp-button"> Real World Practice </a>
 					{:else}
-						<a
-							href="/login?redirect=/units/{unitData.id}"
-							class="inline-flex items-center rounded-2xl border border-[#A0998A] bg-[#E8E5D7] px-4 py-2 text-sm font-medium text-[#33312E] transition-all hover:bg-[#F4F1DE] hover:text-[#C17C74]"
-						>
-							<svg
-								class="mr-2 h-4 w-4"
-								viewBox="0 0 24 24"
-								fill="none"
-								xmlns="http://www.w3.org/2000/svg"
-							>
-								<path
-									d="M15 3H19C19.5304 3 20.0391 3.21071 20.4142 3.58579C20.7893 3.96086 21 4.46957 21 5V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H15M10 17L15 12M15 12L10 7M15 12H3"
-									stroke="currentColor"
-									stroke-width="2"
-									stroke-linecap="round"
-									stroke-linejoin="round"
-								/>
-							</svg>
-							Sign in to track progress
+						<a href="/login?redirect=/units/{unitData.id}" class="signin-button">
+							Sign-in to Unlock Progress Tracking & RWPs
 						</a>
 					{/if}
 				</div>
@@ -237,12 +189,9 @@
 			/>
 
 			<!-- Navigation footer -->
-			<div class="mt-8 flex justify-between border-t border-[#A0998A] pt-4">
-				<a
-					href={`/modules/${unitData.module.id}`}
-					class="flex items-center text-[#34667F] hover:text-[#C17C74]"
-				>
-					<svg class="mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+			<div class="navigation-footer">
+				<a href={`/modules/${unitData.module.id}`} class="back-link">
+					<svg class="back-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 						<path
 							stroke-linecap="round"
 							stroke-linejoin="round"
@@ -256,3 +205,200 @@
 		{/if}
 	</div>
 </div>
+
+<style>
+	/* Page layout */
+	.page-container {
+		display: flex;
+		width: 100%;
+		justify-content: center;
+	}
+
+	.content-container {
+		margin-left: auto;
+		margin-right: auto;
+		max-width: 1240px; /* You can adjust this value as needed */
+		padding: 1rem;
+		width: 100%; /* Ensures it takes full available width up to max-width */
+	}
+
+	/* Error display */
+	.error-container {
+		padding: 4rem 0;
+		text-align: center;
+	}
+
+	.error-heading {
+		margin-bottom: 1rem;
+		font-family: 'Arvo', serif;
+		font-size: 1.25rem;
+		color: #c17c74;
+	}
+
+	.error-text {
+		margin-bottom: 1rem;
+		color: #33312e;
+	}
+
+	.error-button {
+		display: inline-block;
+		border-radius: 0.5rem;
+		background-color: #c17c74;
+		padding: 0.5rem 1rem;
+		font-weight: 500;
+		color: white;
+		transition: all 0.2s;
+	}
+
+	.error-button:hover {
+		background-color: #aa6b64;
+	}
+
+	/* Unit header */
+	.unit-header {
+		margin-bottom: 1rem;
+		border-bottom: 1px solid #a0998a;
+		padding-bottom: 0.5rem;
+	}
+
+	.module-nav {
+		margin-bottom: 0.5rem;
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+	}
+
+	.module-badge {
+		display: flex;
+		height: 3rem;
+		width: 3rem;
+		align-items: center;
+		justify-content: center;
+		border-radius: 9999px;
+		background-color: #c17c74;
+		color: white;
+		box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+		transition: transform 0.2s;
+	}
+
+	.module-badge:hover {
+		transform: scale(1.05);
+	}
+
+	.module-badge-text {
+		font-family: 'Arvo', serif;
+		font-size: 1.25rem;
+		font-weight: 700;
+	}
+
+	.dropdown-wrapper {
+		position: relative;
+		z-index: 20;
+	}
+
+	.module-title {
+		font-size: 1rem;
+		font-weight: 500;
+		color: #a0998a;
+		font-style: italic;
+	}
+
+	.module-title-highlight {
+		color: #c17c74;
+	}
+
+	.unit-description {
+		margin-top: 0.5rem;
+		font-size: 1.125rem;
+		color: #33312e;
+	}
+
+	.action-buttons {
+		margin-top: 1.5rem;
+		display: flex;
+		flex-direction: column;
+		gap: 1rem;
+	}
+
+	@media (min-width: 640px) {
+		.action-buttons {
+			flex-direction: row;
+			flex-wrap: wrap;
+			align-items: center;
+			gap: 1rem;
+			/* space-y: 0; */
+			margin-top: 0;
+		}
+	}
+
+	/* Navigation footer */
+	.navigation-footer {
+		margin-top: 2rem;
+		display: flex;
+		justify-content: space-between;
+		border-top: 1px solid #a0998a;
+		padding-top: 1rem;
+	}
+
+	.back-link {
+		display: flex;
+		align-items: center;
+		color: #34667f;
+	}
+
+	.back-link:hover {
+		color: #c17c74;
+	}
+
+	.back-icon {
+		margin-right: 0.5rem;
+		height: 1.25rem;
+		width: 1.25rem;
+	}
+
+	/* Button styles */
+	.rwp-button,
+	.signin-button {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		padding: 8px 16px;
+		border-radius: 16px;
+		font-weight: 600;
+		font-size: 0.875rem;
+		cursor: pointer;
+		transition: all 0.2s;
+		min-width: 140px;
+		text-decoration: none;
+	}
+
+	.rwp-button {
+		background-color: #34667f;
+		color: #f4f1de;
+		border: 1px solid #295267;
+	}
+
+	.rwp-button:hover {
+		transform: translateY(-1px);
+		box-shadow: 0 2px 4px rgba(41, 82, 103, 0.3);
+		background-color: #7d8c5c;
+	}
+
+	.signin-button {
+		background-color: #e8e5d7;
+		border: 1px solid #a0998a;
+	}
+
+	.signin-button:hover {
+		transform: translateY(-1px);
+		box-shadow: 0 2px 4px rgba(160, 153, 138, 0.2);
+		background-color: #f4f1de;
+		color: #c17c74;
+	}
+
+	.rwp-button:active,
+	.signin-button:active {
+		transform: translateY(1px);
+		box-shadow: none;
+	}
+</style>

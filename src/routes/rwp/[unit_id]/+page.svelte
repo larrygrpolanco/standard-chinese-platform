@@ -9,6 +9,7 @@
 		saveRwpContent
 	} from '$lib/supabase/client';
 	import { authStore } from '$lib/stores/authStore';
+	import TapeConstruction from "$lib/components/TapeConstruction.svelte";
 
 	const unitId = parseInt($page.params.unit_id);
 
@@ -66,6 +67,7 @@
 	}
 </script>
 
+<TapeConstruction />
 <div class="rwp-container">
 	{#if loading}
 		<p>Loading...</p>

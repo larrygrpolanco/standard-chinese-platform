@@ -1,9 +1,11 @@
+<!-- ModuleCard.svelte -->
 <script>
 	import { fade } from 'svelte/transition';
 
 	// Props
 	export let authStore;
 	export let latestUnit = null;
+	export let completedCount = 0; // Just pass the count of completed units
 
 	// Navigation functions
 	function navigateToModules() {
@@ -24,6 +26,28 @@
 			event.preventDefault();
 			navigateToModules();
 		}
+	}
+
+	// Get progress level based on completed count
+	function getProgressWidth() {
+		if (!$authStore || completedCount === 0) return 0;
+		if (completedCount < 10) return 15;
+		if (completedCount < 20) return 30;
+		if (completedCount < 30) return 45;
+		if (completedCount < 40) return 60;
+		if (completedCount < 50) return 75;
+		if (completedCount < 63) return 90;
+		return 100;
+	}
+
+	// Get a descriptive progress status text
+	function getProgressStatusText() {
+		if (!$authStore || completedCount === 0) return 'SIDE A - NOT STARTED';
+		if (completedCount < 15) return 'SIDE A - JUST STARTED';
+		if (completedCount < 30) return 'SIDE A - MAKING PROGRESS';
+		if (completedCount < 45) return 'SIDE B - OVER HALFWAY';
+		if (completedCount < 63) return 'SIDE B - ALMOST DONE';
+		return 'SIDE B - COMPLETE';
 	}
 </script>
 
@@ -83,10 +107,10 @@
 						>
 							<!-- Progress bar -->
 							<div
-								class="h-full {$authStore && latestUnit ? 'w-[30%]' : 'w-0'}"
-								style="transition: width 0.3s ease-out; background-color: #C17C74; opacity: 0.8;"
+								class="h-full"
+								style="width: {getProgressWidth()}%; transition: width 0.3s ease-out; background-color: #C17C74; opacity: 0.8;"
 								role="progressbar"
-								aria-valuenow={$authStore && latestUnit ? 30 : 0}
+								aria-valuenow={getProgressWidth()}
 								aria-valuemin="0"
 								aria-valuemax="100"
 							></div>
@@ -103,8 +127,8 @@
 						</div>
 					</div>
 					<p class="mt-1 font-['Courier_New',monospace] text-xs text-[#33312E] opacity-70">
-						{#if $authStore && latestUnit}
-							SIDE A - MODULE {latestUnit.units.modules.order_num}
+						{#if $authStore}
+							{getProgressStatusText()} - {completedCount}/63 UNITS
 						{:else}
 							SIDE A - NOT STARTED
 						{/if}

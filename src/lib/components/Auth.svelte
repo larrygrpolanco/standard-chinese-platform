@@ -49,68 +49,186 @@
 	}
 </script>
 
-<div class="auth-form mx-auto max-w-md rounded-lg border border-gray-200 bg-white p-6 shadow-md">
-	<h2 class="mb-6 text-center text-2xl font-bold">{isRegister ? 'Create Account' : 'Sign In'}</h2>
+<div class="auth-container">
+	<div class="auth-form">
+		<h2 class="form-title">
+			{isRegister ? 'Create Account' : 'Sign In'}
+		</h2>
 
-	{#if error}
-		<div class="mb-4 rounded border border-red-400 bg-red-100 px-4 py-3 text-red-700">
-			{error}
-		</div>
-	{/if}
-
-	<form on:submit|preventDefault={handleSubmit} class="space-y-4">
-		<div class="form-group">
-			<label for="email" class="mb-1 block text-sm font-medium text-gray-700">Email</label>
-			<input
-				type="email"
-				id="email"
-				bind:value={email}
-				required
-				class="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 focus:outline-none"
-			/>
-		</div>
-
-		<div class="form-group">
-			<label for="password" class="mb-1 block text-sm font-medium text-gray-700">Password</label>
-			<input
-				type="password"
-				id="password"
-				bind:value={password}
-				required
-				class="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 focus:outline-none"
-			/>
-		</div>
-
-		{#if isRegister}
-			<div class="form-group">
-				<label for="confirmPassword" class="mb-1 block text-sm font-medium text-gray-700"
-					>Confirm Password</label
-				>
-				<input
-					type="password"
-					id="confirmPassword"
-					bind:value={confirmPassword}
-					required
-					class="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 focus:outline-none"
-				/>
+		{#if error}
+			<div class="error-message">
+				{error}
 			</div>
 		{/if}
 
-		<button
-			type="submit"
-			disabled={loading}
-			class="w-full rounded-md bg-indigo-600 px-4 py-2 text-white hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:outline-none disabled:opacity-50"
-		>
-			{loading ? 'Processing...' : isRegister ? 'Register' : 'Sign In'}
-		</button>
-	</form>
+		<form on:submit|preventDefault={handleSubmit} class="auth-form-fields">
+			<div class="form-group">
+				<label for="email">Email</label>
+				<input
+					type="email"
+					id="email"
+					bind:value={email}
+					required
+				/>
+			</div>
 
-	<div class="mt-4 text-center">
-		<button
-			on:click={() => (isRegister = !isRegister)}
-			class="text-indigo-600 hover:text-indigo-500"
-		>
-			{isRegister ? 'Already have an account? Sign In' : 'Need an account? Register'}
-		</button>
+			<div class="form-group">
+				<label for="password">Password</label>
+				<input
+					type="password"
+					id="password"
+					bind:value={password}
+					required
+				/>
+			</div>
+
+			{#if isRegister}
+				<div class="form-group">
+					<label for="confirmPassword">Confirm Password</label>
+					<input
+						type="password"
+						id="confirmPassword"
+						bind:value={confirmPassword}
+						required
+					/>
+				</div>
+			{/if}
+
+			<button
+				type="submit"
+				disabled={loading}
+				class="tape-button"
+			>
+				{loading ? 'Processing...' : isRegister ? 'Register' : 'Sign In'}
+			</button>
+		</form>
+
+		<div class="toggle-mode">
+			<button
+				on:click={() => (isRegister = !isRegister)}
+				class="toggle-button"
+			>
+				{isRegister ? 'Already have an account? Sign In' : 'Need an account? Register'}
+			</button>
+		</div>
 	</div>
 </div>
+
+<style>
+	.auth-container {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		width: 100%;
+	}
+
+	.auth-form {
+		width: 100%;
+		max-width: 28rem;
+		margin: 0 auto;
+		padding: 1.5rem;
+		background-color: #E8E5D7;
+		border: 1px solid #A0998A;
+		border-radius: 0.5rem;
+		box-shadow: inset 0 1px 3px rgba(51, 49, 46, 0.1);
+	}
+
+	.form-title {
+		margin-bottom: 1.5rem;
+		font-family: 'Arvo', serif;
+		font-size: 1.5rem;
+		font-weight: bold;
+		text-align: center;
+		color: #33312E;
+	}
+
+	.error-message {
+		margin-bottom: 1rem;
+		padding: 0.75rem 1rem;
+		background-color: #F4F1DE;
+		border: 1px solid #C17C74;
+		border-radius: 0.25rem;
+		color: #C17C74;
+	}
+
+	.auth-form-fields {
+		font-family: 'Work Sans', sans-serif;
+		display: flex;
+		flex-direction: column;
+		gap: 1.5rem;
+	}
+
+	.form-group {
+		display: flex;
+		flex-direction: column;
+	}
+
+	.form-group label {
+		display: block;
+		margin-bottom: 0.5rem;
+		font-size: 0.875rem;
+		font-weight: 500;
+		color: #33312E;
+	}
+
+	.form-group input {
+		width: 100%;
+		padding: 0.5rem 0.75rem;
+		background-color: #F4F1DE;
+		border: 1px solid #A0998A;
+		border-radius: 0.375rem;
+		box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
+		transition: all 0.2s;
+	}
+
+	.form-group input:focus {
+		outline: none;
+		border-color: #DDB967;
+		box-shadow: 0 0 0 2px rgba(221, 185, 103, 0.2);
+	}
+
+	.tape-button {
+		width: 100%;
+		padding: 0.5rem 1rem;
+		background-color: #C17C74;
+		color: #F4F1DE;
+		font-weight: 600;
+		border: none;
+		border-radius: 9999px;
+		box-shadow: 0 2px 0 #826D5B;
+		transition: all 0.2s;
+	}
+	
+	.tape-button:hover:not(:disabled) {
+		background-color: #AD6C66;
+	}
+	
+	.tape-button:active {
+		transform: translateY(2px);
+		box-shadow: 0 0 0 #826D5B;
+	}
+	
+	.tape-button:disabled {
+		opacity: 0.5;
+		cursor: not-allowed;
+	}
+
+	.toggle-mode {
+		margin-top: 1.5rem;
+		text-align: center;
+	}
+
+	.toggle-button {
+		padding: 0.5rem 1rem;
+		color: #34667F;
+		border: none;
+		background: transparent;
+		border-radius: 9999px;
+		transition: all 0.2s;
+	}
+
+	.toggle-button:hover {
+		background-color: rgba(221, 185, 103, 0.2);
+		color: #C17C74;
+	}
+</style>

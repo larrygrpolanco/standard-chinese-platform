@@ -17,7 +17,7 @@
 		// Digital counter animation
 		counterInterval = setInterval(() => {
 			counter = (counter + 1) % 1000;
-		}, 100);
+		}, 150);
 
 		// Animated dots
 		dotsInterval = setInterval(() => {
@@ -56,8 +56,8 @@
 		<div class="absolute top-[8%] right-[8%] h-2 w-2 rounded-full bg-[#C17C74]"></div>
 		
 		<!-- Side labels -->
-		<!-- <div class="absolute top-[42%] left-[8%] text-[6px] font-semibold text-[#33312E]/70">A</div>
-		<div class="absolute top-[42%] right-[8%] text-[6px] font-semibold text-[#33312E]/70">B</div> -->
+		<div class="absolute top-[42%] left-[8%] text-[6px] font-semibold text-[#33312E]/70">A</div>
+		<div class="absolute top-[42%] right-[8%] text-[6px] font-semibold text-[#33312E]/70">B</div>
 
 		<!-- Tape path with movement -->
 		<div class="absolute top-[60%] right-0 left-0 h-[1px] bg-[#33312E] opacity-20"></div>

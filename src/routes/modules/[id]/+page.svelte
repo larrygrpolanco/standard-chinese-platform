@@ -3,13 +3,14 @@
 	import { page } from '$app/stores';
 	import { onMount } from 'svelte';
 	import { fade } from 'svelte/transition';
-	import { getModuleById, getUnitsByModuleId } from '$lib/supabase/client';
+	import { getModuleById, getUnitsByModuleId, getUserProgress } from '$lib/supabase/client';
 	import UnitCard from '$lib/components/UnitCard.svelte';
 	import Loader from '$lib/components/Loader.svelte';
 
 	let module = null;
 	let units = [];
 	let loading = true;
+	let unitProgressMap = {}; // Map unit IDs to completion status
 
 	// Learning objectives by module ID - customize these later
 	const moduleObjectives = {
@@ -71,12 +72,25 @@
 
 	onMount(async () => {
 		const moduleId = $page.params.id;
+
+		// Fetch module and units
 		module = await getModuleById(moduleId);
 		if (module) {
 			units = await getUnitsByModuleId(moduleId);
+
+			// Fetch user progress for all units
+			const progressData = await getUserProgress();
+
+			// Create a lookup map of unit completion status
+			unitProgressMap = progressData.reduce((map, progress) => {
+				map[progress.unit_id] = progress.status === 'completed';
+				return map;
+			}, {});
 		}
 		loading = false;
 	});
+
+    
 
 	$: objectives = module ? moduleObjectives[module.id] || moduleObjectives.default : [];
 </script>
@@ -150,28 +164,29 @@
 			<h2 class="mb-4 font-['Arvo',serif] text-xl font-semibold text-[#33312E]">Choose a Unit</h2>
 
 			{#if units.length > 0}
-				<div class="grid grid-cols-1 gap-2 mb-4">
-					{#each units as unit, index}
-						<UnitCard {unit} {index} />
-					{/each}
-				</div>
-                <!-- Navigation footer -->
-			<div class="mt-8 flex justify-between border-t border-[#A0998A] pt-4">
-				<a
-					href={`/modules`}
-					class="flex items-center text-[#34667F] hover:text-[#C17C74]"
-				>
-					<svg class="mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-						<path
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							stroke-width="2"
-							d="M15 19l-7-7 7-7"
-						></path>
-					</svg>
-					Back to Modules
-				</a>
+			<div class="grid grid-cols-1 gap-2 mb-4">
+				{#each units as unit, index}
+					<UnitCard 
+						{unit} 
+						{index} 
+						isCompleted={!!unitProgressMap[unit.id]} 
+					/>
+				{/each}
 			</div>
+				<!-- Navigation footer -->
+				<div class="mt-8 flex justify-between border-t border-[#A0998A] pt-4">
+					<a href={`/modules`} class="flex items-center text-[#34667F] hover:text-[#C17C74]">
+						<svg class="mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								stroke-width="2"
+								d="M15 19l-7-7 7-7"
+							></path>
+						</svg>
+						Back to Modules
+					</a>
+				</div>
 			{:else}
 				<div class="rounded-lg border border-[#A0998A] bg-[#E8E5D7] p-6 text-center">
 					<p class="mb-2 text-[#33312E]">No units found in this module.</p>
@@ -184,7 +199,6 @@
 				</div>
 			{/if}
 		</section>
-        
 	{:else}
 		<div class="py-16 text-center">
 			<h1 class="mb-4 font-['Arvo',serif] text-xl text-[#C17C74]">Module Not Found</h1>

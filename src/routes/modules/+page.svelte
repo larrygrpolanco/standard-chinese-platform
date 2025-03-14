@@ -1,16 +1,103 @@
 <!-- src/routes/modules/+page.svelte -->
 <script>
-	import { onMount } from 'svelte';
-	import { getModules } from '$lib/supabase/client';
-	import Loader from '$lib/components/Loader.svelte';
+  import { onMount } from 'svelte';
+  import { getModules, getUserProgress, supabase } from '$lib/supabase/client';
+  import Loader from '$lib/components/Loader.svelte';
 
-	let modules = [];
-	let loading = true;
+  let modules = [];
+  let loading = true;
+  let moduleProgress = {};
 
-	onMount(async () => {
-		modules = await getModules();
-		loading = false;
-	});
+  // Define total units per module (based on your counts)
+  const totalUnitsPerModule = {
+    1: 4,
+    2: 8,
+    3: 6,
+    4: 5,
+    5: 8,
+    6: 8,
+    7: 8,
+    8: 8,
+    9: 8
+  };
+
+  onMount(async () => {
+    loading = true;
+    
+    // Get all units with their module_id in one query
+    const { data: unitModuleMap, error: unitError } = await supabase
+      .from('units')
+      .select('id, module_id');
+      
+    if (unitError) {
+      console.error('Error fetching unit-module mapping:', unitError);
+      loading = false;
+      return;
+    }
+    
+    // Create a lookup map of unit_id -> module_id
+    const unitToModuleMap = {};
+    unitModuleMap.forEach(unit => {
+      unitToModuleMap[unit.id] = unit.module_id;
+    });
+    
+    // Fetch modules and user progress in parallel
+    const [modulesData, progressData] = await Promise.all([
+      getModules(),
+      getUserProgress()
+    ]);
+    
+    modules = modulesData;
+    
+    // Calculate completion percentage for each module
+    moduleProgress = calculateModuleProgress(progressData, unitToModuleMap);
+    
+    loading = false;
+  });
+
+  // Function to calculate module progress
+  function calculateModuleProgress(progressData, unitToModuleMap) {
+    // Create empty object to store progress
+    const progress = {};
+
+    // Initialize all modules with 0 completed units
+    for (const moduleId in totalUnitsPerModule) {
+      progress[moduleId] = {
+        completed: 0,
+        total: totalUnitsPerModule[moduleId],
+        percentage: 0
+      };
+    }
+    
+    // Count completed units by module
+    progressData.forEach((item) => {
+      if (item.status === 'completed') {
+        // Look up which module this unit belongs to
+        const moduleId = unitToModuleMap[item.unit_id];
+        
+        if (moduleId && progress[moduleId]) {
+          progress[moduleId].completed++;
+          // Recalculate percentage
+          progress[moduleId].percentage =
+            (progress[moduleId].completed / progress[moduleId].total) * 100;
+        }
+      }
+    });
+
+    return progress;
+  }
+
+	// Function to get progress status text
+	function getProgressStatusText(moduleId) {
+		const progress = moduleProgress[moduleId];
+		if (!progress) return 'SIDE A - NOT STARTED';
+
+		if (progress.percentage === 0) return 'SIDE A - NOT STARTED';
+		if (progress.percentage < 33) return 'SIDE A - STARTED';
+		if (progress.percentage < 66) return 'SIDE B - HALFWAY';
+		if (progress.percentage < 100) return 'SIDE B - ALMOST DONE';
+		return 'COMPLETE - ALL UNITS FINISHED';
+	}
 
 	// Function to get color attributes based on module number
 	function getModuleColors(moduleNumber) {
@@ -49,9 +136,7 @@
 
 			<!-- Title with retro underline -->
 			<div class="title-container">
-				<h1 class="page-title">
-					Learning Modules
-				</h1>
+				<h1 class="page-title">Learning Modules</h1>
 				<div class="title-underline"></div>
 			</div>
 
@@ -132,7 +217,11 @@
 										<div class="progress-label">PROGRESS:</div>
 										<div class="progress-bar-container">
 											<!-- Progress bar -->
-											<div class="progress-bar"></div>
+											<div
+												class="progress-bar"
+												style="width: {moduleProgress[module.id]?.percentage || 0}%"
+											></div>
+
 											<!-- Tick marks -->
 											<div class="progress-ticks">
 												{#each Array(4) as _, i}
@@ -141,7 +230,7 @@
 											</div>
 										</div>
 									</div>
-									<p class="progress-status">SIDE A - NOT STARTED</p>
+									<p class="progress-status">{getProgressStatusText(module.id)}</p>
 								</div>
 							</div>
 
@@ -159,12 +248,7 @@
 								<div class="module-cta-container">
 									<span class="module-cta-button">
 										Start learning
-										<svg
-											class="cta-arrow"
-											fill="none"
-											viewBox="0 0 24 24"
-											stroke="currentColor"
-										>
+										<svg class="cta-arrow" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 											<path
 												stroke-linecap="round"
 												stroke-linejoin="round"
@@ -187,7 +271,7 @@
 	/* Page background */
 	.page-background {
 		min-height: 100vh;
-		background-color: #F4F1DE;
+		background-color: #f4f1de;
 		padding-bottom: 3rem;
 		background-image: url('/textures/subtle-paper.png');
 		background-repeat: repeat;
@@ -223,8 +307,8 @@
 		height: 100%;
 		width: 100%;
 		border-radius: 0.375rem;
-		border: 2px solid #33312E;
-		background-color: #E8E5D7;
+		border: 2px solid #33312e;
+		background-color: #e8e5d7;
 	}
 
 	.tape-reels {
@@ -242,7 +326,7 @@
 		height: 1rem;
 		width: 1rem;
 		border-radius: 50%;
-		border: 1px solid #33312E;
+		border: 1px solid #33312e;
 	}
 
 	.tape-reel:first-child {
@@ -262,7 +346,7 @@
 		font-family: 'Arvo', serif;
 		font-size: 2.5rem;
 		font-weight: bold;
-		color: #33312E;
+		color: #33312e;
 	}
 
 	.title-underline {
@@ -271,7 +355,7 @@
 		left: 0;
 		height: 0.375rem;
 		width: 100%;
-		background-color: #DDB967;
+		background-color: #ddb967;
 	}
 
 	.page-description {
@@ -279,7 +363,7 @@
 		max-width: 36rem;
 		font-family: 'Work Sans', sans-serif;
 		line-height: 1.625;
-		color: #33312E;
+		color: #33312e;
 		opacity: 0.8;
 	}
 
@@ -297,15 +381,19 @@
 		flex-direction: column;
 		overflow: hidden;
 		border-radius: 0.5rem;
-		border: 2px solid #33312E;
-		background-color: #E8E5D7;
-		box-shadow: inset 0 1px 20px rgba(255, 255, 255, 0.5), 2px 2px 0 #826D5B;
+		border: 2px solid #33312e;
+		background-color: #e8e5d7;
+		box-shadow:
+			inset 0 1px 20px rgba(255, 255, 255, 0.5),
+			2px 2px 0 #826d5b;
 		transition: all 0.2s;
 	}
 
 	.module-card:hover {
 		transform: translateY(-0.25rem);
-		box-shadow: inset 0 1px 20px rgba(255, 255, 255, 0.5), 4px 4px 0 #826D5B;
+		box-shadow:
+			inset 0 1px 20px rgba(255, 255, 255, 0.5),
+			4px 4px 0 #826d5b;
 	}
 
 	/* Top colored binding */
@@ -313,7 +401,7 @@
 		height: 0.75rem;
 		width: 100%;
 		background-color: var(--bg-color);
-		border-bottom: 2px solid #33312E;
+		border-bottom: 2px solid #33312e;
 	}
 
 	/* Card content */
@@ -344,17 +432,17 @@
 		align-items: center;
 		justify-content: center;
 		border-radius: 9999px;
-		border: 2px solid #33312E;
+		border: 2px solid #33312e;
 		background-color: var(--bg-color);
 		transform: rotate(-5deg);
-		box-shadow: 1px 1px 0 #826D5B;
+		box-shadow: 1px 1px 0 #826d5b;
 	}
 
 	.module-number {
 		font-family: 'Arvo', serif;
 		font-size: 1.25rem;
 		font-weight: bold;
-		color: #33312E;
+		color: #33312e;
 	}
 
 	.module-title {
@@ -362,12 +450,12 @@
 		font-size: 1.25rem;
 		font-weight: 600;
 		flex-grow: 1;
-		color: #33312E;
+		color: #33312e;
 		transition: color 0.15s;
 	}
 
 	.module-card:hover .module-title {
-		color: #C17C74;
+		color: #c17c74;
 	}
 
 	.tape-icon {
@@ -401,8 +489,8 @@
 		flex-grow: 1;
 		overflow: hidden;
 		border-radius: 0.125rem;
-		border: 1px solid #33312E;
-		background-color: #F4F1DE;
+		border: 1px solid #33312e;
+		background-color: #f4f1de;
 		box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
 	}
 
@@ -430,7 +518,7 @@
 		margin-top: 0.25rem;
 		height: 0.25rem;
 		width: 1px;
-		background-color: #33312E;
+		background-color: #33312e;
 		opacity: 0.4;
 	}
 
@@ -438,7 +526,7 @@
 		margin-top: 0.25rem;
 		font-family: 'Courier New', monospace;
 		font-size: 0.75rem;
-		color: #33312E;
+		color: #33312e;
 		opacity: 0.7;
 	}
 
@@ -452,7 +540,7 @@
 	.module-divider::before {
 		content: '';
 		flex-grow: 1;
-		border-top: 1px dashed #A0998A;
+		border-top: 1px dashed #a0998a;
 	}
 
 	/* Footer section with description and CTA */
@@ -472,7 +560,7 @@
 		font-family: 'Work Sans', sans-serif;
 		font-size: 0.875rem;
 		line-height: 1.5;
-		color: #33312E;
+		color: #33312e;
 		display: -webkit-box;
 		-webkit-box-orient: vertical;
 		-webkit-line-clamp: 3;
@@ -480,29 +568,35 @@
 	}
 
 	.module-cta-container {
-		border-top: 2px solid #33312E;
+		border-top: 2px solid #33312e;
 		padding: 0.75rem;
 		text-align: right;
-		background: repeating-linear-gradient(45deg, rgba(var(--accent-color-rgb, 0, 0, 0), 0.05), rgba(var(--accent-color-rgb, 0, 0, 0), 0.05) 10px, transparent 10px, transparent 20px);
+		background: repeating-linear-gradient(
+			45deg,
+			rgba(var(--accent-color-rgb, 0, 0, 0), 0.05),
+			rgba(var(--accent-color-rgb, 0, 0, 0), 0.05) 10px,
+			transparent 10px,
+			transparent 20px
+		);
 	}
 
 	.module-cta-button {
 		display: inline-flex;
 		align-items: center;
 		border-radius: 9999px;
-		border: 1px solid #33312E;
-		background-color: #F4F1DE;
+		border: 1px solid #33312e;
+		background-color: #f4f1de;
 		padding: 0.375rem 1rem;
 		font-size: 0.875rem;
 		font-weight: 500;
-		color: #33312E;
-		box-shadow: 1px 1px 0 #826D5B;
+		color: #33312e;
+		box-shadow: 1px 1px 0 #826d5b;
 		transition: all 0.15s ease-out;
 	}
 
 	.module-card:hover .module-cta-button {
 		transform: translateY(-0.125rem);
-		box-shadow: 2px 2px 0 #826D5B;
+		box-shadow: 2px 2px 0 #826d5b;
 	}
 
 	.module-card:active .module-cta-button {
@@ -535,7 +629,7 @@
 			height: 100%;
 			width: 0.75rem;
 			border-bottom: none;
-			border-right: 2px solid #33312E;
+			border-right: 2px solid #33312e;
 		}
 
 		.module-content {
@@ -547,13 +641,13 @@
 		.module-header {
 			flex: 1;
 			padding: 1.5rem 1rem 1.5rem 1.5rem;
-			border-right: none; 
+			border-right: none;
 		}
 
 		.module-footer {
 			flex: 1.5;
 			flex-direction: column;
-			border-left: 1px dashed #A0998A;
+			border-left: 1px dashed #a0998a;
 		}
 
 		.module-divider {

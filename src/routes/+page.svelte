@@ -2,17 +2,30 @@
 	import { onMount } from 'svelte';
 	import { fade } from 'svelte/transition';
 	import { authStore } from '$lib/stores/authStore';
-	import { getLatestUnit } from '$lib/supabase/client';
+	import { getLatestUnit, getUserProgress } from '$lib/supabase/client';
 	import ModuleCard from '$lib/components/ModuleCard.svelte';
 
 	let latestUnit = null;
+	let completedCount = 0;
 
 	onMount(async () => {
-		authStore.initialize();
+		// Wait for auth initialization to complete
+		await authStore.initialize();
 
 		// Only fetch if user is logged in
 		if ($authStore) {
-			latestUnit = await getLatestUnit();
+			// Fetch latest unit and user progress in parallel
+			const [latestUnitData, progressData] = await Promise.all([
+				getLatestUnit(),
+				getUserProgress()
+			]);
+
+			latestUnit = latestUnitData;
+
+			// Simply count completed units
+			if (progressData && progressData.length > 0) {
+				completedCount = progressData.filter((item) => item.status === 'completed').length;
+			}
 		}
 	});
 </script>
@@ -47,10 +60,8 @@
 			</p>
 
 			<!-- Core Module -->
-			<div class="relative mx-auto mb-8 w-full max-w-3xl" in:fade={{ duration: 400, delay: 400 }}>
-				<!-- Module card styled as vintage cassette case -->
-				<ModuleCard {authStore} {latestUnit} />
-			</div>
+			<!-- Module card styled as vintage cassette case -->
+			<ModuleCard {authStore} {latestUnit} {completedCount} />
 			<!-- Guidebook Button (moved below module card) -->
 			<div
 				class="mt-4 mb-6 flex max-w-xl flex-col items-center"
