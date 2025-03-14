@@ -125,6 +125,8 @@ fsi-chinese-learning/
 │       ├── +page.svelte                         # Home page
 │       ├── guidebook/
 │       │   ├── +page.svelte             # Blog type guidebook with helpful langauge learning write-ups
+│       ├── login/
+│       │   ├── +page.svelte             
 │       ├── modules/
 │       │   ├── +page.svelte                     # All modules listing
 │       │   └── [id]/                            # Single module view

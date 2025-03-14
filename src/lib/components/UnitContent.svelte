@@ -8,7 +8,6 @@
 	import ReviewTab from './ReviewTab.svelte';
 	import ExercisesTab from './ExercisesTab.svelte';
 	import VocabularyTab from './VocabularyTab.svelte';
-	import AIPracticeTab from './AIPracticeTab.svelte';
 
 	const dispatch = createEventDispatcher();
 

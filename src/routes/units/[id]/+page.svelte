@@ -11,12 +11,21 @@
 	import UnitContent from '$lib/components/UnitContent.svelte';
 	import Loader from '$lib/components/Loader.svelte';
 	import UnitDropdown from '$lib/components/UnitDropdown.svelte';
+	import UnitProgressButton from '$lib/components/UnitProgressButton.svelte';
+	import { authStore } from '$lib/stores/authStore'; // Import auth store
 
 	let unitData = null;
 	let loading = true;
 	let error = null;
 	let activeTab = 'review'; // Default tab
 	let currentUnitId = '';
+	let userProgress = null; // Add this to track user progress
+	let user; // Add this to track authenticated user
+
+	// Subscribe to auth changes
+	authStore.subscribe((value) => {
+		user = value;
+	});
 
 	// Tab data holders
 	let tabData = {
@@ -65,6 +74,11 @@
 			} else {
 				// Load initial tab data
 				await loadTabData(activeTab);
+
+				// Load user progress if logged in
+				if (user) {
+					userProgress = await getUserUnitProgress(unitId);
+				}
 			}
 		} catch (err) {
 			console.error('Error loading unit:', err);
@@ -72,6 +86,17 @@
 		} finally {
 			loading = false;
 		}
+	}
+
+	// Reload progress when authentication state changes
+	$: if (user && unitData?.id) {
+		getUserUnitProgress(unitData.id)
+			.then((progress) => {
+				userProgress = progress;
+			})
+			.catch((err) => {
+				console.error('Error loading user progress:', err);
+			});
 	}
 
 	// Watch for URL changes and reload data when unit ID changes
@@ -142,6 +167,42 @@
 				{#if unitData.description}
 					<p class="mt-2 text-lg text-[#33312E]">{unitData.description}</p>
 				{/if}
+				<!-- After unit description -->
+				{#if unitData.description}
+					<p class="mt-2 text-lg text-[#33312E]">{unitData.description}</p>
+				{/if}
+
+				<!-- Progress tracking and RWP practice area -->
+				<div class="mt-4 flex flex-wrap items-center gap-3">
+					{#if user}
+						<UnitProgressButton
+							unitId={unitData.id}
+							initialStatus={userProgress?.status || 'in_progress'}
+						/>
+
+						<a
+							href="/rwp/{unitData.id}"
+							class="inline-flex items-center rounded-md bg-[#34667F] px-4 py-2 text-white transition-colors hover:bg-[#295267]"
+						>
+							<svg class="mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M13 10V3L4 14h7v7l9-11h-7z"
+								></path>
+							</svg>
+							Practice with RWP
+						</a>
+					{:else}
+						<a
+							href="/login?redirect=/units/{unitData.id}"
+							class="text-[#34667F] underline hover:text-[#C17C74]"
+						>
+							Sign in to track progress and practice with RWP
+						</a>
+					{/if}
+				</div>
 			</header>
 
 			<UnitContent
