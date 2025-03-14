@@ -1,0 +1,146 @@
+
+# Taped Chinese Learning Platform Project Description
+
+I'm developing a web-based language learning platform that modernizes the Foreign Service Institute's "Standard Chinese: A Modular Approach" course materials. Built with SvelteKit, Tailwind CSS, and Supabase, this application digitizes textbook content and audio recordings from the comprehensive FSI course used to train diplomats. The content follows the original structure of 9 core modules, but I want it presented in an accessible, interactive format. Key features include toggling between simplified/traditional Chinese characters, integrated audio playback for dialogues and exercises, LLM integration for practice which incorporates learners context (Revelvant World Practice), and eventually user accounts to track progress. I'm prioritizing a clean, intuitive UI that allows users to navigate freely between modules. Being that this uses old tapes, the website has a cassette tape vintage aesthetic. As a solo developer learning fullstack development, I'm focusing on getting core feautures in and digitizing the content as an MVP, I want to make sure that this looks nice and cohesive. The platform will always maintain free access to the core FSI materials, with potential premium features like LLM-generated personalized exercises added later.
+
+I am currently working on setting up authentication and user profiles. 
+
+I want to track
+1. User progress through the course (finished/in-progress units)
+2. Current position in the course (to show on homepage)
+3. User-specific data for the "Relevant World Practice" (RWP) feature:
+   - Basic user information (name, city, job, hobbies)
+   - Latest AI-generated test content
+
+
+- **Fixed structure**: 9 modules with varying numbers of units (4-8 per module), for a total of 63 units
+- **Database schema**: Already established with modules, units, vocabulary, tapes, reference lists, exercises, and questions
+- **User needs**: Track progress (completed/in-progress), store latest RWP-generated content, and save user context for RWP generation
+- **Expected scale**: Dozens to hundreds of users (not a high-traffic application)
+- **Authentication preference**: Email/password to start, possibly adding OAuth later
+- **Future plans**: Potential subscription service
+
+Auth Database Design
+
+additional tables for user functionality:
+
+### 1. User Profiles Table
+(This is automatically created by Supabase, but we need to consider what custom fields to add)
+
+```sql
+-- This table is automatically created by Supabase
+-- We just need to add custom fields
+
+-- Custom profile fields for our application
+ALTER TABLE auth.users ADD COLUMN display_name TEXT;
+ALTER TABLE auth.users ADD COLUMN preferred_character_set TEXT DEFAULT 'simplified' CHECK (preferred_character_set IN ('simplified', 'traditional', 'both'));
+```
+
+### 2. User Progress Table
+```sql
+CREATE TABLE public.user_progress (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  unit_id INTEGER NOT NULL REFERENCES public.units(id) ON DELETE CASCADE,
+  status TEXT NOT NULL DEFAULT 'in_progress' CHECK (status IN ('in_progress', 'completed')),
+  last_accessed TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  UNIQUE (user_id, unit_id)
+);
+
+COMMENT ON TABLE public.user_progress IS 'Tracks users progress through units';
+```
+
+### 3. User Preferences Table (for RWP context)
+```sql
+CREATE TABLE public.user_preferences (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  full_name TEXT,
+  occupation TEXT,
+  location TEXT,
+  hobbies TEXT,
+  learning_context TEXT,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  UNIQUE (user_id)
+);
+
+COMMENT ON TABLE public.user_preferences IS 'Stores user context for Relevant World Practice';
+```
+
+### 4. Generated RWP Content Table
+```sql
+CREATE TABLE public.rwp_content (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  unit_id INTEGER NOT NULL REFERENCES public.units(id) ON DELETE CASCADE,
+  content JSONB NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  UNIQUE (user_id, unit_id)
+);
+
+COMMENT ON TABLE public.rwp_content IS 'Stores the most recent AI-generated RWP content per unit per user';
+```
+
+
+
+
+## Project Architecture
+
+```
+fsi-chinese-learning/
+├── src/
+│   ├── lib/
+│   │   ├── components/
+│   │   │   ├── AudioPlayer.svelte               # Audio playback component
+│   │   │   ├── Breadcrumb.svelte                # Audio playback component
+│   │   │   ├── CassetteTapeSelector.svelte
+│   │   │   ├── ChineseText.svelte               # Chinese text display with font options
+│   │   │   ├── DialogueDisplay.svelte
+│   │   │   ├── ExerciseTab.svelte
+│   │   │   ├── FlashcardDeck.svelte
+│   │   │   ├── FontToggle.svelte                # Toggle for character/pinyin display
+│   │   │   ├── Header.svelte                    # Site header with navigation
+│   │   │   ├── Loader.svelte                   # Cassette tape loading animation        
+│   │   │   ├── ReviewTab.svelte
+│   │   │   ├── TabSelector.svelte
+│   │   │   ├── UnitCard.svelte
+│   │   │   ├── UnitContent.svelte               # Main content display for units
+│   │   │   ├── UnitProgressButton.svelte
+│   │   │   ├── VocabularyTab.svelte
+│   │   │   └── QuestionTypes/
+│   │   │       ├── DisplayOnlyQuestion.svelte
+│   │   │       ├── MultipleChoiceQuestion.svelte
+│   │   │       ├── ShortAnswerQuestion.svelte
+│   │   │       └── TableRowQuestion.svelte
+│   │   ├── stores/
+│   │   │   └── fontPreferences.js               # Store for font settings
+│   │   │   └── authStore.js 
+│   │   └── supabase/
+│   │       └── client.js                        # Supabase connection and functions
+│   └── routes/
+│       ├── +layout.svelte                       # Main layout with header & navigation
+│       ├── +page.svelte                         # Home page
+│       ├── guidebook/
+│       │   ├── +page.svelte             # Blog type guidebook with helpful langauge learning write-ups
+│       ├── modules/
+│       │   ├── +page.svelte                     # All modules listing
+│       │   └── [id]/                            # Single module view
+│       │       └── +page.svelte
+│       ├── rwp/
+│       │   ├── +page.svelte             # Main RWP landing/explanation page
+│       │   └── [unit_id]/                # RWP for specific unit
+│       │       └── +page.svelte
+│       └── units/                               # All units are at the same level
+│           └── [id]/                            # Individual unit page with tabs
+│               └── +page.svelte                 # Contains vocabulary, tapes, exercises as tabs
+├── static/
+│   └── fonts/                                   # Chinese font files
+└── supabase/
+    └── schema.sql                               # Database schema definitions
+````
+
+RWP Implementation
+<a href="/rwp/{unitId}">Practice with RWP</a>

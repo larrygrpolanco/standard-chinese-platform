@@ -194,3 +194,140 @@ export async function getCompleteUnit(unitId) {
 		...vocabularyData
 	};
 }
+
+// Authentication functions
+export async function signUp(email, password) {
+	const { data, error } = await supabase.auth.signUp({
+		email,
+		password
+	});
+
+	if (error) throw error;
+	return data;
+}
+
+export async function signIn(email, password) {
+	const { data, error } = await supabase.auth.signInWithPassword({
+		email,
+		password
+	});
+
+	if (error) throw error;
+	return data;
+}
+
+export async function signOut() {
+	const { error } = await supabase.auth.signOut();
+	if (error) throw error;
+	return true;
+}
+
+export async function getCurrentUser() {
+	const {
+		data: { user }
+	} = await supabase.auth.getUser();
+	return user;
+}
+
+// Update a unit's progress status
+export async function updateUnitProgress(unitId, status) {
+	const user = await getCurrentUser();
+	if (!user) throw new Error('User not authenticated');
+
+	const { data, error } = await supabase.from('user_progress').upsert(
+		{
+			user_id: user.id,
+			unit_id: unitId,
+			status,
+			last_accessed: new Date().toISOString()
+		},
+		{
+			onConflict: 'user_id,unit_id'
+		}
+	);
+
+	if (error) throw error;
+	return data;
+}
+
+// Get all progress entries for current user
+export async function getUserProgress() {
+	const user = await getCurrentUser();
+	if (!user) return [];
+
+	const { data, error } = await supabase
+		.from('user_progress')
+		.select(
+			`
+      id, 
+      unit_id, 
+      status, 
+      last_accessed,
+      units(id, title, module_id, order_num)
+    `
+		)
+		.eq('user_id', user.id);
+
+	if (error) throw error;
+	return data || [];
+}
+
+// Get the most recently accessed unit
+export async function getLatestUnit() {
+	const user = await getCurrentUser();
+	if (!user) return null;
+
+	const { data, error } = await supabase
+		.from('user_progress')
+		.select(
+			`
+      unit_id, 
+      status,
+      units(id, title, module_id, 
+        modules(id, title, order_num))
+    `
+		)
+		.eq('user_id', user.id)
+		.order('last_accessed', { ascending: false })
+		.limit(1)
+		.single();
+
+	if (error && error.code !== 'PGRST116') throw error;
+	return data;
+}
+
+// Save RWP generated content
+export async function saveRwpContent(unitId, content) {
+  const user = await getCurrentUser();
+  if (!user) throw new Error('User not authenticated');
+  
+  const { data, error } = await supabase
+    .from('rwp_content')
+    .upsert({
+      user_id: user.id,
+      unit_id: unitId,
+      content,
+      created_at: new Date().toISOString()
+    }, {
+      onConflict: 'user_id,unit_id'
+    });
+    
+  if (error) throw error;
+  return data;
+}
+
+// Get RWP content for a unit
+export async function getRwpContent(unitId) {
+  const user = await getCurrentUser();
+  if (!user) return null;
+  
+  const { data, error } = await supabase
+    .from('rwp_content')
+    .select('*')
+    .eq('user_id', user.id)
+    .eq('unit_id', unitId)
+    .single();
+    
+  if (error && error.code !== 'PGRST116') throw error;
+  return data;
+}

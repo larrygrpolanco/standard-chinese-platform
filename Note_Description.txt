@@ -26,6 +26,7 @@ fsi-chinese-learning/
 │   │   │   ├── TabSelector.svelte
 │   │   │   ├── UnitCard.svelte
 │   │   │   ├── UnitContent.svelte               # Main content display for units
+│   │   │   ├── UnitProgressButton.svelte
 │   │   │   ├── VocabularyTab.svelte
 │   │   │   └── QuestionTypes/
 │   │   │       ├── DisplayOnlyQuestion.svelte
@@ -34,6 +35,7 @@ fsi-chinese-learning/
 │   │   │       └── TableRowQuestion.svelte
 │   │   ├── stores/
 │   │   │   └── fontPreferences.js               # Store for font settings
+│   │   │   └── authStore.js 
 │   │   └── supabase/
 │   │       └── client.js                        # Supabase connection and functions
 │   └── routes/
@@ -58,8 +60,7 @@ fsi-chinese-learning/
     └── schema.sql                               # Database schema definitions
 ````
 
-RWP Implementation
-<a href="/rwp/{unitId}">Practice with RWP</a>
+
 
 **Database Schema**
 ```sql
