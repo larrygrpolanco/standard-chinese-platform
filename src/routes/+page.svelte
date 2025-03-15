@@ -3,7 +3,7 @@
 	import { fade } from 'svelte/transition';
 	import { authStore } from '$lib/stores/authStore';
 	import { getLatestUnit, getUserProgress } from '$lib/supabase/client';
-	import ModuleCard from '$lib/components/ModuleCard.svelte';
+	import ModuleCard from '$lib/components/UI/ModuleCard.svelte';
 
 	let latestUnit = null;
 	let completedCount = 0;

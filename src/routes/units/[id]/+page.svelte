@@ -9,9 +9,9 @@
 		getUserProgress
 	} from '$lib/supabase/client';
 	import UnitContent from '$lib/components/UnitContent.svelte';
-	import Loader from '$lib/components/Loader.svelte';
-	import UnitDropdown from '$lib/components/UnitDropdown.svelte';
-	import UnitProgressButton from '$lib/components/UnitProgressButton.svelte';
+	import Loader from '$lib/components/UI/Loader.svelte';
+	import UnitDropdown from '$lib/components/UI/UnitDropdown.svelte';
+	import UnitProgressButton from '$lib/components/UI/UnitProgressButton.svelte';
 	import { authStore } from '$lib/stores/authStore'; // Import auth store
 
 	let unitData = null;

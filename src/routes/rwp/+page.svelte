@@ -1,6 +1,6 @@
 <script>
 
-	import TapeConstruction from "$lib/components/TapeConstruction.svelte";
+	import TapeConstruction from "$lib/components/UI/TapeConstruction.svelte";
 
 </script>
 

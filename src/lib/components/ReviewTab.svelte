@@ -2,7 +2,7 @@
 <script>
 	import DialogueDisplay from './DialogueDisplay.svelte';
 	import CassetteTapeSelector from './CassetteTapeSelector.svelte';
-	import FontToggle from './FontToggle.svelte';
+	import FontToggle from './UI/FontToggle.svelte';
 	import { fontPreferences } from '$lib/stores/fontPreferences';
 
 	// Props

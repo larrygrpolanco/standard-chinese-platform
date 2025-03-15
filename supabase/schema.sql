@@ -187,11 +187,18 @@ CREATE TABLE public.user_progress (
 CREATE TABLE public.user_preferences (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  
   full_name TEXT,
-  occupation TEXT,
-  location TEXT,
-  hobbies TEXT,
-  learning_context TEXT,
+  
+  -- Basic learning info
+  learning_level TEXT, 
+  learning_goals TEXT[],
+  
+  -- JSON fields for flexible storage
+  personal_context JSONB, -- general user information
+  module_responses JSONB, -- structured by module_id
+  
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   UNIQUE (user_id)
 );
 

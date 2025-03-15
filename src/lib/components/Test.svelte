@@ -2,7 +2,7 @@
 <script>
 	import { onMount } from 'svelte';
 	import { getModules } from '$lib/supabase/client';
-	import Loader from '$lib/components/Loader.svelte';
+	import Loader from '$lib/components/UI/Loader.svelte';
 
 	let modules = [];
 	let loading = true;

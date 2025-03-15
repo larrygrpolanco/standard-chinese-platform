@@ -2,7 +2,7 @@
 	import { onMount, createEventDispatcher } from 'svelte';
 	import { fly } from 'svelte/transition';
 	import { elasticOut, backOut } from 'svelte/easing';
-	import FontToggle from './FontToggle.svelte';
+	import FontToggle from './UI/FontToggle.svelte';
 	import { fontPreferences } from '$lib/stores/fontPreferences';
 
 	// Props

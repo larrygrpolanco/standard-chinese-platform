@@ -2,9 +2,9 @@
 	import { onMount } from 'svelte';
 	import { page } from '$app/stores';
 	import { authStore } from '$lib/stores/authStore';
-	import ModuleDropdown from './UI/ModuleDropdown.svelte';
-	import NavigationItem from './UI/NavigationItem.svelte';
-	import MobileMenu from './UI/MobileMenu.svelte';
+	import ModuleDropdown from './ModuleDropdown.svelte';
+	import NavigationItem from './NavigationItem.svelte';
+	import MobileMenu from './MobileMenu.svelte';
 
 	// Core modules data
 	const coreModules = [

@@ -4,7 +4,7 @@
 	import { createEventDispatcher, onMount } from 'svelte';
 	import { getUnitExercisesData } from '$lib/supabase/client';
 	import { supabase } from '$lib/supabase/client';
-	import TabSelector from './TabSelector.svelte';
+	import TabSelector from './UI/TabSelector.svelte';
 	import ReviewTab from './ReviewTab.svelte';
 	import ExercisesTab from './ExercisesTab.svelte';
 	import VocabularyTab from './VocabularyTab.svelte';

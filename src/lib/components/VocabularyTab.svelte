@@ -1,7 +1,7 @@
 <script>
-    import ChineseText from './ChineseText.svelte';
+    import ChineseText from './UI/ChineseText.svelte';
     import FlashcardDeck from './FlashcardDeck.svelte';
-    import FontToggle from './FontToggle.svelte';
+    import FontToggle from './UI/FontToggle.svelte';
     import { fly } from 'svelte/transition';
     
     /** @type {Array<{ chinese_simplified: string, chinese_traditional: string, pinyin: string, english: string }>} */

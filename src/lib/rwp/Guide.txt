@@ -1,0 +1,253 @@
+## Step-by-Step Guide: Adding a New Exercise Type
+
+Here's how to add a new exercise type with this updated structure:
+
+### 1. Create a Template Function
+
+```javascript
+// src/lib/rwp/templates/gapFill.js
+export default function createTemplate(unitData, userProfile, specificFocus = '') {
+  return `
+You are creating a personalized Chinese gap-fill (cloze) exercise.
+
+<unit_vocabulary>
+${unitData.vocabulary.map((v) => `${v.chinese_simplified}: ${v.english}`).join('\n')}
+</unit_vocabulary>
+
+<!-- Other context -->
+
+Create a gap-fill exercise with:
+1. A paragraph with missing words indicated by _____
+2. 10 words to fill in the blanks
+3. Include hints for each blank
+
+Return in this JSON format:
+\`\`\`json
+{
+  "title": "Gap Fill Exercise",
+  "description": "Fill in the blanks with appropriate words",
+  "exercise_type": "gap_fill",
+  "content": {
+    "text": "今天我要去_____买东西。",
+    "text_pinyin": "Jīntiān wǒ yào qù _____ mǎi dōngxi.",
+    "text_english": "Today I want to go to the _____ to buy things."
+  },
+  "blanks": [
+    {
+      "id": 1,
+      "answer": "商店",
+      "answer_pinyin": "shāngdiàn",
+      "answer_english": "store",
+      "hint": "A place to buy things"
+    }
+  ],
+  "vocabulary_focus": [
+    {
+      "word": "商店",
+      "pinyin": "shāngdiàn",
+      "english": "store"
+    }
+  ]
+}
+\`\`\``;
+}
+```
+
+### 2. Create a Component to Display This Exercise Type
+
+```svelte
+<!-- src/lib/components/rwp/GapFillExercise.svelte -->
+<script>
+  import ChineseText from '$lib/components/UI/ChineseText.svelte';
+  import FontToggle from '$lib/components/UI/FontToggle.svelte';
+  
+  export let content;
+  export let blanks;
+  export let vocabulary = [];
+  export let showAnswers = false;
+</script>
+
+<div class="gap-fill-container">
+  <div class="exercise-header">
+    <h3 class="exercise-title">Gap Fill Exercise</h3>
+    <FontToggle compact={true} label="" />
+  </div>
+  
+  <div class="instructions">
+    Fill in the blanks with the appropriate words.
+  </div>
+  
+  <div class="text-container">
+    <ChineseText 
+      simplified={content.text} 
+      traditional={content.text} 
+      pinyin={content.text_pinyin} 
+      english={content.text_english} 
+    />
+  </div>
+  
+  <div class="blanks-container">
+    <h4>Blanks:</h4>
+    <div class="blanks-list">
+      {#each blanks as blank}
+        <div class="blank-item">
+          <div class="blank-number">#{blank.id}</div>
+          <div class="blank-content">
+            {#if showAnswers}
+              <ChineseText 
+                simplified={blank.answer} 
+                traditional={blank.answer} 
+                pinyin={blank.answer_pinyin} 
+                english={blank.answer_english} 
+              />
+            {:else}
+              <div class="hint">Hint: {blank.hint}</div>
+              <input type="text" class="blank-input" placeholder="Type answer here" />
+            {/if}
+          </div>
+        </div>
+      {/each}
+    </div>
+  </div>
+  
+  <!-- Only show vocabulary if provided -->
+  {#if vocabulary && vocabulary.length > 0}
+    <div class="vocabulary-section">
+      <h4>Vocabulary:</h4>
+      <div class="vocabulary-list">
+        {#each vocabulary as word}
+          <div class="vocabulary-item">
+            <ChineseText 
+              simplified={word.word} 
+              traditional={word.word} 
+              pinyin={word.pinyin} 
+              english={word.english} 
+            />
+          </div>
+        {/each}
+      </div>
+    </div>
+  {/if}
+</div>
+
+<style>
+  /* Add styling here */
+</style>
+```
+
+### 3. Register the New Exercise Type
+
+```javascript
+// src/lib/rwp/exerciseTypes.js
+import readingComprehension from './templates/readingComprehension.js';
+import gapFill from './templates/gapFill.js';
+import ReadingExercise from '../components/rwp/ReadingExercise.svelte';
+import GapFillExercise from '../components/rwp/GapFillExercise.svelte';
+
+export const exerciseTypes = {
+  'reading_comprehension': {
+    template: readingComprehension,
+    component: ReadingExercise,
+    description: 'Reading Comprehension',
+    supportedQuestionTypes: ['multiple_choice', 'short_answer']
+  },
+  'gap_fill': {
+    template: gapFill,
+    component: GapFillExercise,
+    description: 'Gap Fill Exercise',
+    supportedQuestionTypes: []
+  }
+};
+
+// ...existing code...
+```
+
+### 4. Update ExerciseGenerator Component
+
+```svelte
+<!-- src/lib/components/rwp/ExerciseGenerator.svelte -->
+<script>
+  import { getExerciseTypeOptions } from '$lib/rwp/exerciseTypes.js';
+  
+  // ...existing code...
+  
+  // Get available exercise types as options
+  const exerciseOptions = getExerciseTypeOptions();
+</script>
+
+<div class="panel">
+  <!-- ...existing code... -->
+  
+  <div class="form-group">
+    <label for="exercise-type" class="form-label">Exercise Type</label>
+    <select
+      id="exercise-type"
+      bind:value={exerciseType}
+      class="form-select"
+    >
+      {#each exerciseOptions as option}
+        <option value={option.value}>{option.label}</option>
+      {/each}
+    </select>
+  </div>
+  
+  <!-- ...existing code... -->
+</div>
+```
+
+## Testing the System
+
+Here's how to test your RWP implementation:
+
+### 1. Debugging LLM Responses
+
+Enable debug mode in the UI to see raw LLM responses in the console. This helps you:
+- See if the model is generating valid JSON
+- Identify formatting issues or missing fields
+- Understand how the model is interpreting your prompt
+
+### 2. Testing Template Changes
+
+1. Make changes to a template file (e.g., `readingComprehension.js`)
+2. Enable debug mode
+3. Generate a new exercise
+4. Examine the console output for raw response
+5. If JSON is valid but needs adjustments, modify your template
+6. Repeat until you get the output structure you want
+
+### 3. Testing New Exercise Types
+
+When adding a new exercise type:
+1. Start with a minimal template and component
+2. Generate exercises in debug mode
+3. Test rendering with simple data
+4. Gradually enhance the template and component
+
+### 4. Handling JSON Format Changes
+
+When changing JSON structure in templates:
+1. First update your display component to handle both old and new formats
+2. Then update your template
+3. Test with debug mode enabled
+
+## Simplifications Summary
+
+I've recommended these simplifications to the system:
+
+1. **Centralized Exercise Type Registry**: One place to define and manage all exercise types
+2. **Dynamic Component Rendering**: Using `svelte:component` to select the right component
+3. **Debug Mode**: For easier testing and troubleshooting 
+4. **Streamlined JSON Parsing**: With better error reporting
+
+These changes make the system more maintainable while keeping the core functionality intact.
+
+## Common JSON Issues to Watch For
+
+When debugging JSON problems:
+
+1. **Missing Quotes**: The LLM might forget quotes around keys or string values
+2. **Trailing Commas**: Invalid in JSON (e.g., `[1, 2, 3,]`)
+3. **Unescaped Characters**: Special characters in strings need escaping
+4. **Inconsistent Field Names**: The LLM might use different field names than your components expect
+
+With debug mode, you'll quickly identify these issues and can adjust your prompts accordingly.

@@ -2,7 +2,7 @@
 	import '../app.css';
 	import { onMount } from 'svelte';
 	import { authStore } from '$lib/stores/authStore';
-	import Header from '$lib/components/Header.svelte';
+	import Header from '$lib/components/UI/Header.svelte';
 
 	onMount(() => {
 		authStore.initialize();

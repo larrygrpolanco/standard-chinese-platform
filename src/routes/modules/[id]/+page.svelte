@@ -4,8 +4,8 @@
 	import { onMount } from 'svelte';
 	import { fade } from 'svelte/transition';
 	import { getModuleById, getUnitsByModuleId, getUserProgress } from '$lib/supabase/client';
-	import UnitCard from '$lib/components/UnitCard.svelte';
-	import Loader from '$lib/components/Loader.svelte';
+	import UnitCard from '$lib/components/UI/UnitCard.svelte';
+	import Loader from '$lib/components/UI/Loader.svelte';
 
 	let module = null;
 	let units = [];
