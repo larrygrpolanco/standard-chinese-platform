@@ -19,7 +19,7 @@
 
 <div class="container mx-auto max-w-2xl px-4 py-12">
 	<h1 class="mb-8 text-center font-['Arvo',_serif] text-[2.5rem] font-bold text-[#33312E]">
-		Account Access
+		Account
 	</h1>
 	<Auth />
 </div>

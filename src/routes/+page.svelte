@@ -159,24 +159,11 @@
 						Real World Practice (RWP)
 					</h2>
 
-					<p
-						class="mx-auto mb-6 p-2 font-['Work_Sans',sans-serif] text-base leading-relaxed text-[#33312E]"
-					>
-						RWPs are exercises added to each unit which let you apply what you learn in each unit to
-						real-life (or imagined) situations based on your interests, career, or goals. Instead of
-						just repeating textbook phrases, you'll practice using Chinese in situations that matter
-						to you.
-						<br /> <br />
-						While the classic FSI course excels at teaching structural patterns, it was designed for
-						rapid memorization rather than creative language use. We hope that the RWPs added to each
-						unit bridges this gap!
-					</p>
-
 					<a
 						href="/rwp"
-						class="group mb-2 inline-flex items-center rounded-lg border-2 border-[#C17C74] bg-[#F4F1DE] px-6 py-3 font-medium text-[#C17C74] shadow-[2px_2px_0_#826D5B] transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:bg-[#C17C74] hover:text-white hover:shadow-[1px_1px_0_#826D5B]"
+						class="group mb-2 inline-flex items-center rounded-lg border-2 border-[#C17C74] bg-[#F4F1DE] px-6 font-medium text-[#C17C74] shadow-[2px_2px_0_#826D5B] transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:bg-[#C17C74] hover:text-white hover:shadow-[1px_1px_0_#826D5B]"
 					>
-						<span class=" font-['Work_Sans',sans-serif] font-semibold">Learn more</span>
+						<span class=" font-['Work_Sans',sans-serif] font-semibold">Try it out</span>
 						<svg
 							class="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1"
 							fill="none"
@@ -191,6 +178,19 @@
 							/>
 						</svg>
 					</a>
+
+					<p
+						class="mx-auto mb-6 p-2 font-['Work_Sans',sans-serif] text-base leading-relaxed text-[#33312E]"
+					>
+						RWPs are exercises added to each unit which let you apply what you learn in each unit to
+						real-life (or imagined) situations based on your interests, career, or goals. Instead of
+						just repeating textbook phrases, you'll practice using Chinese in situations that matter
+						to you.
+						<br /> <br />
+						While the classic FSI course excels at teaching structural patterns, it was designed for
+						rapid memorization rather than creative language use. We hope that the RWPs added to each
+						unit bridges this gap!
+					</p>
 				</div>
 
 				<!-- Tape visual elements -->

@@ -172,8 +172,10 @@
 						<a href="/rwp/{unitData.id}" class="rwp-button"> Real World Practice </a>
 					{:else}
 						<a href="/login?redirect=/units/{unitData.id}" class="signin-button">
-							Sign-in to Unlock Progress Tracking & RWPs
+							Sign-in to Unlock Progress Tracking
 						</a>
+
+						<a href="/rwp" class="rwp-button"> Try RWPs </a>
 					{/if}
 				</div>
 			</header>
