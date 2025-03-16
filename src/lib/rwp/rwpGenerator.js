@@ -21,6 +21,8 @@ export async function generateRwpExercise(unitId, exerciseType, specificFocus = 
 
 		// 3. Build user profile
 		const userProfile = {
+            full_name: userPreferences?.full_name || 'Student',
+	        learning_goals: userPreferences?.learning_goals || 'not specified',
 			learning_level: userPreferences?.learning_level || 'beginner',
 			personal_context: userPreferences?.personal_context || {},
 			module_responses: userPreferences?.module_responses || {}

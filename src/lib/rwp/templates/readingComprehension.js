@@ -19,6 +19,7 @@
  *
  * @param {Object} userProfile - User's learning profile and preferences
  * @param {string} userProfile.learning_level - User's Chinese proficiency level
+ * @param {string} userProfile.learning_level - User's Chinese proficiency level
  * @param {Object} userProfile.personal_context - User's personal information
  * @param {Object} userProfile.module_responses - User's responses to module questions
  *
@@ -27,6 +28,9 @@
  * @returns {string} A prompt for the LLM to generate a reading comprehension exercise
  */
 export function planReadingComprehension(unitData, userProfile, specificFocus = '') {
+	// Debugging
+    console.log('FULL USER PROFILE OBJECT:', JSON.stringify(userProfile, null, 2));
+
 	// Safely extract unit and module information
 	const unitId = unitData?.id || 'unknown';
 	const unitTitle = unitData?.title || 'unknown';
@@ -46,17 +50,14 @@ export function planReadingComprehension(unitData, userProfile, specificFocus = 
 		.join('\n');
 
 	// Safely extract user profile data
+	const fullName = userProfile?.full_name || 'Student';
 	const learningLevel = userProfile?.learning_level || 'beginner';
+	const learningGoals = userProfile?.learning_goals || 'not specified';
 	const personalContext = userProfile?.personal_context || {};
 	const occupation = personalContext?.occupation || 'not specified';
 	const location = personalContext?.location || 'not specified';
 	const hobbies = personalContext?.hobbies || 'not specified';
 	const reasonLearning = personalContext?.reason_learning || 'not specified';
-
-	// Safely extract learning goals as a comma-separated string
-	const learningGoals = Array.isArray(userProfile?.learning_goals)
-		? userProfile.learning_goals.join(', ')
-		: 'Not specified';
 
 	// Process ALL module responses (not just the current module)
 	let currentModuleResponses = '';
@@ -98,7 +99,7 @@ ${formattedVocabulary || 'No vocabulary available for this unit.'}
 ${formattedDialogues || 'No dialogues available for this unit.'}
 
 # USER PROFILE
-- Name: ${userProfile?.full_name || 'Student'}
+- Name: ${fullName}
 - Learning Level: ${learningLevel}
 - Learning Goals: ${learningGoals}
 - Occupation: ${occupation}
