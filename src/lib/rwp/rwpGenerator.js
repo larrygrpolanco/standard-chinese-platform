@@ -26,50 +26,74 @@ export async function generateRwpExercise(unitId, exerciseType, specificFocus = 
 			module_responses: userPreferences?.module_responses || {}
 		};
 
-		// 4. Generate the prompt
+		// 4. Get exercise type configuration
 		const exerciseTypeConfig = exerciseTypes[exerciseType];
 		if (!exerciseTypeConfig) throw new Error(`Exercise type '${exerciseType}' not supported`);
 
-		const prompt = exerciseTypeConfig.template(unitData, userProfile, specificFocus);
+		// 5. PHASE 1: Plan the exercise content
+		const plannerPrompt = exerciseTypeConfig.plannerTemplate(unitData, userProfile, specificFocus);
 
-		// 5. Call API through server endpoint
-		const response = await fetch('/api/generate-rwp', {
+		const planResponse = await fetch('/api/generate-rwp', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ prompt, debug }) // Pass debug flag
+			body: JSON.stringify({ prompt: plannerPrompt, debug })
 		});
 
-		if (!response.ok) {
-			const error = await response.json();
-			throw new Error(error.error || 'Error generating content');
+		if (!planResponse.ok) {
+			const error = await planResponse.json();
+			throw new Error(error.error || 'Error generating content plan');
 		}
 
-		const responseData = await response.json();
+		const planData = await planResponse.json();
+		const plan = debug ? planData.raw : planData;
 
-		// If in debug mode, return the debugging info and log to console
 		if (debug) {
-			console.log('=== LLM RAW RESPONSE ===');
-			console.log(responseData.raw);
-			console.log('=== PARSED RESULT ===');
-			console.log(responseData.parsed);
+			console.log('=== PLAN PROMPT ===');
+			console.log(plannerPrompt);
+			console.log('=== PLAN RESPONSE ===');
+			console.log(plan);
+		}
 
-			if (responseData.parsed.error) {
-				throw new Error(`JSON parsing failed: ${responseData.parsed.message}`);
+		// 6. PHASE 2: Format the plan into proper JSON with traditional characters
+		const formatterPrompt = exerciseTypeConfig.formatterTemplate(plan, userProfile, specificFocus);
+
+		const jsonResponse = await fetch('/api/generate-rwp', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ prompt: formatterPrompt, debug })
+		});
+
+		if (!jsonResponse.ok) {
+			const error = await jsonResponse.json();
+			throw new Error(error.error || 'Error formatting content');
+		}
+
+		const jsonData = await jsonResponse.json();
+
+		// Debug logging for second phase
+		if (debug) {
+			console.log('=== FORMATTER PROMPT ===');
+			console.log(formatterPrompt);
+			console.log('=== JSON RESPONSE ===');
+			console.log(jsonData.raw);
+			console.log('=== PARSED RESULT ===');
+			console.log(jsonData.parsed);
+
+			if (jsonData.parsed && jsonData.parsed.error) {
+				throw new Error(`JSON parsing failed: ${jsonData.parsed.message}`);
 			}
 
-			return responseData.parsed;
+			return jsonData.parsed;
 		}
 
-		// 6. Parse and save to database
-		let parsedContent;
+		// 7. Save to database
 		try {
-			// For normal mode, responseData contains the raw string
-			parsedContent = typeof responseData === 'string' ? JSON.parse(responseData) : responseData;
+			const parsedContent = typeof jsonData === 'string' ? JSON.parse(jsonData) : jsonData;
 			await saveRwpContent(unitId, parsedContent);
 			return parsedContent;
 		} catch (error) {
-			console.error('Failed to parse LLM response:', error);
-			throw new Error('Generated content was not valid JSON');
+			console.error('Failed to process LLM response:', error);
+			throw new Error('Failed to process generated content');
 		}
 	} catch (error) {
 		console.error('Error in generateRwpExercise:', error);

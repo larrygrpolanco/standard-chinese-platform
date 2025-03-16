@@ -28,11 +28,25 @@ fsi-chinese-learning/
 │   │   │   ├── UnitContent.svelte               # Main content display for units
 │   │   │   ├── UnitProgressButton.svelte
 │   │   │   ├── VocabularyTab.svelte
-│   │   │   └── QuestionTypes/
-│   │   │       ├── DisplayOnlyQuestion.svelte
-│   │   │       ├── MultipleChoiceQuestion.svelte
-│   │   │       ├── ShortAnswerQuestion.svelte
-│   │   │       └── TableRowQuestion.svelte
+│   │   │   ├── QuestionTypes/
+│   │   │   |   ├── DisplayOnlyQuestion.svelte
+│   │   │   |   ├── MultipleChoiceQuestion.svelte
+│   │   │   |   ├── ShortAnswerQuestion.svelte
+│   │   │   |   └── TableRowQuestion.svelte
+│   │   │   └── rwp/
+│   │   │       ├── ExerciseGenerator.svelte
+│   │   │       ├── QuestionDisplay.svelte
+│   │   │       ├── ReadingExercise.svelte
+│   │   │       ├── RWPHeader.svelte
+│   │   │       └── VocabularySection.svelte
+│   │   └── rwp/
+│   │   │   ├── exerciseTypes.js
+│   │   │   ├── rwpGenerator.js
+│   │   │   └── templates/
+│   │   │       ├── readingComprehension.js
+│   │   │       ├── QuestionDisplay.js
+│   │   │       ├── ReadingExercise.js
+│   │   │       └── multipleChoice.js
 │   │   ├── stores/
 │   │   │   └── fontPreferences.js               # Store for font settings
 │   │   │   └── authStore.js 
@@ -40,6 +54,10 @@ fsi-chinese-learning/
 │   │       └── client.js                        # Supabase connection and functions
 │   └── routes/
 │       ├── +layout.svelte                       # Main layout with header & navigation
+│       ├── api/
+│       │   └── generate-rwp/                           
+│       │       └── server.js
+│       ├── rwp/
 │       ├── +page.svelte                         # Home page
 │       ├── guidebook/
 │       │   ├── +page.svelte             # Blog type guidebook with helpful langauge learning write-ups
@@ -60,9 +78,52 @@ fsi-chinese-learning/
     └── schema.sql                               # Database schema definitions
 ````
 
-
-
 **Database Schema**
+create table public.user_preferences (
+  id uuid not null default extensions.uuid_generate_v4 (),
+  user_id uuid not null,
+  full_name text null,
+  learning_level text null,
+  learning_goals text[] null,
+  personal_context jsonb null,
+  module_responses jsonb null,
+  updated_at timestamp with time zone null,
+  constraint user_preferences_pkey primary key (id),
+  constraint user_preferences_updated_at_key unique (updated_at),
+  constraint user_preferences_user_id_key unique (user_id),
+  constraint user_preferences_user_id_fkey foreign KEY (user_id) references auth.users (id) on delete CASCADE
+) TABLESPACE pg_default;
+
+create table public.user_progress (
+  id uuid not null default extensions.uuid_generate_v4 (),
+  user_id uuid not null,
+  unit_id integer not null,
+  status text not null default 'in_progress'::text,
+  last_accessed timestamp with time zone null default now(),
+  constraint user_progress_pkey primary key (id),
+  constraint user_progress_user_id_unit_id_key unique (user_id, unit_id),
+  constraint user_progress_unit_id_fkey foreign KEY (unit_id) references units (id) on delete CASCADE,
+  constraint user_progress_user_id_fkey foreign KEY (user_id) references auth.users (id) on delete CASCADE,
+  constraint user_progress_status_check check (
+    (
+      status = any (array['in_progress'::text, 'completed'::text])
+    )
+  )
+) TABLESPACE pg_default;
+
+create table public.rwp_content (
+  id uuid not null default extensions.uuid_generate_v4 (),
+  user_id uuid not null,
+  unit_id integer not null,
+  content jsonb not null,
+  created_at timestamp with time zone null default now(),
+  constraint rwp_content_pkey primary key (id),
+  constraint rwp_content_user_id_unit_id_key unique (user_id, unit_id),
+  constraint rwp_content_unit_id_fkey foreign KEY (unit_id) references units (id) on delete CASCADE,
+  constraint rwp_content_user_id_fkey foreign KEY (user_id) references auth.users (id) on delete CASCADE
+) TABLESPACE pg_default;
+
+
 ```sql
 -- Modules table (top level course organization)
 CREATE TABLE public.modules (
