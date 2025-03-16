@@ -4,37 +4,39 @@
 
 	export let question;
 	export let showAnswers = false;
+
+	// Added debug logging
+	console.log('QuestionDisplay received question:', question);
 </script>
 
-<!-- Traditional will use same content for now -->
 <div class="question-block">
 	<div class="question-text">
 		<span class="question-number">{question.id}.</span>
 		<ChineseText
-			simplified={question.question}
-			traditional={question.question}
-			pinyin={question.question_pinyin}
-			english={question.question_english}
+			simplified={question.question || ''}
+			traditional={question.question_traditional || question.question || ''}
+			pinyin={question.question_pinyin || ''}
+			english={question.question_english || ''}
 		/>
 	</div>
 
 	<!-- Multiple choice options -->
-	{#if question.type === 'multiple_choice' && question.options}
+	{#if question.type === 'multiple_choice' && question.options && question.options.length > 0}
 		<div class="options-container">
 			{#each question.options as option}
 				<div class="option {showAnswers && question.answer === option.id ? 'correct-answer' : ''}">
 					<span class="option-letter">{option.id}.</span>
 					<ChineseText
-						simplified={option.text}
-						traditional={option.text}
-						pinyin={option.pinyin}
+						simplified={option.text || ''}
+						traditional={option.text_traditional || option.text || ''}
+						pinyin={option.pinyin || ''}
 						english=""
 					/>
 				</div>
 			{/each}
 		</div>
 
-		{#if showAnswers}
+		{#if showAnswers && question.answer}
 			<div class="answer-explanation">
 				<div class="answer-label">Answer: {question.answer}</div>
 				{#if question.explanation}
@@ -45,14 +47,14 @@
 
 		<!-- Short answer questions -->
 	{:else if question.type === 'short_answer'}
-		{#if showAnswers}
+		{#if showAnswers && question.answer}
 			<div class="answer-container">
 				<div class="answer-label">Answer:</div>
 				<ChineseText
-					simplified={question.answer}
-					traditional={question.answer}
-					pinyin={question.answer_pinyin}
-					english={question.answer_english}
+					simplified={question.answer || ''}
+					traditional={question.answer_traditional || question.answer || ''}
+					pinyin={question.answer_pinyin || ''}
+					english={question.answer_english || ''}
 				/>
 			</div>
 		{:else}
@@ -60,6 +62,8 @@
 				<textarea class="answer-input" placeholder="Write your answer here"></textarea>
 			</div>
 		{/if}
+	{:else}
+		<div class="error-message">Question type not supported or missing options.</div>
 	{/if}
 </div>
 
@@ -153,5 +157,11 @@
 		border-radius: 0.375rem;
 		min-height: 80px;
 		resize: vertical;
+	}
+
+	.error-message {
+		color: #e53935;
+		font-size: 0.875rem;
+		margin-top: 0.5rem;
 	}
 </style>

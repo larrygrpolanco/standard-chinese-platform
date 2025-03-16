@@ -5,7 +5,6 @@
 	export let vocabulary = [];
 </script>
 
-<!-- Traditional will use same content for now -->
 <div class="vocabulary-container">
 	<h3 class="vocabulary-title">Key Vocabulary</h3>
 	<div class="vocabulary-list">
@@ -13,7 +12,7 @@
 			<div class="vocabulary-item">
 				<ChineseText
 					simplified={vocab.word}
-					traditional={vocab.word}
+					traditional={vocab.word_traditional || vocab.word}
 					pinyin={vocab.pinyin}
 					english={vocab.english}
 				/>

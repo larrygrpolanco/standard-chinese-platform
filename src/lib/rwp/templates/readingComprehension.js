@@ -27,10 +27,8 @@
  *
  * @returns {string} A prompt for the LLM to generate a reading comprehension exercise
  */
-export function planReadingComprehension(unitData, userProfile, specificFocus = '') {
-	// Debugging
-    console.log('FULL USER PROFILE OBJECT:', JSON.stringify(userProfile, null, 2));
 
+export function planReadingComprehension(unitData, userProfile, specificFocus = '') {
 	// Safely extract unit and module information
 	const unitId = unitData?.id || 'unknown';
 	const unitTitle = unitData?.title || 'unknown';
@@ -84,7 +82,7 @@ export function planReadingComprehension(unitData, userProfile, specificFocus = 
 	}
 
 	return `
-You are a Mandarin Chinese language education expert creating a personalized reading comprehension exercise.
+You are a Mandarin Chinese language education expert creating a personalized reading comprehension exercise based on FSI course materials.
 
 # UNIT INFORMATION
 Unit ID: ${unitId}
@@ -114,161 +112,179 @@ ${otherModuleResponses ? `# OTHER MODULE RESPONSES (SECONDARY CONTEXT)\n${otherM
 ${specificFocus ? `# SPECIFIC FOCUS FOR THIS EXERCISE\n${specificFocus}` : ''}
 
 # TASK
-Create a personalized reading comprehension exercise that meets these requirements:
+Create a highly personalized reading comprehension exercise that connects the unit's language patterns with the user's context.
 
-1. Write a SHORT STORY (3-5 paragraphs) that:
-   - Uses vocabulary and language patterns from this unit
-   - Incorporates the user's personal context (occupation, location, hobbies)
-   - ESPECIALLY focuses on themes from the CURRENT MODULE RESPONSES when available
-   - Is appropriate for their ${learningLevel} level
+First, conduct a thorough analysis inside <analysis> tags:
+1. Summarize the key grammatical structures and patterns from the dialogues in 2-3 sentences
+2. List 5-7 key vocabulary words and 2-3 grammar points that should be featured in the exercise
+3. Identify 2-3 main themes that could connect unit content to the user's personal context
+4. Plan the progression of questions, noting 3-4 simple questions for beginning, 3-4 moderate for middle, and 3-4 complex for end
+5. Brainstorm at least one specific question for each comprehension type (literal, inferential, applied)
+6. Identify how you'll incorporate the user's occupation (${occupation}), location (${location}), and interests (${hobbies}) into the story
+
+After completing your analysis, create the following:
+
+1. STORY (3-5 paragraphs) that:
+   - Uses vocabulary and grammar patterns from this unit naturally
+   - Is deeply personalized to the user's context (work, location, interests)
+   - Especially incorporates themes from CURRENT MODULE RESPONSES
+   - Uses the appropriate language level (${learningLevel})
    - Feels authentic and engaging
+   - Makes natural use of the unit vocabulary and dialogue patterns
 
-2. Create 5 COMPREHENSION QUESTIONS about the story:
-   - 3 multiple-choice questions with 4 options each
-   - 2 short-answer questions
-   - Include explanations for the correct answers
-   - Questions should test understanding, not just recall
+2. 10 COMPREHENSION QUESTIONS:
+   - Include a mix of question types:
+     - Literal comprehension (key details and facts)
+     - Inferential comprehension (reading between lines, drawing conclusions)
+     - Applied comprehension (relating content to learner's own experiences)
+   - Each question must have exactly 4 answer choices (A, B, C, D)
+   - Scaffold questions from simple to complex to build confidence
+   - Include at least one question about the main ideas/themes
+   - Use vocabulary from the provided list in both questions and answer choices
+   - Ensure all Chinese text is appropriate for the student's level
 
-3. Identify KEY VOCABULARY used in the story
+3. ANSWER KEY:
+   - Provide the correct answer letter for each question
+   - Include a brief explanation of why each answer is correct and why others are incorrect
+   - Note any key vocabulary or grammar structures used in the question
 
-The content should be personally meaningful by connecting to the user's:
-- Professional context (${occupation})
-- Location/environment (${location})
-- Personal interests (${hobbies})
-- Learning motivations (${reasonLearning})
-- PRIORITIZE themes from their current module responses when creating the story context
+4. KEY VOCABULARY LIST:
+   - Highlight 8-12 important vocabulary items used in the story
+   - Include both Chinese characters and English meanings
 
-Focus on creating high-quality, engaging content that balances:
-- Authentic, natural Chinese
-- Appropriate difficulty level
-- Personal relevance
-- Educational value
+Format your response as follows:
 
-Return the complete exercise plan with all elements (title, description, story, questions, and vocabulary).
+<analysis>
+[Your detailed analysis following the guidelines above]
+</analysis>
+
+# PERSONALIZED READING COMPREHENSION EXERCISE
+
+## TITLE
+[An engaging, descriptive title for the exercise]
+
+## INTRODUCTION
+[Brief introduction to the exercise in English, mentioning how it connects to the unit content and user's context]
+
+## STORY
+[Your 3-5 paragraph story in Chinese]
+
+## COMPREHENSION QUESTIONS
+1. [First question in Chinese]
+   A. [Answer choice in Chinese]
+   B. [Answer choice in Chinese]
+   C. [Answer choice in Chinese]
+   D. [Answer choice in Chinese]
+
+[Continue for all 10 questions]
+
+## ANSWER KEY
+1. [Correct answer letter] - [Explanation]
+2. [Correct answer letter] - [Explanation]
+[Continue for all 10 questions]
+
+## KEY VOCABULARY
+- [Chinese term]: [English meaning]
+[List 8-12 key vocabulary items used in the story]
 `;
 }
 
 /**
- * Generates a prompt to format a reading comprehension exercise plan into properly
- * structured JSON with both simplified and traditional characters.
- *
- * @param {string} plan - The exercise plan generated by planReadingComprehension
- * @param {Object} userProfile - User's learning profile (for context)
- * @param {string} specificFocus - Optional specific focus for the exercise
- *
- * @returns {string} A prompt for the LLM to format the plan into structured JSON
+ * Formats the reading comprehension plan into a structured JSON format
+ * with all required translations.
  */
-export function formatReadingComprehension(plan, userProfile, specificFocus = '') {
-	// Safely extract user profile data
-	const learningLevel = userProfile?.learning_level || 'beginner';
-	const personalContext = userProfile?.personal_context || {};
-	const occupation = personalContext?.occupation || 'not specified';
-	const location = personalContext?.location || 'not specified';
-
+export function formatReadingComprehension(planOutput) {
 	return `
-You are a JSON formatting specialist with expertise in Chinese language. Format this reading comprehension exercise plan into structured JSON that includes both simplified and traditional Chinese characters.
+You are a Chinese language expert responsible for transforming a reading comprehension exercise plan into a structured JSON format with complete translations and pinyin.
 
-# EXERCISE PLAN TO FORMAT
-${plan}
+# ORIGINAL READING COMPREHENSION PLAN
+${planOutput}
 
-# USER CONTEXT (For reference only)
-- Learning Level: ${learningLevel}
-- Occupation: ${occupation}
-- Location: ${location}
-${specificFocus ? `- Specific Focus: ${specificFocus}` : ''}
+# TASK
+Transform the above reading comprehension exercise into a structured JSON object following these requirements:
 
-# YOUR TASK
+1. ALL Chinese text must have THREE representations:
+   - Simplified Chinese (original)
+   - Traditional Chinese (convert if not provided)
+   - Pinyin (generate accurate pinyin with tone marks)
+   - English translation (translate where missing)
 
-1. Format the exercise content into valid JSON following exactly this structure:
-\`\`\`json
+2. Create a JSON object with the following structure:
 {
-  "title": "Story title",
-  "description": "Brief description of exercise and learning goals",
-  "exercise_type": "reading_comprehension",
-  "content": {
-    "story": "Chinese text in simplified characters",
-    "story_traditional": "Same story in traditional characters", 
-    "story_pinyin": "Complete pinyin for the story",
-    "story_english": "English translation of the story"
+  "meta": {
+    "title": "", // Chinese title
+    "title_traditional": "", // Traditional version of title
+    "title_pinyin": "", // Pinyin of title
+    "title_english": "", // English translation of title
+    "introduction": "" // From the INTRODUCTION section (keep in English)
+  },
+  "story": {
+    "text": "", // Full story text in simplified Chinese
+    "text_traditional": "", // Traditional version of the story
+    "text_pinyin": "", // Full pinyin for the story with proper tone marks
+    "text_english": "" // Full English translation of the story
   },
   "questions": [
     {
       "id": 1,
-      "type": "multiple_choice",
-      "question": "Question text in simplified Chinese",
-      "question_traditional": "Question text in traditional Chinese",
-      "question_pinyin": "Pinyin for the question",
-      "question_english": "English translation of the question",
-      "options": [
+      "type": "multiple_choice", 
+      "question": "", // Question in simplified Chinese
+      "question_traditional": "", // Traditional version of question
+      "question_pinyin": "", // Pinyin of question
+      "question_english": "", // English translation of question
+      "options": [ // VERY IMPORTANT: Each multiple_choice question MUST have these options
         {
-          "id": "A", 
-          "text": "Option A in simplified Chinese", 
-          "text_traditional": "Option A in traditional Chinese", 
-          "pinyin": "Pinyin for option A"
+          "id": "A", // A, B, C, D
+          "text": "", // Option text in simplified Chinese
+          "text_traditional": "", // Traditional version of option text
+          "pinyin": "" // Pinyin of option text
         },
         {
-          "id": "B", 
-          "text": "Option B in simplified Chinese", 
-          "text_traditional": "Option B in traditional Chinese", 
-          "pinyin": "Pinyin for option B"
+          "id": "B",
+          "text": "",
+          "text_traditional": "",
+          "pinyin": ""
         },
         {
-          "id": "C", 
-          "text": "Option C in simplified Chinese", 
-          "text_traditional": "Option C in traditional Chinese", 
-          "pinyin": "Pinyin for option C"
+          "id": "C",
+          "text": "",
+          "text_traditional": "",
+          "pinyin": ""
         },
         {
-          "id": "D", 
-          "text": "Option D in simplified Chinese", 
-          "text_traditional": "Option D in traditional Chinese", 
-          "pinyin": "Pinyin for option D"
+          "id": "D",
+          "text": "",
+          "text_traditional": "",
+          "pinyin": ""
         }
       ],
-      "answer": "A",
-      "explanation": "Explanation of why option A is correct"
-    },
-    // Two more multiple choice questions with the same structure
-    {
-      "id": 4,
-      "type": "short_answer",
-      "question": "Short answer question in simplified Chinese",
-      "question_traditional": "Short answer question in traditional Chinese",
-      "question_pinyin": "Pinyin for the question",
-      "question_english": "English translation of the question",
-      "sample_answer": "Example of a good answer for reference",
-      "sample_answer_traditional": "Example in traditional Chinese",
-      "sample_answer_pinyin": "Pinyin for sample answer"
+      "answer": "A", // Correct option ID for multiple_choice
+      "explanation": "" // Explanation in English
     }
-    // One more short answer question with the same structure
+    // ...more questions
   ],
-  "vocabulary_focus": [
+  "vocabulary": [
     {
-      "word": "Word in simplified Chinese",
-      "word_traditional": "Word in traditional Chinese",
-      "pinyin": "Pinyin for the word",
-      "english": "English meaning"
+      "word": "", // Word in simplified Chinese
+      "word_traditional": "", // Traditional version of word
+      "pinyin": "", // Pinyin of word with tone marks
+      "english": "" // English meaning
     }
-    // More vocabulary words with the same structure
+    // ...more vocabulary items
   ]
 }
-\`\`\`
 
-2. For traditional Chinese versions:
-   - Accurately convert all simplified Chinese characters to traditional characters
-   - Include traditional versions for ALL Chinese text (story, questions, options, vocabulary)
-   - Ensure consistent conversion throughout the document
+3. IMPORTANT ACCURACY REQUIREMENTS:
+   - Extract the Chinese title from the TITLE section
+   - Get the introduction text from the INTRODUCTION section
+   - Convert the story from the STORY section
+   - For each question in COMPREHENSION QUESTIONS, create a question object
+   - EACH MULTIPLE CHOICE QUESTION MUST HAVE AN OPTIONS ARRAY with options A, B, C, D
+   - Extract options A, B, C, D from the text for each question
+   - Use the ANSWER KEY to set the correct answer and explanation for each question
+   - Extract vocabulary items from the KEY VOCABULARY section
+   - Make sure all Chinese has traditional, pinyin, and English translations
 
-3. Format Requirements:
-   - Return ONLY the JSON object, with no additional text, markdown, or code blocks
-   - Ensure the JSON is valid and properly formatted
-   - Use the exact field names and structure shown above
-   - Include proper Unicode encoding for all Chinese characters
-
-4. Content Guidelines:
-   - Maintain the original meaning and educational value from the plan
-   - Ensure all questions properly relate to the story
-   - Include descriptive explanations for the correct answers
-   - Select vocabulary that is actually used in the story
+Return ONLY the JSON object without any surrounding text, code blocks, or explanations.
 `;
 }

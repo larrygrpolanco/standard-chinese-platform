@@ -14,6 +14,7 @@
 	import ModuleQuestions from '$lib/components/ModuleQuestions.svelte';
 	import { authStore } from '$lib/stores/authStore';
 	import FontToggle from '$lib/components/UI/FontToggle.svelte';
+	import Toast from '$lib/components/UI/Toast.svelte';
 
 	// RWP components
 	import RwpHeader from '$lib/components/rwp/RwpHeader.svelte';
@@ -34,6 +35,14 @@
 	let error = null;
 	let user;
 	let debug = true;
+
+	// Collapsible panel states
+	let contextPanelOpen = true;
+	let generatorPanelOpen = true;
+
+	// Toast state
+	let toastVisible = false;
+	let toastMessage = '';
 
 	// Get unit ID from URL parameter
 	const unitId = parseInt($page.params.unit_id);
@@ -81,6 +90,17 @@
 		}
 	});
 
+	// Show toast notification
+	function showToast(message) {
+		toastMessage = message;
+		toastVisible = true;
+
+		// Hide toast after 3 seconds
+		setTimeout(() => {
+			toastVisible = false;
+		}, 3000);
+	}
+
 	// Save module responses
 	async function saveModuleResponses(event) {
 		try {
@@ -96,16 +116,10 @@
 			userPreferences.module_responses = updatedResponses;
 
 			// Show toast message
-			const toast = document.getElementById('toast');
-			toast.textContent = 'Your responses have been saved!';
-			toast.classList.add('show');
-
-			setTimeout(() => {
-				toast.classList.remove('show');
-			}, 3000);
+			showToast('Your responses have been saved!');
 		} catch (err) {
 			console.error('Error saving responses:', err);
-			alert('Failed to save your responses. Please try again.');
+			showToast('Failed to save your responses');
 		}
 	}
 
@@ -122,9 +136,11 @@
 
 		try {
 			rwpContent = await generateRwpExercise(unitId, exerciseType, specificFocus, debug);
+			showToast('New exercise generated successfully!');
 		} catch (err) {
 			console.error('Error generating exercise:', err);
 			error = err.message || 'Failed to generate exercise';
+			showToast('Failed to generate exercise');
 		} finally {
 			generating = false;
 		}
@@ -133,6 +149,15 @@
 	// Toggle answer visibility
 	function toggleAnswers() {
 		showAnswers = !showAnswers;
+	}
+
+	// Toggle panel visibility
+	function togglePanel(panel) {
+		if (panel === 'context') {
+			contextPanelOpen = !contextPanelOpen;
+		} else if (panel === 'generator') {
+			generatorPanelOpen = !generatorPanelOpen;
+		}
 	}
 
 	// Determine which component to use based on exercise type
@@ -151,55 +176,108 @@
 			<div class="error-container">
 				<h1 class="error-heading">{error}</h1>
 				<p class="error-text">We couldn't load this practice exercise. Please try again later.</p>
-				<a href="/modules" class="error-button">Browse All Modules</a>
+				<a href="/units/{unitId}" class="tape-tab">Go back to unit</a>
 			</div>
 		{:else}
 			<!-- Header component -->
 			<RwpHeader {unitData} />
 
-			<div class="font-controls">
-				<FontToggle />
-			</div>
 
 			<div class="grid-layout">
 				<!-- Left column: Module questions and generator -->
 				<div class="left-column">
 					{#if user}
-						<div class="panel">
-							<h2 class="panel-title">Your Context</h2>
-							<p class="panel-description">
-								Tell us about yourself to personalize your practice exercises.
-							</p>
+						<!-- Context panel - collapsible -->
+						<div class="collapsible-panel">
+							<button
+								class="panel-header"
+								on:click={() => togglePanel('context')}
+								aria-expanded={contextPanelOpen}
+							>
+								<h2 class="panel-title">Your Context</h2>
+								<svg
+									class="panel-icon {contextPanelOpen ? 'rotate-180' : ''}"
+									fill="none"
+									stroke="currentColor"
+									viewBox="0 0 24 24"
+								>
+									<path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2"
+										d="M19 9l-7 7-7-7"
+									></path>
+								</svg>
+							</button>
 
-							{#if userPreferences}
-								<ModuleQuestions
-									moduleId={unitData.module.id}
-									moduleResponses={userPreferences.module_responses}
-									on:save={saveModuleResponses}
-								/>
+							{#if contextPanelOpen}
+								<div class="panel-content">
+									<p class="panel-description">
+										Tell us about yourself to personalize your practice exercises.
+									</p>
+
+									{#if userPreferences}
+										<ModuleQuestions
+											moduleId={unitData.module.id}
+											moduleResponses={userPreferences.module_responses}
+											on:save={saveModuleResponses}
+										/>
+									{/if}
+								</div>
 							{/if}
 						</div>
 					{:else}
-						<div class="panel">
-							<h2 class="panel-title">Sign In to Personalize</h2>
-							<p class="panel-description">
-								Create an account to save your preferences and track your progress.
-							</p>
-							<a href="/login?redirect=/rwp/{unitId}" class="signin-button">
-								Sign In or Create Account
-							</a>
+						<div class="collapsible-panel">
+							<div class="panel-header">
+								<h2 class="panel-title">Sign In to Personalize</h2>
+							</div>
+							<div class="panel-content">
+								<p class="panel-description">
+									Create an account to save your preferences and track your progress.
+								</p>
+								<a href="/login?redirect=/rwp/{unitId}" class="signin-button">
+									Sign In or Create Account
+								</a>
+							</div>
 						</div>
 					{/if}
 
-					<!-- Exercise generator component -->
-					<ExerciseGenerator
-						{generating}
-						bind:exerciseType
-						bind:specificFocus
-						bind:debug
-						hasExistingContent={!!rwpContent}
-						on:generate={generateExercise}
-					/>
+					<!-- Exercise generator component - collapsible -->
+					<div class="collapsible-panel">
+						<button
+							class="panel-header"
+							on:click={() => togglePanel('generator')}
+							aria-expanded={generatorPanelOpen}
+						>
+							<h2 class="panel-title">Exercise Generator</h2>
+							<svg
+								class="panel-icon {generatorPanelOpen ? 'rotate-180' : ''}"
+								fill="none"
+								stroke="currentColor"
+								viewBox="0 0 24 24"
+							>
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M19 9l-7 7-7-7"
+								></path>
+							</svg>
+						</button>
+
+						{#if generatorPanelOpen}
+							<div class="panel-content">
+								<ExerciseGenerator
+									{generating}
+									bind:exerciseType
+									bind:specificFocus
+									bind:debug
+									hasExistingContent={!!rwpContent}
+									on:generate={generateExercise}
+								/>
+							</div>
+						{/if}
+					</div>
 				</div>
 
 				<!-- Right column: Exercise content -->
@@ -208,7 +286,7 @@
 						<div class="exercise-container">
 							<div class="exercise-header">
 								<h2 class="exercise-title">{rwpContent.title || 'Practice Exercise'}</h2>
-								<button on:click={toggleAnswers} class="toggle-answers-button">
+								<button on:click={toggleAnswers} class="tape-tab {showAnswers ? 'active' : ''}">
 									{showAnswers ? 'Hide Answers' : 'Show Answers'}
 								</button>
 							</div>
@@ -269,8 +347,8 @@
 	</div>
 </div>
 
-<!-- Toast notification -->
-<div id="toast" class="toast">Your responses have been saved!</div>
+<!-- Toast component -->
+<Toast message={toastMessage} show={toastVisible} />
 
 <style>
 	/* Page layout */
@@ -278,12 +356,13 @@
 		display: flex;
 		width: 100%;
 		justify-content: center;
+		background-color: var(--color-cream-paper, #f4f1de);
 	}
 
 	.content-container {
 		margin-left: auto;
 		margin-right: auto;
-		max-width: 1240px;
+		max-width: 1200px;
 		padding: 1rem;
 		width: 100%;
 	}
@@ -298,26 +377,12 @@
 		margin-bottom: 1rem;
 		font-family: 'Arvo', serif;
 		font-size: 1.25rem;
-		color: #c17c74;
+		color: var(--color-terracotta, #c17c74);
 	}
 
 	.error-text {
 		margin-bottom: 1rem;
-		color: #33312e;
-	}
-
-	.error-button {
-		display: inline-block;
-		border-radius: 0.5rem;
-		background-color: #c17c74;
-		padding: 0.5rem 1rem;
-		font-weight: 500;
-		color: white;
-		transition: all 0.2s;
-	}
-
-	.error-button:hover {
-		background-color: #aa6b64;
+		color: var(--color-charcoal, #33312e);
 	}
 
 	/* Grid layout */
@@ -341,24 +406,55 @@
 		gap: 1.5rem;
 	}
 
-	/* Panel for sign-in */
-	.panel {
+	/* Collapsible panel */
+	.collapsible-panel {
 		background-color: white;
-		border: 1px solid #e8e5d7;
+		border: 1px solid var(--color-warm-gray, #a0998a);
 		border-radius: 0.5rem;
-		padding: 1.5rem;
 		box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+		overflow: hidden;
+	}
+
+	.panel-header {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		width: 100%;
+		padding: 1rem 1.5rem;
+		background-color: var(--color-beige, #e8e5d7);
+		border: none;
+		text-align: left;
+		cursor: pointer;
+		transition: background-color 0.2s;
+	}
+
+	.panel-header:hover {
+		background-color: #dbd8ca;
 	}
 
 	.panel-title {
 		font-size: 1.25rem;
 		font-weight: 600;
-		color: #33312e;
-		margin-bottom: 0.5rem;
+		color: var(--color-charcoal, #33312e);
+		margin: 0;
+	}
+
+	.panel-icon {
+		height: 1.25rem;
+		width: 1.25rem;
+		transition: transform 0.2s;
+	}
+
+	.rotate-180 {
+		transform: rotate(180deg);
+	}
+
+	.panel-content {
+		padding: 1.5rem;
 	}
 
 	.panel-description {
-		color: #6b6a65;
+		color: var(--color-warm-gray, #6b6a65);
 		margin-bottom: 1.25rem;
 		font-size: 0.875rem;
 	}
@@ -374,9 +470,9 @@
 		cursor: pointer;
 		transition: all 0.2s;
 		text-decoration: none;
-		background-color: #c17c74;
+		background-color: var(--color-terracotta, #c17c74);
 		color: white;
-		border: 1px solid #a06b65;
+		border: 1px solid var(--color-terracotta-hover, #a06b65);
 		width: 100%;
 		margin-top: 0.5rem;
 	}
@@ -384,13 +480,13 @@
 	.signin-button:hover {
 		transform: translateY(-1px);
 		box-shadow: 0 2px 4px rgba(193, 124, 116, 0.3);
-		background-color: #b06c65;
+		background-color: var(--color-terracotta-hover, #ad6c66);
 	}
 
 	/* Exercise container */
 	.exercise-container {
 		background-color: white;
-		border: 1px solid #e8e5d7;
+		border: 1px solid var(--color-warm-gray, #a0998a);
 		border-radius: 0.5rem;
 		padding: 1.5rem;
 		box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
@@ -406,49 +502,43 @@
 	.exercise-title {
 		font-size: 1.5rem;
 		font-weight: 700;
-		color: #33312e;
+		color: var(--color-charcoal, #33312e);
+		font-family: 'Arvo', serif;
 	}
 
 	.exercise-description {
-		color: #6b6a65;
+		color: var(--color-warm-gray, #6b6a65);
 		margin-bottom: 1.5rem;
 		font-size: 0.925rem;
 	}
 
-	.toggle-answers-button {
-		background-color: #e8e5d7;
-		border: 1px solid #a0998a;
-		color: #33312e;
-		padding: 4px 12px;
-		font-size: 0.75rem;
-		border-radius: 16px;
+	/* Button styling - following style guide */
+	.tape-tab {
+		display: inline-flex;
+		align-items: center;
+		padding: 8px 12px;
+		font-size: 0.875rem;
 		font-weight: 600;
-		cursor: pointer;
+		color: var(--color-charcoal, #33312e);
+		background-color: var(--color-beige, #e8e5d7);
+		border: 1px solid var(--color-warm-gray, #a0998a);
+		border-radius: 16px;
 		transition: all 0.2s;
 	}
 
-	.toggle-answers-button:hover {
-		background-color: #f4f1de;
+	.tape-tab:hover:not(.active) {
+		background-color: rgba(221, 185, 103, 0.2);
 	}
 
-	/* Questions container */
-	.questions-container {
-		margin-bottom: 2rem;
-	}
-
-	.questions-title {
-		font-size: 1.25rem;
-		font-weight: 600;
-		color: #33312e;
-		margin-bottom: 0.75rem;
-		padding-bottom: 0.375rem;
-		border-bottom: 1px solid #e8e5d7;
+	.tape-tab.active {
+		background-color: var(--color-gold, #ddb967);
+		color: var(--color-charcoal, #33312e);
 	}
 
 	/* Empty state */
 	.empty-state {
 		background-color: white;
-		border: 1px solid #e8e5d7;
+		border: 1px solid var(--color-warm-gray, #a0998a);
 		border-radius: 0.5rem;
 		padding: 3rem 1.5rem;
 		text-align: center;
@@ -458,12 +548,13 @@
 	.empty-state-title {
 		font-size: 1.25rem;
 		font-weight: 600;
-		color: #33312e;
+		color: var(--color-charcoal, #33312e);
 		margin-bottom: 0.75rem;
+		font-family: 'Arvo', serif;
 	}
 
 	.empty-state-description {
-		color: #6b6a65;
+		color: var(--color-warm-gray, #6b6a65);
 		margin-bottom: 1.5rem;
 		max-width: 400px;
 		margin-left: auto;
@@ -471,8 +562,8 @@
 	}
 
 	.generate-button-large {
-		background-color: #34667f;
-		color: #f4f1de;
+		background-color: var(--color-navy, #34667f);
+		color: var(--color-cream-paper, #f4f1de);
 		border: 1px solid #295267;
 		padding: 12px 24px;
 		border-radius: 20px;
@@ -488,23 +579,29 @@
 		background-color: #2d586e;
 	}
 
+	.generate-button-large:disabled {
+		opacity: 0.7;
+		cursor: not-allowed;
+	}
+
 	/* Navigation footer */
 	.navigation-footer {
 		margin-top: 2rem;
 		display: flex;
 		justify-content: space-between;
-		border-top: 1px solid #a0998a;
+		border-top: 1px solid var(--color-warm-gray, #a0998a);
 		padding-top: 1rem;
 	}
 
 	.back-link {
 		display: flex;
 		align-items: center;
-		color: #34667f;
+		color: var(--color-navy, #34667f);
+		transition: color 0.2s;
 	}
 
 	.back-link:hover {
-		color: #c17c74;
+		color: var(--color-terracotta, #c17c74);
 	}
 
 	.back-icon {
@@ -513,48 +610,12 @@
 		width: 1.25rem;
 	}
 
-	/* Toast notification */
-	.toast {
-		visibility: hidden;
-		position: fixed;
-		bottom: 20px;
-		left: 50%;
-		transform: translateX(-50%);
-		background-color: #333;
-		color: white;
-		text-align: center;
-		border-radius: 8px;
-		padding: 16px;
-		z-index: 1000;
-		box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-	}
-
-	.toast.show {
-		visibility: visible;
-		animation:
-			fadein 0.5s,
-			fadeout 0.5s 2.5s;
-	}
-
-	@keyframes fadein {
-		from {
-			bottom: 0;
-			opacity: 0;
-		}
-		to {
-			bottom: 20px;
-			opacity: 1;
-		}
-	}
-
-	@keyframes fadeout {
-		from {
-			bottom: 20px;
-			opacity: 1;
-		}
-		to {
-			bottom: 0;
-			opacity: 0;
-		}
+	/* Error message */
+	.error-message {
+		color: var(--color-terracotta, #c17c74);
+		padding: 1rem;
+		border: 1px solid var(--color-terracotta, #c17c74);
+		border-radius: 0.5rem;
+		background-color: rgba(193, 124, 116, 0.1);
 	}
 </style>

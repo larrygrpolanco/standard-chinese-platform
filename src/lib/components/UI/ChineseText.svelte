@@ -1,4 +1,4 @@
-<!-- ChineseText.svelte -->
+<!-- src/lib/components/UI/ChineseText.svelte -->
 <script>
 	import { fontPreferences } from '$lib/stores/fontPreferences';
 

@@ -73,6 +73,7 @@ export async function POST({ request }) {
 }
 
 // Helper function to safely try parsing JSON
+// Helper function to safely try parsing JSON
 function tryParseJson(str) {
 	try {
 		// Remove markdown code block formatting if present
@@ -84,6 +85,15 @@ function tryParseJson(str) {
 
 		if (match && match[1]) {
 			jsonStr = match[1].trim(); // Extract just the JSON part
+		}
+
+		// If it still doesn't look like JSON, look for the first { and last }
+		if (!jsonStr.startsWith('{')) {
+			const firstBrace = jsonStr.indexOf('{');
+			const lastBrace = jsonStr.lastIndexOf('}');
+			if (firstBrace !== -1 && lastBrace !== -1) {
+				jsonStr = jsonStr.substring(firstBrace, lastBrace + 1);
+			}
 		}
 
 		return JSON.parse(jsonStr);

@@ -1,4 +1,4 @@
-<!-- src/lib/components/FontToggle.svelte -->
+<!-- src/lib/components/UI/FontToggle.svelte -->
 <script>
 	import { fontPreferences } from '$lib/stores/fontPreferences';
 
