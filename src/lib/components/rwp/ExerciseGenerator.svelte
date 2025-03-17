@@ -14,121 +14,185 @@
 	}
 </script>
 
-<div class="panel">
-	<h2 class="panel-title">Generate Exercise</h2>
-	<p class="panel-description">Choose what type of exercise you'd like to practice with.</p>
-
+<div class="generator-form">
 	<div class="form-group">
-		<label for="exercise-type" class="form-label">Exercise Type</label>
-		<select id="exercise-type" bind:value={exerciseType} class="form-select">
-			<option value="reading_comprehension">Reading Comprehension</option>
-			<!-- Add more options as you implement them -->
-		</select>
+		<label for="exercise-type" class="form-label">Practice Type</label>
+		<div class="select-wrapper">
+			<select id="exercise-type" bind:value={exerciseType} class="vintage-select">
+				<option value="reading_comprehension">Reading Comprehension</option>
+				<!-- Add more options as you implement them -->
+			</select>
+			<div class="select-icon">
+				<svg viewBox="0 0 24 24" width="16" height="16">
+					<path fill="none" stroke="currentColor" stroke-width="2" d="M6 9l6 6 6-6" />
+				</svg>
+			</div>
+		</div>
 	</div>
 
 	<div class="form-group">
-		<label for="specific-focus" class="form-label"> Specific Focus (Optional) </label>
+		<label for="specific-focus" class="form-label">
+			Specific Focus <span class="optional-text">(optional)</span>
+		</label>
 		<input
 			id="specific-focus"
 			type="text"
 			bind:value={specificFocus}
 			placeholder="e.g., measure words, time expressions"
-			class="form-input"
+			class="vintage-input"
 		/>
+		<p class="input-hint">Specify grammar points or vocabulary you want to practice</p>
 	</div>
 
-	<div class="form-group">
-		<label class="flex items-center gap-2">
-			<input type="checkbox" bind:checked={debug} class="form-checkbox" />
-			<span class="text-sm">Debug Mode</span>
+	<div class="form-group checkbox-group">
+		<label class="vintage-checkbox">
+			<input type="checkbox" bind:checked={debug} hidden />
+			<span class="checkbox-custom"></span>
+			<span class="checkbox-label">Debug Mode</span>
 		</label>
 	</div>
-
-	<button on:click={handleGenerate} disabled={generating} class="generate-button">
-		{generating
-			? 'Generating...'
-			: hasExistingContent
-				? 'Regenerate Exercise'
-				: 'Generate Exercise'}
-	</button>
 </div>
 
 <style>
-	.panel {
-		background-color: white;
-		border: 1px solid #e8e5d7;
-		border-radius: 0.5rem;
-		padding: 1.5rem;
-		box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-	}
-
-	.panel-title {
-		font-size: 1.25rem;
-		font-weight: 600;
-		color: #33312e;
-		margin-bottom: 0.5rem;
-	}
-
-	.panel-description {
-		color: #6b6a65;
-		margin-bottom: 1.25rem;
-		font-size: 0.875rem;
+	.generator-form {
+		display: flex;
+		flex-direction: column;
+		gap: 1.25rem;
+		font-family: 'Work Sans', sans-serif;
 	}
 
 	.form-group {
-		margin-bottom: 1rem;
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
 	}
 
 	.form-label {
-		display: block;
-		font-size: 0.875rem;
 		font-weight: 500;
-		color: #33312e;
-		margin-bottom: 0.375rem;
+		color: var(--color-charcoal, #33312E);
+		font-size: 0.9375rem;
 	}
 
-	.form-select,
-	.form-input {
+	.optional-text {
+		font-weight: normal;
+		font-style: italic;
+		font-size: 0.8125rem;
+		color: var(--color-warm-gray, #A0998A);
+	}
+
+	/* Custom select styling */
+	.select-wrapper {
+		position: relative;
+	}
+
+	.vintage-select {
+		appearance: none;
 		width: 100%;
-		padding: 0.5rem;
-		border: 1px solid #e8e5d7;
-		border-radius: 0.375rem;
+		padding: 0.625rem 0.875rem;
+		padding-right: 2.5rem; /* Space for icon */
 		font-size: 0.875rem;
-		color: #33312e;
-	}
-
-	.form-select:focus,
-	.form-input:focus {
-		outline: none;
-		border-color: #34667f;
-		box-shadow: 0 0 0 3px rgba(52, 102, 127, 0.1);
-	}
-
-	.generate-button {
-		display: inline-flex;
-		align-items: center;
-		justify-content: center;
-		padding: 8px 16px;
-		border-radius: 16px;
-		font-weight: 600;
-		font-size: 0.875rem;
+		color: var(--color-charcoal, #33312E);
+		background-color: var(--color-cream-paper, #F4F1DE);
+		border: 1px solid var(--color-warm-gray, #A0998A);
+		border-radius: 6px;
 		cursor: pointer;
+		box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
 		transition: all 0.2s;
-		background-color: #34667f;
-		color: #f4f1de;
-		border: 1px solid #295267;
-		width: 100%;
 	}
 
-	.generate-button:hover:not(:disabled) {
-		transform: translateY(-1px);
-		box-shadow: 0 2px 4px rgba(41, 82, 103, 0.3);
-		background-color: #2d586e;
+	.vintage-select:focus {
+		outline: none;
+		border-color: var(--color-gold, #DDB967);
+		box-shadow: 0 0 0 3px rgba(221, 185, 103, 0.2);
 	}
 
-	.generate-button:disabled {
-		background-color: #a0998a;
-		border-color: #a0998a;
-		cursor: not-allowed;
+	.select-icon {
+		position: absolute;
+		right: 0.875rem;
+		top: 50%;
+		transform: translateY(-50%);
+		color: var(--color-warm-gray, #A0998A);
+		pointer-events: none;
+	}
+
+	/* Input styling */
+	.vintage-input {
+		padding: 0.625rem 0.875rem;
+		font-size: 0.875rem;
+		color: var(--color-charcoal, #33312E);
+		background-color: var(--color-cream-paper, #F4F1DE);
+		border: 1px solid var(--color-warm-gray, #A0998A);
+		border-radius: 6px;
+		box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
+		transition: all 0.2s;
+	}
+
+	.vintage-input:focus {
+		outline: none;
+		border-color: var(--color-gold, #DDB967);
+		box-shadow: 0 0 0 3px rgba(221, 185, 103, 0.2);
+	}
+
+	.vintage-input::placeholder {
+		color: rgba(160, 152, 138, 0.6);
+		font-style: italic;
+		font-size: 0.8125rem;
+	}
+
+	.input-hint {
+		font-size: 0.75rem;
+		color: var(--color-warm-gray, #A0998A);
+		margin: 0.25rem 0 0 0;
+	}
+
+	/* Checkbox styling */
+	.checkbox-group {
+		margin-top: 0.5rem;
+	}
+
+	.vintage-checkbox {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		cursor: pointer;
+		user-select: none;
+	}
+
+	.checkbox-custom {
+		display: inline-block;
+		width: 18px;
+		height: 18px;
+		background-color: var(--color-cream-paper, #F4F1DE);
+		border: 1px solid var(--color-warm-gray, #A0998A);
+		border-radius: 3px;
+		position: relative;
+		transition: all 0.2s;
+	}
+
+	.checkbox-custom::after {
+		content: '';
+		position: absolute;
+		display: none;
+		left: 6px;
+		top: 2px;
+		width: 5px;
+		height: 10px;
+		border: solid var(--color-charcoal, #33312E);
+		border-width: 0 2px 2px 0;
+		transform: rotate(45deg);
+	}
+
+	input[type="checkbox"]:checked + .checkbox-custom {
+		background-color: var(--color-gold, #DDB967);
+		border-color: var(--color-gold, #DDB967);
+	}
+
+	input[type="checkbox"]:checked + .checkbox-custom::after {
+		display: block;
+	}
+
+	.checkbox-label {
+		font-size: 0.875rem;
+		color: var(--color-warm-gray, #6B6A65);
 	}
 </style>

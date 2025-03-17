@@ -1,6 +1,6 @@
 <!-- src/lib/components/ModuleQuestions.svelte -->
 <script>
-	import { createEventDispatcher, onMount, afterUpdate } from 'svelte';
+	import { createEventDispatcher, onMount } from 'svelte';
 	const dispatch = createEventDispatcher();
 
 	export let moduleId;
@@ -96,8 +96,6 @@
 		});
 	}
 
-	// Remove the afterUpdate hook completely
-
 	function handleSave() {
 		const updatedResponses = { ...moduleResponses };
 
@@ -117,55 +115,99 @@
 </script>
 
 <div class="module-questions">
-	<p class="mb-4 text-sm">Your answers help create personalized exercises</p>
+	<p class="helper-text">Your answers help personalize exercises to your interests and experiences.</p>
 
 	{#each questions as question (question.id)}
-		<div class="question-group">
+		<div class="question-card">
 			<label for={`${moduleId}-${question.id}`} class="question-label">
 				{question.question}
 			</label>
-			<textarea
-				id={`${moduleId}-${question.id}`}
-				bind:value={answers[question.id]}
-				class="question-input"
-				rows="2"
-				maxlength="50"
-				placeholder="Maximum 50 characters"
-			></textarea>
-			<div class="char-count {answers[question.id]?.length >= 45 ? 'near-limit' : ''}">
-				{answers[question.id]?.length || 0}/50
+			<div class="input-wrapper">
+				<textarea
+					id={`${moduleId}-${question.id}`}
+					bind:value={answers[question.id]}
+					class="question-input"
+					rows="2"
+					maxlength="50"
+					placeholder="Your answer here..."
+				></textarea>
+				<div class="char-count {answers[question.id]?.length >= 45 ? 'near-limit' : ''}">
+					{answers[question.id]?.length || 0}/50
+				</div>
 			</div>
 		</div>
 	{/each}
 
-	<button on:click={handleSave} class="save-button"> Save Responses </button>
+	<button on:click={handleSave} class="vintage-button">
+		<span class="button-text">Save Responses</span>
+	</button>
 </div>
 
 <style>
 	.module-questions {
+		display: flex;
+		flex-direction: column;
+		gap: 1rem;
 		font-family: 'Work Sans', sans-serif;
 	}
 
-	.question-group {
+	.helper-text {
+		color: var(--color-warm-gray, #A0998A);
+		font-size: 0.875rem;
+		line-height: 1.5;
+		margin: 0 0 0.5rem 0;
+	}
+
+	.question-card {
+		background-color: var(--color-cream-paper, #F4F1DE);
+		background-image: linear-gradient(to bottom, rgba(255, 255, 255, 0.2), rgba(0, 0, 0, 0.01));
+		border: 1px solid var(--color-warm-gray, #A0998A);
+		border-radius: 6px;
+		padding: 0.75rem;
 		margin-bottom: 1rem;
-		position: relative;
 	}
 
 	.question-label {
 		display: block;
-		margin-bottom: 0.375rem;
 		font-weight: 500;
-		color: #33312e;
+		color: var(--color-charcoal, #33312E);
+		margin-bottom: 0.5rem;
+		font-size: 0.9375rem;
+	}
+
+	.input-wrapper {
+		position: relative;
+		background-color: white;
+		border: 1px solid var(--color-warm-gray, #A0998A);
+		border-radius: 4px;
+		box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
+		transition: border-color 0.2s, box-shadow 0.2s;
+	}
+
+	.input-wrapper:focus-within {
+		border-color: var(--color-gold, #DDB967);
+		box-shadow: 0 0 0 3px rgba(221, 185, 103, 0.2);
 	}
 
 	.question-input {
 		width: 100%;
 		padding: 0.625rem;
-		background-color: #f4f1de;
-		border: 1px solid #a0998a;
-		border-radius: 0.25rem;
+		padding-right: 3.5rem; /* Space for character count */
+		background-color: transparent;
+		border: none;
 		font-family: inherit;
+		font-size: 0.875rem;
+		color: var(--color-charcoal, #33312E);
 		resize: vertical;
+	}
+
+	.question-input:focus {
+		outline: none;
+	}
+
+	.question-input::placeholder {
+		color: rgba(160, 152, 138, 0.6);
+		font-style: italic;
 	}
 
 	.char-count {
@@ -173,26 +215,50 @@
 		right: 0.5rem;
 		bottom: 0.5rem;
 		font-size: 0.75rem;
-		color: #70594a;
+		font-family: 'Courier New', monospace;
+		color: var(--color-warm-gray, #A0998A);
+		background-color: rgba(255, 255, 255, 0.8);
+		padding: 0.125rem 0.375rem;
+		border-radius: 3px;
 	}
 
 	.near-limit {
-		color: #c17c74;
+		color: var(--color-terracotta, #C17C74);
 		font-weight: 600;
 	}
 
-	.save-button {
-		padding: 0.75rem 1.25rem;
-		background-color: #826d5b;
-		color: #f4f1de;
+	.vintage-button {
+		position: relative;
+		align-self: flex-end;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		background-color: var(--color-terracotta, #C17C74);
+		color: white;
 		border: none;
-		border-radius: 9999px;
+		border-radius: 24px;
+		padding: 0.625rem 1.25rem;
 		font-weight: 600;
+		font-size: 0.875rem;
 		cursor: pointer;
-		transition: background-color 0.2s;
+		transition: all 0.2s;
+		box-shadow: 0 3px 0 var(--color-terracotta-hover, #AD6C66);
+		transform: translateY(0);
 	}
 
-	.save-button:hover {
-		background-color: #70594a;
+	.vintage-button:hover {
+		transform: translateY(-1px);
+		box-shadow: 0 4px 0 var(--color-terracotta-hover, #AD6C66);
+		background-color: #b06b64;
+	}
+
+	.vintage-button:active {
+		transform: translateY(3px);
+		box-shadow: 0 0 0 var(--color-terracotta-hover, #AD6C66);
+	}
+
+	.button-text {
+		position: relative;
+		z-index: 1;
 	}
 </style>

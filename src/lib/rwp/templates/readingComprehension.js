@@ -28,7 +28,7 @@
  * @returns {string} A prompt for the LLM to generate a reading comprehension exercise
  */
 
-export function planReadingComprehension(unitData, userProfile, specificFocus = '') {
+export function planTemplate(unitData, userProfile, specificFocus = '') {
 	// Safely extract unit and module information
 	const unitId = unitData?.id || 'unknown';
 	const unitTitle = unitData?.title || 'unknown';
@@ -82,81 +82,90 @@ export function planReadingComprehension(unitData, userProfile, specificFocus = 
 	}
 
 	return `
-You are a Mandarin Chinese language education expert creating a personalized reading comprehension exercise based on FSI course materials.
+You are a Mandarin Chinese language education expert tasked with creating a personalized reading comprehension exercise based on FSI (Foreign Service Institute) course materials. Your goal is to make the language practice more relevant, engaging, and connected to the learner's real-life context.
 
-# UNIT INFORMATION
-Unit ID: ${unitId}
-Unit Title: ${unitTitle}
-Module ID: ${moduleId}
-Module Title: ${moduleTitle}
+First, review the following information:
 
-# VOCABULARY FROM THIS UNIT
-${formattedVocabulary || 'No vocabulary available for this unit.'}
+1. Vocabulary and Dialogues:
+<vocabulary>
+${formattedVocabulary}
+</vocabulary>
 
-# DIALOGUES FROM THIS UNIT
-${formattedDialogues || 'No dialogues available for this unit.'}
+<dialogues>
+${formattedDialogues}
+</dialogues>
 
-# USER PROFILE
-- Name: ${fullName}
-- Learning Level: ${learningLevel}
-- Learning Goals: ${learningGoals}
-- Occupation: ${occupation}
-- Location: ${location}
-- Hobbies: ${hobbies}
-- Reason for Learning: ${reasonLearning}
+2. Module Responses:
+<current_module_responses>
+${currentModuleResponses}
+</current_module_responses>
 
-${currentModuleResponses ? `# CURRENT MODULE RESPONSES (PRIORITIZE THESE)\n${currentModuleResponses}` : ''}
+<other_module_responses>
+${otherModuleResponses}
+</other_module_responses>
 
-${otherModuleResponses ? `# OTHER MODULE RESPONSES (SECONDARY CONTEXT)\n${otherModuleResponses}` : ''}
+3. Unit Information:
+<unit_id>${unitId}</unit_id>
+<unit_title>${unitTitle}</unit_title>
+<module_id>${moduleId}</module_id>
+<module_title>${moduleTitle}</module_title>
 
-${specificFocus ? `# SPECIFIC FOCUS FOR THIS EXERCISE\n${specificFocus}` : ''}
+4. User Profile:
+<full_name>${fullName}</full_name>
+<learning_level>${learningLevel}</learning_level>
+<learning_goals>${learningGoals}</learning_goals>
+<occupation>${occupation}</occupation>
+<location>${location}</location>
+<hobbies>${hobbies}</hobbies>
+<reason_learning>${reasonLearning}</reason_learning>
 
-# TASK
-Create a highly personalized reading comprehension exercise that connects the unit's language patterns with the user's context.
+5. Specific Focus:
+<specific_focus>${specificFocus}</specific_focus>
 
-First, conduct a thorough analysis inside <analysis> tags:
-1. Summarize the key grammatical structures and patterns from the dialogues in 2-3 sentences
-2. List 5-7 key vocabulary words and 2-3 grammar points that should be featured in the exercise
-3. Identify 2-3 main themes that could connect unit content to the user's personal context
-4. Plan the progression of questions, noting 3-4 simple questions for beginning, 3-4 moderate for middle, and 3-4 complex for end
-5. Brainstorm at least one specific question for each comprehension type (literal, inferential, applied)
-6. Identify how you'll incorporate the user's occupation (${occupation}), location (${location}), and interests (${hobbies}) into the story
+Now, conduct a thorough analysis of the provided information. Conduct this analysis inside <exercise_planning> tags:
 
-After completing your analysis, create the following:
+1. Key grammatical structures and patterns from the dialogues (2-3 sentences)
+2. 5-7 key vocabulary words and 2-3 grammar points to feature in the exercise
+3. 2-3 main themes connecting unit content to the user's personal context
+4. Progression plan for questions (3-4 simple, 3-4 moderate, 3-4 complex)
+5. At least one specific question for each comprehension type (literal, inferential, applied)
+6. How you'll incorporate the user's occupation, location, and interests into the story
+7. Ideas for making the practice feel more "real" and personally connected to the learner
+8. List of 5-7 vocabulary words and 2-3 grammar points explicitly connected to the user's context
+9. Brainstorm 3-5 story ideas that incorporate the user's personal information, occupation, and interests
+10. Plan for integrating themes from current module responses into the story and questions
 
-1. STORY (3-5 paragraphs) that:
-   - Uses vocabulary and grammar patterns from this unit naturally
-   - Is deeply personalized to the user's context (work, location, interests)
-   - Especially incorporates themes from CURRENT MODULE RESPONSES
-   - Uses the appropriate language level (${learningLevel})
-   - Feels authentic and engaging
-   - Makes natural use of the unit vocabulary and dialogue patterns
+Based on your analysis, create the following components for the reading comprehension exercise:
 
-2. 10 COMPREHENSION QUESTIONS:
+1. STORY (3-5 paragraphs):
+   - Use vocabulary and grammar patterns from this unit naturally
+   - Deeply personalize to the user's context (work, location, interests)
+   - Incorporate themes from CURRENT MODULE RESPONSES
+   - Use appropriate language level (${learningLevel})
+   - Create an authentic and engaging narrative
+   - Make natural use of the unit vocabulary and dialogue patterns
+
+2. COMPREHENSION QUESTIONS (10 total):
    - Include a mix of question types:
      - Literal comprehension (key details and facts)
      - Inferential comprehension (reading between lines, drawing conclusions)
      - Applied comprehension (relating content to learner's own experiences)
-   - Each question must have exactly 4 answer choices (A, B, C, D)
-   - Scaffold questions from simple to complex to build confidence
-   - Include at least one question about the main ideas/themes
-   - Use vocabulary from the provided list in both questions and answer choices
+   - Provide exactly 4 answer choices (A, B, C, D) for each question
+   - Scaffold questions from simple to complex
+   - Include at least one question about main ideas/themes
+   - Use vocabulary from the provided list in questions and answer choices
    - Ensure all Chinese text is appropriate for the student's level
 
 3. ANSWER KEY:
    - Provide the correct answer letter for each question
    - Include a brief explanation of why each answer is correct and why others are incorrect
-   - Note any key vocabulary or grammar structures used in the question
+   - Note key vocabulary or grammar structures used in the question
 
 4. KEY VOCABULARY LIST:
    - Highlight 8-12 important vocabulary items used in the story
    - Include both Chinese characters and English meanings
 
 Format your response as follows:
-
-<analysis>
-[Your detailed analysis following the guidelines above]
-</analysis>
 
 # PERSONALIZED READING COMPREHENSION EXERCISE
 
@@ -186,6 +195,8 @@ Format your response as follows:
 ## KEY VOCABULARY
 - [Chinese term]: [English meaning]
 [List 8-12 key vocabulary items used in the story]
+
+Remember to make the exercise feel authentic and personally relevant to the learner, connecting the language practice to real-life situations as much as possible.
 `;
 }
 
@@ -193,7 +204,7 @@ Format your response as follows:
  * Formats the reading comprehension plan into a structured JSON format
  * with all required translations.
  */
-export function formatReadingComprehension(planOutput) {
+export function formatTemplate(planOutput) {
 	return `
 You are a Chinese language expert responsible for transforming a reading comprehension exercise plan into a structured JSON format with complete translations and pinyin.
 
@@ -201,90 +212,71 @@ You are a Chinese language expert responsible for transforming a reading compreh
 ${planOutput}
 
 # TASK
-Transform the above reading comprehension exercise into a structured JSON object following these requirements:
+Transform the above reading comprehension exercise into a well-structured JSON object following these requirements:
 
-1. ALL Chinese text must have THREE representations:
-   - Simplified Chinese (original)
-   - Traditional Chinese (convert if not provided)
-   - Pinyin (generate accurate pinyin with tone marks)
-   - English translation (translate where missing)
+1. ALL Chinese text must have these representations:
+   - Simplified Chinese 
+   - Traditional Chinese 
+   - Pinyin (with tone marks)
+   - English translation 
 
 2. Create a JSON object with the following structure:
 {
   "meta": {
-    "title": "", // Chinese title
+    "title": "", // Chinese title in simplified characters
     "title_traditional": "", // Traditional version of title
-    "title_pinyin": "", // Pinyin of title
+    "title_pinyin": "", // Pinyin of title with tone marks
     "title_english": "", // English translation of title
-    "introduction": "" // From the INTRODUCTION section (keep in English)
+    "introduction": "" // Brief introduction in English (from INTRODUCTION section)
   },
   "story": {
-    "text": "", // Full story text in simplified Chinese
-    "text_traditional": "", // Traditional version of the story
-    "text_pinyin": "", // Full pinyin for the story with proper tone marks
-    "text_english": "" // Full English translation of the story
+    "text": "", // Story in simplified Chinese with paragraph breaks as \\n\\n
+    "text_traditional": "", // Traditional version with paragraph breaks
+    "text_pinyin": "", // Pinyin with tone marks and paragraph breaks
+    "text_english": "" // English translation with paragraph breaks
   },
   "questions": [
+    // IMPORTANT: LIMIT TO 5-6 QUESTIONS MAXIMUM FOR BETTER QUALITY
     {
       "id": 1,
       "type": "multiple_choice", 
       "question": "", // Question in simplified Chinese
-      "question_traditional": "", // Traditional version of question
-      "question_pinyin": "", // Pinyin of question
-      "question_english": "", // English translation of question
-      "options": [ // VERY IMPORTANT: Each multiple_choice question MUST have these options
+      "question_traditional": "", // Traditional version
+      "question_pinyin": "", // Pinyin with tone marks
+      "question_english": "", // English translation
+      "options": [
         {
-          "id": "A", // A, B, C, D
-          "text": "", // Option text in simplified Chinese
-          "text_traditional": "", // Traditional version of option text
-          "pinyin": "" // Pinyin of option text
+          "id": "A",
+          "text": "", // Option in simplified Chinese
+          "text_traditional": "", // Traditional version
+          "pinyin": "" // Pinyin with tone marks
         },
-        {
-          "id": "B",
-          "text": "",
-          "text_traditional": "",
-          "pinyin": ""
-        },
-        {
-          "id": "C",
-          "text": "",
-          "text_traditional": "",
-          "pinyin": ""
-        },
-        {
-          "id": "D",
-          "text": "",
-          "text_traditional": "",
-          "pinyin": ""
-        }
+        // Options B, C, D with same structure
       ],
-      "answer": "A", // Correct option ID for multiple_choice
-      "explanation": "" // Explanation in English
+      "answer": "", // Correct option ID (A, B, C, or D)
+      "explanation": "" // Brief explanation in English
     }
-    // ...more questions
+    // More questions (5-6 total)
   ],
   "vocabulary": [
     {
       "word": "", // Word in simplified Chinese
-      "word_traditional": "", // Traditional version of word
-      "pinyin": "", // Pinyin of word with tone marks
+      "word_traditional": "", // Traditional version
+      "pinyin": "", // Pinyin with tone marks
       "english": "" // English meaning
     }
-    // ...more vocabulary items
+    // 8-12 vocabulary items from the unit
   ]
 }
 
-3. IMPORTANT ACCURACY REQUIREMENTS:
-   - Extract the Chinese title from the TITLE section
-   - Get the introduction text from the INTRODUCTION section
-   - Convert the story from the STORY section
-   - For each question in COMPREHENSION QUESTIONS, create a question object
-   - EACH MULTIPLE CHOICE QUESTION MUST HAVE AN OPTIONS ARRAY with options A, B, C, D
-   - Extract options A, B, C, D from the text for each question
-   - Use the ANSWER KEY to set the correct answer and explanation for each question
-   - Extract vocabulary items from the KEY VOCABULARY section
-   - Make sure all Chinese has traditional, pinyin, and English translations
+3. IMPORTANT REQUIREMENTS:
+   - USE ONLY VOCABULARY FROM THE UNIT (avoid introducing new words)
+   - MAINTAIN PARAGRAPH STRUCTURE with \\n\\n between paragraphs
+   - LIMIT TO 5-6 QUESTIONS MAXIMUM (for better quality)
+   - EACH MULTIPLE CHOICE QUESTION MUST HAVE EXACTLY 4 OPTIONS (A, B, C, D)
+   - ENSURE all Chinese text has matching traditional, pinyin and English translations
+   - USE APPROPRIATE DIFFICULTY LEVEL for the learner
 
-Return ONLY the JSON object without any surrounding text, code blocks, or explanations.
+Return ONLY the valid JSON object without surrounding text, code blocks, or explanations.
 `;
 }

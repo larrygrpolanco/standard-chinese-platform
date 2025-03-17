@@ -35,10 +35,8 @@ fsi-chinese-learning/
 │   │   │   |   └── TableRowQuestion.svelte
 │   │   │   └── rwp/
 │   │   │       ├── ExerciseGenerator.svelte
-│   │   │       ├── QuestionDisplay.svelte
 │   │   │       ├── ReadingExercise.svelte
 │   │   │       ├── RWPHeader.svelte
-│   │   │       └── VocabularySection.svelte
 │   │   └── rwp/
 │   │   │   ├── exerciseTypes.js
 │   │   │   ├── rwpGenerator.js

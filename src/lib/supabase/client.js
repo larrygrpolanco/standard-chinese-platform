@@ -252,31 +252,33 @@ export async function updateUnitProgress(unitId, status) {
 
 // Get user progress for either all units or a specific unit
 export async function getUserProgress(unitId = null) {
-  const user = await getCurrentUser();
-  if (!user) return unitId ? null : [];
+	const user = await getCurrentUser();
+	if (!user) return unitId ? null : [];
 
-  let query = supabase
-    .from('user_progress')
-    .select(`
+	let query = supabase
+		.from('user_progress')
+		.select(
+			`
       id, 
       unit_id, 
       status, 
       last_accessed
-    `)
-    .eq('user_id', user.id);
-  
-  // If unitId is provided, filter for just that unit
-  if (unitId) {
-    query = query.eq('unit_id', unitId);
-    const { data, error } = await query.maybeSingle();
-    if (error) throw error;
-    return data; // Will be null if no record exists
-  } else {
-    // Return all progress records
-    const { data, error } = await query;
-    if (error) throw error;
-    return data || [];
-  }
+    `
+		)
+		.eq('user_id', user.id);
+
+	// If unitId is provided, filter for just that unit
+	if (unitId) {
+		query = query.eq('unit_id', unitId);
+		const { data, error } = await query.maybeSingle();
+		if (error) throw error;
+		return data; // Will be null if no record exists
+	} else {
+		// Return all progress records
+		const { data, error } = await query;
+		if (error) throw error;
+		return data || [];
+	}
 }
 
 // Get the most recently accessed unit
@@ -303,72 +305,87 @@ export async function getLatestUnit() {
 	return data;
 }
 
-// Save RWP generated content
-export async function saveRwpContent(unitId, content) {
-  const user = await getCurrentUser();
-  if (!user) throw new Error('User not authenticated');
-  
-  const { data, error } = await supabase
-    .from('rwp_content')
-    .upsert({
-      user_id: user.id,
-      unit_id: unitId,
-      content,
-      created_at: new Date().toISOString()
-    }, {
-      onConflict: 'user_id,unit_id'
-    });
-    
-  if (error) throw error;
-  return data;
-}
-
 // Get RWP content for a unit
 export async function getRwpContent(unitId) {
-  const user = await getCurrentUser();
-  if (!user) return null;
-  
-  const { data, error } = await supabase
-    .from('rwp_content')
-    .select('*')
-    .eq('user_id', user.id)
-    .eq('unit_id', unitId)
-    .single();
-    
-  if (error && error.code !== 'PGRST116') throw error;
-  return data;
+	const user = await getCurrentUser();
+	if (!user) return null;
+
+	const { data, error } = await supabase
+		.from('rwp_content')
+		.select('*')
+		.eq('user_id', user.id)
+		.eq('unit_id', unitId)
+		.single();
+
+	if (error && error.code !== 'PGRST116') throw error;
+
+	// Important: Make sure exercise_type is at root level when returning
+	if (data && data.content) {
+		// If exercise_type isn't in the content, set a default
+		if (!data.content.exercise_type) {
+			data.content.exercise_type = 'reading_comprehension';
+		}
+	}
+
+	return data;
 }
 
+// Save RWP generated content
+export async function saveRwpContent(unitId, content) {
+	const user = await getCurrentUser();
+	if (!user) throw new Error('User not authenticated');
+
+	// Ensure exercise_type is set
+	if (!content.exercise_type) {
+		content.exercise_type = 'reading_comprehension';
+	}
+
+	const { data, error } = await supabase.from('rwp_content').upsert(
+		{
+			user_id: user.id,
+			unit_id: unitId,
+			content,
+			created_at: new Date().toISOString()
+		},
+		{
+			onConflict: 'user_id,unit_id'
+		}
+	);
+
+	if (error) throw error;
+	return data;
+}
 // Save or update user preferences
 export async function saveUserPreferences(preferences) {
-  const user = await getCurrentUser();
-  if (!user) throw new Error('User not authenticated');
-  
-  const { data, error } = await supabase
-    .from('user_preferences')
-    .upsert({
-      user_id: user.id,
-      ...preferences,
-      updated_at: new Date().toISOString()
-    }, {
-      onConflict: 'user_id'
-    });
-    
-  if (error) throw error;
-  return data;
+	const user = await getCurrentUser();
+	if (!user) throw new Error('User not authenticated');
+
+	const { data, error } = await supabase.from('user_preferences').upsert(
+		{
+			user_id: user.id,
+			...preferences,
+			updated_at: new Date().toISOString()
+		},
+		{
+			onConflict: 'user_id'
+		}
+	);
+
+	if (error) throw error;
+	return data;
 }
 
 // Get user preferences
 export async function getUserPreferences() {
-  const user = await getCurrentUser();
-  if (!user) return null;
-  
-  const { data, error } = await supabase
-    .from('user_preferences')
-    .select('*')
-    .eq('user_id', user.id)
-    .maybeSingle();
-    
-  if (error) throw error;
-  return data;
+	const user = await getCurrentUser();
+	if (!user) return null;
+
+	const { data, error } = await supabase
+		.from('user_preferences')
+		.select('*')
+		.eq('user_id', user.id)
+		.maybeSingle();
+
+	if (error) throw error;
+	return data;
 }

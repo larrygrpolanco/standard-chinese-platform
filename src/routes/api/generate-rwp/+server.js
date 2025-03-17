@@ -28,7 +28,7 @@ export async function POST({ request }) {
 					{
 						role: 'system',
 						content:
-							'You create Chinese language exercises in valid JSON format. Do not use markdown code blocks.'
+							'You create language teaching expert and are trying to make material from the FSI Standard Chinese course more personal and relevant to the laerner. This will be used on a sveltekit website which has a goal of making the FSI material more accssible improving on the weaker aspect.'
 					},
 					{
 						role: 'user',
@@ -72,7 +72,7 @@ export async function POST({ request }) {
 	}
 }
 
-// Helper function to safely try parsing JSON
+
 // Helper function to safely try parsing JSON
 function tryParseJson(str) {
 	try {

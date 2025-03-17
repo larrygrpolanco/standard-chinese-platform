@@ -20,19 +20,17 @@
 <div class="chinese-content">
 	<div class="content-layout">
 		<div class="chinese-section">
-			<!-- Pinyin above characters when enabled -->
-			{#if $fontPreferences.showPinyin && pinyin}
-				<p class="pinyin whitespace-pre-line">{displayPinyin}</p>
-			{/if}
-
-			<!-- Chinese characters -->
-			<p class="chinese-text whitespace-pre-line" lang="zh">
-				{displayText}
-			</p>
+			<!-- Improved Chinese text and pinyin container -->
+			<div class="chinese-display">
+				{#if $fontPreferences.showPinyin && pinyin}
+					<p class="pinyin-text">{displayPinyin}</p>
+				{/if}
+				<p class="chinese-text" lang="zh">{displayText}</p>
+			</div>
 		</div>
 
-		<!-- English translation -->
-		{#if english}
+		<!-- English translation - only show if it exists and fits design -->
+		{#if english && $fontPreferences.showEnglish}
 			<div class="english-section">
 				<p class="english-text whitespace-pre-line">{english}</p>
 			</div>
@@ -42,7 +40,8 @@
 
 <style>
 	.chinese-content {
-		margin-bottom: 1rem;
+		margin-bottom: 0.75rem;
+		width: 100%;
 	}
 
 	.content-layout {
@@ -51,49 +50,85 @@
 		gap: 0.5rem;
 	}
 
-	@media (min-width: 640px) {
+	.chinese-section {
+		width: 100%;
+		flex: 1;
+		min-width: 0; /* Allows flex item to shrink below content size */
+	}
+
+	.chinese-display {
+		width: 100%;
+	}
+
+	.pinyin-text {
+		font-family: 'Work Sans', sans-serif;
+		color: var(--color-warm-gray, #a0998a);
+		font-size: 0.8rem;
+		line-height: 1.5;
+		margin-bottom: 0.125rem;
+		overflow-wrap: break-word;
+		word-wrap: break-word;
+		word-break: break-word;
+		hyphens: auto;
+	}
+
+	.chinese-text {
+		font-family: 'Noto Sans SC', 'Noto Sans TC', sans-serif;
+		font-size: 1.1rem;
+		line-height: 1.6;
+		color: var(--color-charcoal, #33312e);
+		overflow-wrap: break-word;
+		word-wrap: break-word;
+		word-break: break-word;
+		hyphens: auto;
+	}
+
+	.english-section {
+		width: 100%;
+		flex: 1;
+		min-width: 0; /* Allows flex item to shrink below content size */
+	}
+
+	.english-text {
+		font-family: 'Work Sans', sans-serif;
+		font-size: 0.95rem;
+		line-height: 1.5;
+		color: var(--color-charcoal, #33312e);
+		overflow-wrap: break-word;
+		word-wrap: break-word;
+	}
+
+	/* More aggressive space saving on mobile */
+	@media (max-width: 640px) {
+		.chinese-content {
+			margin-bottom: 0.5rem;
+		}
+
+		.pinyin-text {
+			font-size: 0.75rem;
+			line-height: 1.4;
+			margin-bottom: 0.0625rem;
+		}
+
+		.chinese-text {
+			font-size: 1rem;
+			line-height: 1.5;
+		}
+
+		.english-text {
+			font-size: 0.85rem;
+			line-height: 1.4;
+		}
+	}
+
+	@media (min-width: 768px) {
 		.content-layout {
 			flex-direction: row;
 			align-items: flex-start;
 		}
 
 		.chinese-section {
-			flex: 1;
-			min-width: 0; /* Allow text wrapping */
-			padding-right: 1rem;
+			padding-right: 1.5rem;
 		}
-
-		.english-section {
-			flex: 1;
-			min-width: 0; /* Allow text wrapping */
-		}
-	}
-
-	.chinese-text {
-		font-family: 'Noto Sans SC', 'Noto Sans TC', sans-serif;
-		font-size: 1.1em;
-		color: var(--color-charcoal);
-		line-height: 1.5;
-	}
-
-	.pinyin {
-		font-family: 'Work Sans', sans-serif;
-		color: var(--color-warm-gray);
-		font-size: 0.85em;
-		margin-bottom: 0.25rem;
-		line-height: 1.4;
-	}
-
-	.pinyin-large {
-		font-family: 'Work Sans', sans-serif;
-		color: var(--color-charcoal);
-		font-size: 1em;
-		line-height: 1.8;
-	}
-
-	.english-text {
-		font-family: 'Work Sans', sans-serif;
-		color: var(--color-charcoal);
-		line-height: 1.5;
 	}
 </style>
