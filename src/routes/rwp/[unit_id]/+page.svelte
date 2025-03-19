@@ -2,7 +2,7 @@
 <script>
 	import { page } from '$app/stores';
 	import { onMount } from 'svelte';
-	import { slide } from 'svelte/transition'; // Added proper import for transitions
+	import { slide } from 'svelte/transition';
 	import {
 		getUnitBasicInfo,
 		getUserPreferences,
@@ -13,12 +13,7 @@
 	import Loader from '$lib/components/UI/Loader.svelte';
 	import ModuleQuestions from '$lib/components/ModuleQuestions.svelte';
 	import { authStore } from '$lib/stores/authStore';
-	import FontToggle from '$lib/components/UI/FontToggle.svelte';
 	import Toast from '$lib/components/UI/Toast.svelte';
-
-	// RWP components
-	import RwpHeader from '$lib/components/rwp/RwpHeader.svelte';
-	import ExerciseGenerator from '$lib/components/rwp/ExerciseGenerator.svelte';
 	import ComprehensionExercise from '$lib/components/rwp/ComprehensionExercise.svelte';
 
 	// State variables
@@ -31,11 +26,11 @@
 	let showAnswers = false;
 	let error = null;
 	let user;
-	let debug = true;
+	let debug = false; // Set to false by default, developers can enable in UI
 
-	// Collapsible panel states
-	let contextPanelOpen = false;
-	let generatorPanelOpen = false;
+	// Collapsible panel state - only for context panel
+	let contextPanelOpen = true; // Open by default for first-time users
+	let generatorPanelOpen = true; // Open by default
 
 	// Toast state
 	let toastVisible = false;
@@ -76,12 +71,11 @@
 				// Load existing RWP content
 				const rwpData = await getRwpContent(unitId);
 				if (rwpData) {
-					console.log('RWP data from database:', rwpData);
-
-					// Set content
+					console.log('Loaded existing RWP content');
 					rwpContent = rwpData.content;
 
-					console.log('Final rwpContent:', rwpContent);
+					// Close context panel if user already has content
+					contextPanelOpen = false;
 				}
 			}
 		} catch (err) {
@@ -96,8 +90,6 @@
 	function showToast(message) {
 		toastMessage = message;
 		toastVisible = true;
-
-		// Hide toast after 3 seconds
 		setTimeout(() => {
 			toastVisible = false;
 		}, 3000);
@@ -116,8 +108,6 @@
 
 			// Update local state
 			userPreferences.module_responses = updatedResponses;
-
-			// Show toast message
 			showToast('Your responses have been saved!');
 		} catch (err) {
 			console.error('Error saving responses:', err);
@@ -137,9 +127,8 @@
 		error = null;
 
 		try {
-			// Generate content without exerciseType parameter
 			rwpContent = await generateRwpExercise(unitId, specificFocus, debug);
-			showToast('New exercise generated successfully!');
+			showToast('Practice exercise generated successfully!');
 		} catch (err) {
 			console.error('Error generating exercise:', err);
 			error = err.message || 'Failed to generate exercise';
@@ -154,18 +143,19 @@
 		showAnswers = !showAnswers;
 	}
 
-	// Toggle panel visibility
-	function togglePanel(panel) {
-		if (panel === 'context') {
-			contextPanelOpen = !contextPanelOpen;
-		} else if (panel === 'generator') {
-			generatorPanelOpen = !generatorPanelOpen;
-		}
+	// Toggle context panel
+	function toggleContextPanel() {
+		contextPanelOpen = !contextPanelOpen;
+	}
+
+	function toggleGeneratorPanel() {
+		generatorPanelOpen = !generatorPanelOpen;
 	}
 </script>
 
 <svelte:head>
-	<title>{unitData ? `RWP: ${unitData.title}` : 'Real World Practice'} | Taped Chinese</title>
+	<title>{unitData ? `Personalized Practice: ${unitData.title}` : 'Practice'} | Taped Chinese</title
+	>
 </svelte:head>
 
 <div class="page-wrapper">
@@ -184,147 +174,162 @@
 		</div>
 	{:else}
 		<div class="page-container">
-			<!-- Header with navigation -->
+			<!-- Page Header -->
 			<header class="page-header">
-				<a href="/units/{unitId}" class="back-button">
-					<svg viewBox="0 0 24 24" class="back-icon">
-						<path
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							stroke-width="2"
-							d="M15 19l-7-7 7-7"
-						></path>
-					</svg>
-					<span>Back to Unit {unitId}</span>
-				</a>
+				<div class="header-top">
+					<a href="/units/{unitId}" class="back-button">
+						<svg viewBox="0 0 24 24" class="back-icon">
+							<path
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								stroke-width="2"
+								d="M15 19l-7-7 7-7"
+							></path>
+						</svg>
+						<span>Back to Unit</span>
+					</a>
 
-				<div class="unit-info">
 					<div class="unit-badge">Unit {unitId}</div>
-					<h1 class="unit-title">{unitData.title}</h1>
 				</div>
+
+				<h1 class="unit-title">Personalized Practice: {unitData.title}</h1>
+
+				<div class="module-info">
+					<span class="module-label">Module {unitData.module.id}:</span>
+					<span class="module-title">{unitData.module.title}</span>
+				</div>
+
+				<p class="page-description">
+					Apply what you've learned with content that connects to your personal context.
+				</p>
 			</header>
 
-			<!-- Content area -->
+			<!-- Content Layout -->
 			<div class="content-area">
-				<!-- Main content grid -->
 				<div class="practice-layout">
-					<!-- Left side: Controls and customization -->
+					<!-- Sidebar -->
 					<div class="sidebar">
-						<div class="sidebar-section">
-							<div class="section-header">
-								<h2 class="section-title">Personalize Your Practice</h2>
+						{#if user}
+							<!-- Context Panel -->
+							<div class="vintage-panel">
+								<button class="panel-toggle" on:click={toggleContextPanel}>
+									<div class="toggle-header">
+										<h3 class="panel-title">Step 1: Your Learning Context</h3>
+										<p class="panel-subtitle">
+											Tell us about yourself to personalize your practice
+										</p>
+									</div>
+									<div class="fader-icon {contextPanelOpen ? 'open' : ''}"></div>
+								</button>
+
+								{#if contextPanelOpen}
+									<div class="panel-content" transition:slide={{ duration: 300 }}>
+										{#if userPreferences}
+											<ModuleQuestions
+												moduleId={unitData.module.id}
+												moduleResponses={userPreferences.module_responses}
+												on:save={saveModuleResponses}
+											/>
+										{/if}
+									</div>
+								{/if}
 							</div>
 
-							{#if user}
-								<!-- Exercise generator -->
-								<div class="vintage-panel">
-									<button class="panel-toggle" on:click={() => togglePanel('generator')}>
-										<h3 class="panel-title">Generate New Exercise</h3>
-										<div class="toggle-icon {generatorPanelOpen ? 'open' : ''}">
-											<div class="toggle-line"></div>
-											<div class="toggle-line"></div>
-										</div>
-									</button>
-
-									{#if generatorPanelOpen}
-										<div class="panel-content" transition:slide={{ duration: 300 }}>
-											<p class="helper-text">
-												Choose the type of practice that would be most helpful for you right now.
-											</p>
-
-											<ExerciseGenerator
-												{generating}
-												bind:specificFocus
-												bind:debug
-												hasExistingContent={!!rwpContent}
-												on:generate={generateExercise}
-											/>
-
-											<button
-												class="generate-button {generating ? 'generating' : ''}"
-												on:click={generateExercise}
-												disabled={generating}
-											>
-												<div class="button-content">
-													{#if generating}
-														<div class="tape-spinner"></div>
-														<span>Creating your practice...</span>
-													{:else}
-														<svg class="button-icon" viewBox="0 0 24 24">
-															<path d="M19 12H5M12 19V5" stroke="currentColor" stroke-width="2" />
-														</svg>
-														<span>Generate New Exercise</span>
-													{/if}
-												</div>
-											</button>
-										</div>
-									{/if}
-								</div>
-
-								<!-- Learning context panel -->
-								<div class="vintage-panel">
-									<button class="panel-toggle" on:click={() => togglePanel('context')}>
-										<h3 class="panel-title">Your Learning Context</h3>
-										<div class="toggle-icon {contextPanelOpen ? 'open' : ''}">
-											<div class="toggle-line"></div>
-											<div class="toggle-line"></div>
-										</div>
-									</button>
-
-									{#if contextPanelOpen}
-										<div class="panel-content" transition:slide={{ duration: 300 }}>
-											<p class="helper-text">
-												Tell us about your interests and goals to make exercises more relevant to
-												your life.
-											</p>
-
-											{#if userPreferences}
-												<ModuleQuestions
-													moduleId={unitData.module.id}
-													moduleResponses={userPreferences.module_responses}
-													on:save={saveModuleResponses}
-												/>
-											{/if}
-										</div>
-									{/if}
-								</div>
-							{:else}
-								<!-- Sign-in prompt -->
-								<div class="vintage-panel">
-									<div class="panel-content signup-prompt">
-										<div class="tape-icon">
-											<svg viewBox="0 0 24 24" class="cassette-icon">
-												<rect x="2" y="6" width="20" height="12" rx="2" />
-												<circle cx="8" cy="12" r="2" />
-												<circle cx="16" cy="12" r="2" />
-												<path d="M8 12h8" />
-											</svg>
-										</div>
-										<h3 class="prompt-title">Create Your Personal Language Practice</h3>
-										<p class="prompt-text">
-											Sign in to save your preferences and generate exercises tailored to your
-											learning style and interests.
-										</p>
-										<a href="/login?redirect=/rwp/{unitId}" class="vintage-button full-width">
-											<span class="button-text">Sign In or Create Account</span>
-										</a>
+							<!-- Generator Panel -->
+							<div class="vintage-panel">
+								<button class="panel-toggle" on:click={toggleGeneratorPanel}>
+									<div class="toggle-header">
+										<h3 class="panel-title">Step 2: Generate Practice</h3>
+										<p class="panel-subtitle">Create a personalized exercise for this unit</p>
 									</div>
+									<div class="fader-icon {generatorPanelOpen ? 'open' : ''}"></div>
+								</button>
+
+								{#if generatorPanelOpen}
+									<div class="panel-content" transition:slide={{ duration: 300 }}>
+										<!-- Specific Focus Input -->
+										<div class="form-group">
+											<label for="specific-focus" class="form-label">
+												And... <span class="optional-text">(optional)</span>
+											</label>
+											<input
+												id="specific-focus"
+												type="text"
+												bind:value={specificFocus}
+												placeholder="Add anything you want to practice or include"
+												class="vintage-input"
+											/>
+											<p class="input-hint">Specific grammar, vocabulary, situations, etc.</p>
+										</div>
+
+										<!-- Debug toggle (for developers) -->
+										<div class="form-group checkbox-group">
+											<label class="vintage-checkbox">
+												<input type="checkbox" bind:checked={debug} hidden />
+												<span class="checkbox-custom"></span>
+												<span class="checkbox-label">Debug Mode</span>
+											</label>
+										</div>
+
+										<!-- Generate Button -->
+										<button
+											class="generate-button {generating ? 'generating' : ''}"
+											on:click={generateExercise}
+											disabled={generating}
+										>
+											<div class="button-content">
+												{#if generating}
+													<div class="tape-spinner"></div>
+													<span>Creating your practice...</span>
+												{:else if rwpContent}
+													<svg class="button-icon" viewBox="0 0 24 24">
+														<path
+															d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+															stroke="currentColor"
+															stroke-width="2"
+														/>
+													</svg>
+													<span>Regenerate Practice</span>
+												{:else}
+													<svg class="button-icon" viewBox="0 0 24 24">
+														<path d="M19 12H5M12 19V5" stroke="currentColor" stroke-width="2" />
+													</svg>
+													<span>Create Practice</span>
+												{/if}
+											</div>
+										</button>
+									</div>
+								{/if}
+							</div>
+						{:else}
+							<!-- Sign-in prompt -->
+							<div class="vintage-panel">
+								<div class="panel-content signup-prompt">
+									<div class="tape-icon">
+										<svg viewBox="0 0 24 24" class="cassette-icon">
+											<rect x="2" y="6" width="20" height="12" rx="2" />
+											<circle cx="8" cy="12" r="2" />
+											<circle cx="16" cy="12" r="2" />
+											<path d="M8 12h8" />
+										</svg>
+									</div>
+									<h3 class="prompt-title">Create Your Personal Language Practice</h3>
+									<p class="prompt-text">
+										Sign in to save your preferences and generate exercises tailored to your
+										learning style and interests.
+									</p>
+									<a href="/login?redirect=/rwp/{unitId}" class="vintage-button full-width">
+										<span class="button-text">Sign In or Create Account</span>
+									</a>
 								</div>
-							{/if}
-						</div>
+							</div>
+						{/if}
 					</div>
 
-					<!-- Right side: Exercise display -->
+					<!-- Main Content Area -->
 					<div class="main-content">
-						<div class="content-header">
-							<h2 class="content-title">Real World Practice</h2>
-							<p class="content-description">
-								Apply what you've learned in this unit to realistic scenarios and personalized
-								content.
-							</p>
-						</div>
-
 						{#if rwpContent}
+							<!-- Exercise Display -->
 							<div class="exercise-wrapper">
 								<div class="exercise-controls">
 									<h3 class="exercise-title">{rwpContent.meta?.title || 'Practice Exercise'}</h3>
@@ -336,15 +341,13 @@
 									</button>
 								</div>
 
-								<!-- Dynamic exercise component -->
-								{#if rwpContent}
-									<div class="exercise-container">
-										<ComprehensionExercise content={rwpContent} {showAnswers} />
-									</div>
-								{/if}
+								<!-- Exercise Component -->
+								<div class="exercise-container">
+									<ComprehensionExercise content={rwpContent} {showAnswers} />
+								</div>
 							</div>
 						{:else}
-							<!-- Empty state -->
+							<!-- Empty State -->
 							<div class="empty-state">
 								<div class="empty-state-icon">
 									<svg viewBox="0 0 24 24" class="cassette-large">
@@ -380,26 +383,32 @@
 								</div>
 								<h3 class="empty-state-title">Ready to Practice?</h3>
 								<p class="empty-state-text">
-									Generate a personalized exercise based on what you've learned in this unit. Your
-									practice will be tailored to your interests and learning goals.
+									Generate a personalized exercise based on what you've learned in this unit. It
+									will be tailored to your interests and learning goals.
 								</p>
-								<button
-									class="generate-button large {generating ? 'generating' : ''}"
-									on:click={generateExercise}
-									disabled={generating}
-								>
-									<div class="button-content">
-										{#if generating}
-											<div class="tape-spinner"></div>
-											<span>Creating your practice...</span>
-										{:else}
-											<svg class="button-icon" viewBox="0 0 24 24">
-												<path d="M19 12H5M12 19V5" stroke="currentColor" stroke-width="2" />
-											</svg>
-											<span>Create Your First Practice</span>
-										{/if}
-									</div>
-								</button>
+								{#if user}
+									<button
+										class="generate-button large {generating ? 'generating' : ''}"
+										on:click={generateExercise}
+										disabled={generating}
+									>
+										<div class="button-content">
+											{#if generating}
+												<div class="tape-spinner"></div>
+												<span>Creating your practice...</span>
+											{:else}
+												<svg class="button-icon" viewBox="0 0 24 24">
+													<path d="M19 12H5M12 19V5" stroke="currentColor" stroke-width="2" />
+												</svg>
+												<span>Create Practice Exercise</span>
+											{/if}
+										</div>
+									</button>
+								{:else}
+									<a href="/login?redirect=/rwp/{unitId}" class="vintage-button large">
+										<span class="button-text">Sign In to Create Practice</span>
+									</a>
+								{/if}
 							</div>
 						{/if}
 					</div>
@@ -438,8 +447,16 @@
 	.page-header {
 		display: flex;
 		flex-direction: column;
-		gap: 1rem;
+		gap: 0.5rem;
 		margin-bottom: 2rem;
+		padding-bottom: 1rem;
+		border-bottom: 1px solid var(--color-warm-gray, #a0998a);
+	}
+
+	.header-top {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
 	}
 
 	.back-button {
@@ -452,7 +469,6 @@
 		font-weight: 600;
 		text-decoration: none;
 		transition: all 0.2s;
-		width: fit-content;
 	}
 
 	.back-button:hover {
@@ -466,12 +482,6 @@
 		margin-right: 0.375rem;
 	}
 
-	.unit-info {
-		display: flex;
-		flex-direction: column;
-		gap: 0.375rem;
-	}
-
 	.unit-badge {
 		display: inline-block;
 		background-color: var(--color-terracotta, #c17c74);
@@ -480,14 +490,36 @@
 		border-radius: 16px;
 		font-size: 0.875rem;
 		font-weight: 600;
-		width: fit-content;
 	}
 
 	.unit-title {
 		font-family: 'Arvo', 'DM Serif Display', serif;
 		font-size: 1.75rem;
 		color: var(--color-charcoal, #33312e);
+		margin: 0.5rem 0;
+	}
+
+	.module-info {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		margin-bottom: 0.5rem;
+	}
+
+	.module-label {
+		font-weight: 600;
+		color: var(--color-navy, #34667f);
+	}
+
+	.module-title {
+		color: var(--color-warm-gray, #a0998a);
+	}
+
+	.page-description {
+		color: var(--color-warm-gray, #a0998a);
+		font-size: 1rem;
 		margin: 0;
+		line-height: 1.5;
 	}
 
 	/* ===== CONTENT AREA ===== */
@@ -515,23 +547,6 @@
 		gap: 1.5rem;
 	}
 
-	.sidebar-section {
-		display: flex;
-		flex-direction: column;
-		gap: 1rem;
-	}
-
-	.section-header {
-		margin-bottom: 0.5rem;
-	}
-
-	.section-title {
-		font-family: 'Arvo', 'DM Serif Display', serif;
-		font-size: 1.35rem;
-		color: var(--color-charcoal, #33312e);
-		margin: 0;
-	}
-
 	/* Vintage panel styling */
 	.vintage-panel {
 		background-color: var(--color-beige, #e8e5d7);
@@ -547,11 +562,16 @@
 		margin-bottom: 1rem;
 	}
 
+	.generator-panel-header {
+		padding: 0.875rem 1.25rem;
+		border-bottom: 1px solid rgba(160, 152, 138, 0.3);
+	}
+
 	.panel-toggle {
 		display: flex;
 		width: 100%;
 		justify-content: space-between;
-		align-items: center;
+		align-items: flex-start;
 		padding: 0.875rem 1.25rem;
 		background: none;
 		border: none;
@@ -564,12 +584,63 @@
 		background-color: rgba(160, 152, 138, 0.1);
 	}
 
+	.toggle-header {
+		display: flex;
+		flex-direction: column;
+		gap: 0.25rem;
+	}
+
 	.panel-title {
 		font-family: 'Arvo', 'DM Serif Display', serif;
 		font-size: 1.125rem;
 		font-weight: 600;
 		color: var(--color-charcoal, #33312e);
 		margin: 0;
+	}
+
+	.panel-subtitle {
+		font-size: 0.875rem;
+		color: var(--color-warm-gray, #a0998a);
+		margin: 0;
+	}
+
+	.fader-icon {
+		position: relative;
+		width: 16px;
+		height: 16px;
+	}
+
+	/* Vertical track */
+	.fader-icon::before {
+		content: '';
+		position: absolute;
+		left: 50%;
+		top: 0;
+		width: 2px;
+		height: 100%;
+		background-color: var(--color-warm-gray, #a0998a);
+		transform: translateX(-50%);
+	}
+
+	/* Horizontal handle */
+	.fader-icon::after {
+		content: '';
+		position: absolute;
+		left: 0;
+		width: 100%;
+		height: 2px;
+		background-color: var(--color-warm-gray, #a0998a);
+		transition: top 0.3s ease;
+	}
+
+	/* Position when closed (up) */
+	.fader-icon::after {
+		top: 20%;
+	}
+
+	/* Position when open (down) */
+	.fader-icon.open::after {
+		top: 80%;
 	}
 
 	.toggle-icon {
@@ -604,58 +675,83 @@
 
 	.panel-content {
 		padding: 1rem 1.25rem 1.5rem;
-		border-top: 1px solid rgba(160, 152, 138, 0.3);
 	}
 
-	.helper-text {
-		color: var(--color-warm-gray, #a0998a);
-		font-size: 0.875rem;
-		margin-top: 0;
-		margin-bottom: 1rem;
-		line-height: 1.5;
-	}
-
-	/* Sign-up prompt styling */
-	.signup-prompt {
-		text-align: center;
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		padding: 1.5rem;
-	}
-
-	.tape-icon {
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		width: 60px;
-		height: 60px;
-		background-color: var(--color-gold, #ddb967);
-		border-radius: 50%;
-		margin-bottom: 1rem;
-		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-	}
-
-	.cassette-icon {
-		width: 32px;
-		height: 32px;
-		color: var(--color-charcoal, #33312e);
-		stroke-width: 1.5;
-	}
-
-	.prompt-title {
-		font-family: 'Arvo', 'DM Serif Display', serif;
-		font-size: 1.125rem;
-		color: var(--color-charcoal, #33312e);
-		margin-top: 0;
-		margin-bottom: 0.75rem;
-	}
-
-	.prompt-text {
-		color: var(--color-warm-gray, #a0998a);
-		font-size: 0.875rem;
+	/* Form elements styling */
+	.form-group {
 		margin-bottom: 1.25rem;
-		line-height: 1.5;
+	}
+
+	.form-label {
+		display: block;
+		margin-bottom: 0.5rem;
+		font-weight: 600;
+		font-size: 0.9rem;
+		color: var(--color-charcoal, #33312e);
+	}
+
+	.optional-text {
+		font-weight: normal;
+		color: var(--color-warm-gray, #a0998a);
+		font-size: 0.8rem;
+	}
+
+	.vintage-input {
+		width: 100%;
+		padding: 0.625rem 0.875rem;
+		border: 1px solid var(--color-warm-gray, #a0998a);
+		border-radius: 4px;
+		background-color: var(--color-cream-paper, #f4f1de);
+		font-size: 0.9rem;
+	}
+
+	.vintage-input:focus {
+		outline: none;
+		border-color: var(--color-navy, #34667f);
+		box-shadow: 0 0 0 2px rgba(52, 102, 127, 0.2);
+	}
+
+	.input-hint {
+		margin-top: 0.375rem;
+		font-size: 0.8rem;
+		color: var(--color-warm-gray, #a0998a);
+	}
+
+	/* Checkbox styling */
+	.checkbox-group {
+		margin-bottom: 1.5rem;
+	}
+
+	.vintage-checkbox {
+		display: flex;
+		align-items: center;
+		cursor: pointer;
+	}
+
+	.checkbox-custom {
+		position: relative;
+		width: 18px;
+		height: 18px;
+		border: 1px solid var(--color-warm-gray, #a0998a);
+		border-radius: 3px;
+		background-color: var(--color-cream-paper, #f4f1de);
+		margin-right: 0.5rem;
+	}
+
+	.vintage-checkbox input:checked + .checkbox-custom::after {
+		content: '';
+		position: absolute;
+		top: 3px;
+		left: 3px;
+		width: 10px;
+		height: 10px;
+		background-color: var(--color-navy, #34667f);
+		border-radius: 1px;
+	}
+
+	.checkbox-label {
+		font-size: 0.875rem;
+		color: var(--color-charcoal, #33312e);
 	}
 
 	/* Generate button styling */
@@ -726,29 +822,54 @@
 		}
 	}
 
+	/* Sign-up prompt styling */
+	.signup-prompt {
+		text-align: center;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		padding: 1.5rem;
+	}
+
+	.tape-icon {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		width: 60px;
+		height: 60px;
+		background-color: var(--color-gold, #ddb967);
+		border-radius: 50%;
+		margin-bottom: 1rem;
+		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+	}
+
+	.cassette-icon {
+		width: 32px;
+		height: 32px;
+		color: var(--color-charcoal, #33312e);
+		stroke-width: 1.5;
+	}
+
+	.prompt-title {
+		font-family: 'Arvo', 'DM Serif Display', serif;
+		font-size: 1.125rem;
+		color: var(--color-charcoal, #33312e);
+		margin-top: 0;
+		margin-bottom: 0.75rem;
+	}
+
+	.prompt-text {
+		color: var(--color-warm-gray, #a0998a);
+		font-size: 0.875rem;
+		margin-bottom: 1.25rem;
+		line-height: 1.5;
+	}
+
 	/* ===== MAIN CONTENT STYLES ===== */
 	.main-content {
 		display: flex;
 		flex-direction: column;
 		gap: 1.5rem;
-	}
-
-	.content-header {
-		margin-bottom: 1rem;
-	}
-
-	.content-title {
-		font-family: 'Arvo', 'DM Serif Display', serif;
-		font-size: 1.75rem;
-		color: var(--color-charcoal, #33312e);
-		margin: 0 0 0.5rem 0;
-	}
-
-	.content-description {
-		color: var(--color-warm-gray, #a0998a);
-		font-size: 1rem;
-		line-height: 1.5;
-		margin: 0;
 	}
 
 	/* Exercise wrapper */
@@ -865,14 +986,6 @@
 		box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
 	}
 
-	.vintage-error.small {
-		padding: 1.5rem;
-		margin: 0;
-		flex-direction: row;
-		text-align: left;
-		gap: 1rem;
-	}
-
 	.error-icon {
 		display: flex;
 		justify-content: center;
@@ -885,13 +998,6 @@
 		font-weight: bold;
 		border-radius: 50%;
 		margin-bottom: 1.5rem;
-	}
-
-	.error-icon.small {
-		width: 32px;
-		height: 32px;
-		font-size: 1.25rem;
-		margin-bottom: 0;
 	}
 
 	.error-title {
@@ -925,6 +1031,11 @@
 		text-decoration: none;
 		transition: all 0.2s;
 		transform: translateY(0);
+	}
+
+	.vintage-button.large {
+		padding: 1rem 1.5rem;
+		font-size: 1rem;
 	}
 
 	.vintage-button::before {
@@ -978,7 +1089,7 @@
 	}
 
 	@media (max-width: 640px) {
-		.content-title {
+		.unit-title {
 			font-size: 1.5rem;
 		}
 
