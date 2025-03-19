@@ -1,4 +1,4 @@
-<!-- src/lib/components/Loader.svelte -->
+<!-- src/lib/components/UI/Loader.svelte -->
 <script>
 	import { onMount, onDestroy } from 'svelte';
 

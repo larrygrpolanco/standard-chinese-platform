@@ -52,7 +52,7 @@
 </script>
 
 <!-- Core Module -->
-<div class="relative mx-auto mb-8 w-full max-w-3xl" in:fade={{ duration: 400, delay: 400 }}>
+<div class="relative mx-auto mb-8 w-full max-w-xl" in:fade={{ duration: 400, delay: 400 }}>
 	<!-- Module card styled as vintage cassette case -->
 	<div
 		class="group relative flex h-full cursor-pointer flex-col overflow-hidden rounded-lg border-2 border-[#33312E] bg-[#E8E5D7] transition-all hover:-translate-y-1 hover:shadow-[4px_4px_0_#826D5B]"

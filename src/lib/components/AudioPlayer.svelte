@@ -432,7 +432,7 @@
 		border-radius: 45%;
 		transform: translate(-50%, -50%);
 		box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.3);
-         z-index: 1;
+		z-index: 1;
 	}
 
 	.spool-hole {
@@ -444,7 +444,7 @@
 		background-color: var(--color-warm-gray);
 		border-radius: 40%;
 		transform: translate(-50%, -50%);
-        z-index: 2;
+		z-index: 2;
 	}
 
 	.spool-tape {

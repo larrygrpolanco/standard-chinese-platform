@@ -131,7 +131,7 @@
 
 	.exercise-title {
 		font-family: 'Arvo', serif;
-		font-size: 1.5rem;
+		font-size: 2rem;
 		font-weight: 700;
 		color: var(--color-terracotta, #c17c74);
 		margin-bottom: 12px;
