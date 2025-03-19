@@ -1,6 +1,55 @@
+<!-- src/lib/components/UI/TapeConstruction.svelte (enhanced) -->
 <script>
+	// Props
 	export let message = 'Under Construction';
 	export let submessage = "We're recording more content";
+	export let currentPhase = 'init'; // 'init', 'story', 'questions', 'formatting'
+	export let isGenerating = false;
+
+	// Interactive states
+	let clickCounter = 0;
+	let leftReelSpeed = 1;
+	let rightReelSpeed = 1;
+	let tapeProgress = 0;
+
+	// Define generation phases
+	const phases = [
+		{ id: 'init', label: 'Initializing', percentage: 5 },
+		{ id: 'story', label: 'Creating Story', percentage: 30 },
+		{ id: 'questions', label: 'Generating Questions', percentage: 60 },
+		{ id: 'formatting', label: 'Formatting Exercise', percentage: 100 }
+	];
+
+	// Get current phase info
+	$: currentPhaseInfo = phases.find((p) => p.id === currentPhase) || phases[0];
+	$: tapeProgress = currentPhaseInfo.percentage;
+
+	// Handle reel interactions
+	function handleLeftReelClick() {
+		clickCounter++;
+		leftReelSpeed = Math.min(leftReelSpeed + 0.5, 3);
+		setTimeout(() => {
+			leftReelSpeed = Math.max(leftReelSpeed - 0.5, 1);
+		}, 2000);
+	}
+
+	function handleRightReelClick() {
+		clickCounter++;
+		rightReelSpeed = Math.min(rightReelSpeed + 0.5, 3);
+		setTimeout(() => {
+			rightReelSpeed = Math.max(rightReelSpeed - 0.5, 1);
+		}, 2000);
+	}
+
+	// Interactive feedback messages
+	$: clickMessage =
+		clickCounter > 10
+			? 'Winding faster! Keep going!'
+			: clickCounter > 5
+				? 'The tape is moving faster now!'
+				: clickCounter > 0
+					? 'That helps!'
+					: 'Click the reels to speed up recording';
 </script>
 
 <div class="construction-container">
@@ -11,9 +60,19 @@
 					<span class="tape-title">{message}</span>
 				</div>
 				<div class="tape-window">
-					<div class="reel left-reel"></div>
-					<div class="tape-line"></div>
-					<div class="reel right-reel"></div>
+					<div
+						class="reel left-reel"
+						style="animation-duration: {4 / leftReelSpeed}s"
+						on:click={handleLeftReelClick}
+						aria-label="Left reel"
+					></div>
+					<div class="tape-line" style="width: {40 + tapeProgress / 5}%;"></div>
+					<div
+						class="reel right-reel"
+						style="animation-duration: {4 / rightReelSpeed}s"
+						on:click={handleRightReelClick}
+						aria-label="Right reel"
+					></div>
 				</div>
 				<div class="tape-details">
 					<div class="tape-text">{submessage}</div>
@@ -25,6 +84,27 @@
 			</div>
 		</div>
 	</div>
+
+	{#if isGenerating}
+		<div class="progress-section">
+			<div class="phase-indicator">
+				{#each phases as phase}
+					<div class="phase-step {phase.id === currentPhase ? 'active' : ''}">
+						<div class="step-dot"></div>
+						<span class="step-label">{phase.label}</span>
+					</div>
+				{/each}
+			</div>
+
+			<div class="progress-bar">
+				<div class="progress-fill" style="width: {tapeProgress}%"></div>
+			</div>
+
+			<div class="click-helper">
+				<p class="helper-text">{clickMessage}</p>
+			</div>
+		</div>
+	{/if}
 </div>
 
 <style>
@@ -104,6 +184,18 @@
 		position: relative;
 		border: 6px solid #a0998a; /* Warm Gray */
 		overflow: hidden;
+		cursor: pointer; /* Show it's clickable */
+		transition: transform 0.2s;
+	}
+
+	/* Add hover effect to indicate clickability */
+	.reel:hover {
+		transform: scale(1.1);
+	}
+
+	/* Add active state for feedback */
+	.reel:active {
+		transform: scale(0.95);
 	}
 
 	.reel::before {
@@ -144,6 +236,7 @@
 		z-index: 1;
 		border-radius: 2px;
 		opacity: 0.8;
+		transition: width 0.5s ease-out;
 	}
 
 	.tape-details {
@@ -172,6 +265,82 @@
 		border-radius: 50%;
 	}
 
+	/* Progress indicator styles */
+	.progress-section {
+		margin-top: 2rem;
+		width: 100%;
+		max-width: 280px; /* Match cassette width */
+	}
+
+	.phase-indicator {
+		display: flex;
+		justify-content: space-between;
+		margin-bottom: 1rem;
+	}
+
+	.phase-step {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		width: 25%;
+		position: relative;
+		opacity: 0.5;
+		transition: opacity 0.3s;
+	}
+
+	.phase-step.active {
+		opacity: 1;
+	}
+
+	.step-dot {
+		width: 12px;
+		height: 12px;
+		border-radius: 50%;
+		background-color: #a0998a; /* Warm Gray */
+		margin-bottom: 0.5rem;
+	}
+
+	.phase-step.active .step-dot {
+		background-color: #ddb967; /* Gold */
+		box-shadow: 0 0 0 3px rgba(221, 185, 103, 0.3);
+	}
+
+	.step-label {
+		font-size: 0.7rem;
+		text-align: center;
+		white-space: nowrap;
+		font-weight: 600;
+		color: #33312e;
+	}
+
+	.progress-bar {
+		width: 100%;
+		height: 8px;
+		background-color: #e8e5d7; /* Beige */
+		border-radius: 4px;
+		overflow: hidden;
+		box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
+	}
+
+	.progress-fill {
+		height: 100%;
+		background-color: #ddb967; /* Gold */
+		border-radius: 4px;
+		transition: width 0.5s ease;
+	}
+
+	.click-helper {
+		margin-top: 1rem;
+		text-align: center;
+	}
+
+	.helper-text {
+		font-size: 0.875rem;
+		color: #a0998a; /* Warm Gray */
+		font-style: italic;
+		margin: 0;
+	}
+
 	@keyframes spin {
 		from {
 			transform: rotate(0deg);
@@ -193,6 +362,10 @@
 
 	/* Responsive adjustments */
 	@media (max-width: 640px) {
+		.construction-container {
+			padding: 1rem;
+		}
+
 		.cassette {
 			width: 240px;
 			height: 160px;
@@ -205,6 +378,13 @@
 		.tape-text {
 			font-size: 0.75rem;
 		}
+
+		.progress-section {
+			max-width: 240px;
+		}
+
+		.step-label {
+			font-size: 0.6rem;
+		}
 	}
 </style>
-

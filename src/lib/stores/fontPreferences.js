@@ -10,7 +10,8 @@ const storedPrefs =
 // Create store with defaults, overridden by stored values
 const defaultPreferences = {
 	displayMode: storedPrefs.displayMode || 'simplified', // 'simplified', 'traditional', or 'pinyin'
-	showPinyin: storedPrefs.showPinyin !== undefined ? storedPrefs.showPinyin : true
+	showPinyin: storedPrefs.showPinyin !== undefined ? storedPrefs.showPinyin : true,
+    showEnglish: storedPrefs.showEnglish !== undefined ? storedPrefs.showEnglish : true 
 };
 
 // Create the store

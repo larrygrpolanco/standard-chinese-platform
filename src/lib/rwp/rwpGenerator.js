@@ -14,9 +14,23 @@ import {
  * @param {boolean} debug - Whether to run in debug mode
  * @returns {Promise<Object>} The generated exercise content
  */
-export async function generateRwpExercise(unitId, specificFocus = '', debug = false) {
+// Add a progress callback parameter to the function
+export async function generateRwpExercise(
+	unitId,
+	specificFocus = '',
+	debug = false,
+	progressCallback = null
+) {
 	try {
+		// Add a helper function to report progress
+		const updateProgress = (phase) => {
+			if (typeof progressCallback === 'function') {
+				progressCallback(phase);
+			}
+		};
+
 		// 1. Get user data
+		updateProgress('init'); // Initial phase
 		const user = await getCurrentUser();
 		if (!user) throw new Error('User not authenticated');
 
@@ -36,6 +50,7 @@ export async function generateRwpExercise(unitId, specificFocus = '', debug = fa
 		};
 
 		// 4. PHASE 1: Generate the story
+		updateProgress('story'); // Update to story phase
 		console.log('Generating story...');
 		const storyResponse = await fetch('/api/rwp/create-story', {
 			method: 'POST',
@@ -62,6 +77,7 @@ export async function generateRwpExercise(unitId, specificFocus = '', debug = fa
 		}
 
 		// 5. PHASE 2: Generate questions based on the story
+        updateProgress('questions');
 		console.log('Generating questions...');
 		const questionsResponse = await fetch('/api/rwp/create-questions', {
 			method: 'POST',
@@ -89,6 +105,7 @@ export async function generateRwpExercise(unitId, specificFocus = '', debug = fa
 		}
 
 		// 6. PHASE 3: Format everything into JSON structure
+        updateProgress('formatting');
 		console.log('Formatting exercise...');
 		const formatResponse = await fetch('/api/rwp/format-exercise', {
 			method: 'POST',

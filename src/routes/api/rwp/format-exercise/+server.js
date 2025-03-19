@@ -177,16 +177,7 @@ The JSON must follow this exact structure:
       "question_english": "", // English translation
       "guidance": "" // Brief guidance note in English
     }
-  },
-  "vocabulary": [
-    {
-      "word": "", // Word in simplified Chinese
-      "word_traditional": "", // Word in traditional Chinese
-      "pinyin": "", // Pinyin with tone marks
-      "english": "" // English meaning
-    }
-    // 8-12 vocabulary items
-  ]
+  }
 }
 \`\`\`
 

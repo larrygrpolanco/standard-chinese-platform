@@ -1,295 +1,222 @@
 <!-- src/lib/components/rwp/ComprehensionExercise.svelte -->
 <script>
-    import ChineseText from '$lib/components/UI/ChineseText.svelte';
-    import FontToggle from '$lib/components/UI/FontToggle.svelte';
+	import { fade } from 'svelte/transition';
+	import { createEventDispatcher } from 'svelte';
+	import ChineseText from '$lib/components/UI/ChineseText.svelte';
+	import FontToggle from '$lib/components/UI/FontToggle.svelte';
+	import TabSelector from '$lib/components/UI/TabSelector.svelte';
+	import QuizTab from './QuizTab.svelte';
+	import ListeningTab from './ListeningTab.svelte';
+	import VocabularyTab from '$lib/components/VocabularyTab.svelte';
 
-    // Props
-    export let content = {}; // The content JSON
-    export let showAnswers = false; // Whether to show answers
-    
-    // Track user selected answers
-    let selectedAnswers = {};
-    let shortAnswers = {};
-    let reflectionAnswer = '';
-    
-    // Handle multiple choice selection
-    function selectAnswer(questionId, optionId) {
-        selectedAnswers = {
-            ...selectedAnswers,
-            [questionId]: optionId
-        };
-    }
-    
-    // Handle short answer input
-    function updateShortAnswer(id, value) {
-        shortAnswers = {
-            ...shortAnswers,
-            [id]: value
-        };
-    }
-    
-    // Clear inputs when content changes
-    $: if (content) {
-        selectedAnswers = {};
-        shortAnswers = {};
-        reflectionAnswer = '';
-    }
+	// Props
+	export let content = {}; // The content JSON
+	export let showAnswers = false; // Whether to show answers
+	export let vocabulary = []; // Unit vocabulary for the vocabulary tab
+
+	const dispatch = createEventDispatcher();
+
+	// Tab management
+	let activeTab = 'quiz';
+
+	// Tab definitions for TabSelector
+	const tabs = [
+		{
+			id: 'quiz',
+			label: 'Quiz',
+			icon: `<svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>`
+		},
+		{
+			id: 'listening',
+			label: 'Listening',
+			icon: `<svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/></svg>`
+		},
+		{
+			id: 'vocabulary',
+			label: 'Vocabulary',
+			icon: `<svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>`
+		}
+	];
+
+	// Handle tab change
+	function handleTabChange(event) {
+		activeTab = event.detail.tabId;
+	}
 </script>
 
-<div class="comprehension-exercise">
-    <!-- Title and introduction -->
-    <div class="exercise-header">
-        <h2 class="exercise-title">
-            <ChineseText
-                simplified={content.meta?.title || ''}
-                traditional={content.meta?.title_traditional || ''}
-                pinyin={content.meta?.title_pinyin || ''}
-                english={content.meta?.title_english || ''}
-            />
-        </h2>
-        {#if content.meta?.introduction}
-            <p class="exercise-intro">{content.meta.introduction}</p>
-        {/if}
-    </div>
+<div class="reading-exercise">
+	<!-- Title and introduction -->
+	<div class="exercise-header">
+		<h2 class="exercise-title">
+			<ChineseText
+				simplified={content.meta?.title || ''}
+				traditional={content.meta?.title_traditional || ''}
+				pinyin={content.meta?.title_pinyin || ''}
+				english={content.meta?.title_english || ''}
+			/>
+		</h2>
+		{#if content.meta?.introduction}
+			<p class="exercise-intro">{content.meta.introduction}</p>
+		{/if}
+	</div>
 
-    <!-- Font toggle -->
-    <div class="font-controls">
-        <FontToggle />
-    </div>
+	<!-- Font toggle -->
+	<div class="font-controls">
+		<FontToggle />
+	</div>
 
-    <!-- Reading passage section -->
-    <div class="reading-section">
-        <h3 class="section-title">Reading Passage</h3>
-        <div class="reading-content">
-            <ChineseText
-                simplified={content.story?.text || ''}
-                traditional={content.story?.text_traditional || ''}
-                pinyin={content.story?.text_pinyin || ''}
-                english={content.story?.text_english || ''}
-            />
-        </div>
-    </div>
+	<!-- Reading passage section - ALWAYS VISIBLE -->
+	<div class="reading-section">
+		<h3 class="section-title">Reading Passage</h3>
+		<div class="reading-content">
+			<ChineseText
+				simplified={content.story?.text || ''}
+				traditional={content.story?.text_traditional || ''}
+				pinyin={content.story?.text_pinyin || ''}
+				english={content.story?.text_english || ''}
+			/>
+		</div>
+	</div>
 
-    <!-- Multiple choice questions section -->
-    {#if content.questions?.multiple_choice && content.questions.multiple_choice.length > 0}
-    <div class="questions-section">
-        <h3 class="section-title">Multiple Choice Questions</h3>
+	<!-- Tab selection -->
+	<div class="tabs-container">
+		<TabSelector {tabs} bind:activeTab on:tabChange={handleTabChange} />
 
-        <div class="questions-list">
-            {#each content.questions.multiple_choice as question, index}
-                <div class="question-item">
-                    <div class="question-text">
-                        <span class="question-number">{index + 1}</span>
-                        <div class="question-content">
-                            <ChineseText
-                                simplified={question.question || ''}
-                                traditional={question.question_traditional || ''}
-                                pinyin={question.question_pinyin || ''}
-                                english={question.question_english || ''}
-                            />
-                        </div>
-                    </div>
-
-                    <div class="options-grid">
-                        {#each question.options as option}
-                            <div
-                                class="option-item {selectedAnswers[question.id] === option.id ? 'user-selected' : ''} 
-                                {showAnswers && option.id === question.answer ? 'correct-answer' : ''} 
-                                {showAnswers && selectedAnswers[question.id] === option.id && option.id !== question.answer ? 'incorrect-answer' : ''}"
-                                on:click={() => selectAnswer(question.id, option.id)}
-                                role="button"
-                                tabindex="0"
-                            >
-                                <span class="option-letter">{option.id}</span>
-                                <div class="option-content">
-                                    <ChineseText
-                                        simplified={option.text || ''}
-                                        traditional={option.text_traditional || ''}
-                                        pinyin={option.pinyin || ''}
-                                        english={option.english || ''}
-                                    />
-                                </div>
-                            </div>
-                        {/each}
-                    </div>
-
-                    {#if showAnswers}
-                        <div class="answer-explanation">
-                            <div class="correct-label">Correct Answer: {question.answer}</div>
-                            <p class="explanation-text">{question.explanation}</p>
-                        </div>
-                    {/if}
-                </div>
-            {/each}
-        </div>
-    </div>
-    {/if}
-
-    <!-- Short answer questions section -->
-    {#if content.questions?.short_answer && content.questions.short_answer.length > 0}
-    <div class="questions-section">
-        <h3 class="section-title">Short Answer Questions</h3>
-
-        <div class="questions-list">
-            {#each content.questions.short_answer as question, index}
-                <div class="question-item">
-                    <div class="question-text">
-                        <span class="question-number">{index + 1}</span>
-                        <div class="question-content">
-                            <ChineseText
-                                simplified={question.question || ''}
-                                traditional={question.question_traditional || ''}
-                                pinyin={question.question_pinyin || ''}
-                                english={question.question_english || ''}
-                            />
-                        </div>
-                    </div>
-
-                    <div class="short-answer-input">
-                        <textarea
-                            bind:value={shortAnswers[question.id]}
-                            placeholder="Write your answer in Chinese..."
-                            rows="3"
-                            class="vintage-textarea"
-                        ></textarea>
-                    </div>
-
-                    {#if showAnswers}
-                        <div class="answer-explanation">
-                            <div class="sample-answer">
-                                <h4>Sample Answer:</h4>
-                                <div class="sample-answer-content">
-                                    <ChineseText
-                                        simplified={question.sample_answer || ''}
-                                        traditional={question.sample_answer_traditional || ''}
-                                        pinyin={question.sample_answer_pinyin || ''}
-                                        english={question.sample_answer_english || ''}
-                                    />
-                                </div>
-                            </div>
-                            <p class="assessment-guide">{question.assessment_guide || ''}</p>
-                        </div>
-                    {/if}
-                </div>
-            {/each}
-        </div>
-    </div>
-    {/if}
-
-    <!-- Reflection question section -->
-    {#if content.questions?.reflection}
-    <div class="questions-section">
-        <h3 class="section-title">Reflection</h3>
-
-        <div class="reflection-question">
-            <div class="question-content">
-                <ChineseText
-                    simplified={content.questions.reflection.question || ''}
-                    traditional={content.questions.reflection.question_traditional || ''}
-                    pinyin={content.questions.reflection.question_pinyin || ''}
-                    english={content.questions.reflection.question_english || ''}
-                />
-            </div>
-
-            <div class="reflection-input">
-                <textarea
-                    bind:value={reflectionAnswer}
-                    placeholder="Write your thoughts in Chinese..."
-                    rows="5"
-                    class="vintage-textarea"
-                ></textarea>
-            </div>
-
-            {#if showAnswers}
-                <div class="guidance-note">
-                    <h4>Guidance:</h4>
-                    <p>{content.questions.reflection.guidance || ''}</p>
-                </div>
-            {/if}
-        </div>
-    </div>
-    {/if}
-
-    <!-- Vocabulary section -->
-    <div class="vocabulary-section">
-        <h3 class="section-title">Key Vocabulary</h3>
-
-        {#if content.vocabulary && content.vocabulary.length > 0}
-            <div class="vocabulary-grid">
-                {#each content.vocabulary as vocab}
-                    <div class="vocab-item">
-                        <div class="vocab-term">
-                            <ChineseText
-                                simplified={vocab.word || ''}
-                                traditional={vocab.word_traditional || ''}
-                                pinyin={vocab.pinyin || ''}
-                                english={vocab.english || ''}
-                            />
-                        </div>
-                    </div>
-                {/each}
-            </div>
-        {:else}
-            <p class="no-vocab">No vocabulary available</p>
-        {/if}
-    </div>
+		<!-- Tab content area -->
+		<div class="tab-content">
+			{#key activeTab}
+				<div transition:fade={{ duration: 200 }}>
+					{#if activeTab === 'quiz'}
+						<QuizTab
+							{content}
+							{showAnswers}
+							on:toggleAnswers={(e) => {
+								showAnswers = e.detail;
+								dispatch('toggleAnswers', showAnswers);
+							}}
+						/>
+					{:else if activeTab === 'listening'}
+						<ListeningTab {content} />
+					{:else if activeTab === 'vocabulary'}
+						<VocabularyTab {vocabulary} />
+					{/if}
+				</div>
+			{/key}
+		</div>
+	</div>
 </div>
 
 <style>
-    /* Add styling for the new question types */
-    .short-answer-input,
-    .reflection-input {
-        margin: 0.5rem 0 1rem;
-    }
+	/* Main container styling with vintage paper effect */
+	.reading-exercise {
+		font-family: 'Work Sans', sans-serif;
+		margin: 0 auto;
+		padding: 1.5rem;
+		background-color: var(--color-cream-paper, #f4f1de);
+		background-image:
+			url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23a09a8a' fill-opacity='0.05' fill-rule='evenodd'/%3E%3C/svg%3E"),
+			linear-gradient(to bottom, rgba(255, 255, 255, 0.05), rgba(0, 0, 0, 0.02));
+		box-shadow:
+			0 1px 3px rgba(51, 49, 46, 0.1),
+			0 4px 6px rgba(0, 0, 0, 0.03);
+		/* border-radius: 8px; */
+		/* border: 1px solid var(--color-warm-gray, #A0998A); */
+	}
 
-    .vintage-textarea {
-        width: 100%;
-        border: 1px solid var(--color-border);
-        background-color: var(--color-bg-alt);
-        padding: 0.75rem;
-        border-radius: 4px;
-        font-family: inherit;
-        font-size: 0.9rem;
-        transition: border-color 0.2s;
-        resize: vertical;
-    }
+	/* Header styling - updated */
+	.exercise-header {
+		margin-bottom: 24px;
+		position: relative;
+	}
 
-    .vintage-textarea:focus {
-        outline: none;
-        border-color: var(--color-accent);
-        box-shadow: 0 0 0 2px rgba(var(--color-accent-rgb), 0.1);
-    }
+	.exercise-title {
+		font-family: 'Arvo', serif;
+		font-size: 1.5rem;
+		font-weight: 700;
+		color: var(--color-terracotta, #c17c74);
+		margin-bottom: 12px;
+		position: relative;
+		padding-bottom: 8px;
+	}
 
-    .sample-answer {
-        margin-top: 1rem;
-        padding: 0.75rem;
-        background-color: var(--color-bg-lighter);
-        border-left: 3px solid var(--color-accent);
-        border-radius: 4px;
-    }
+	.exercise-title::after {
+		content: '';
+		position: absolute;
+		left: 0;
+		bottom: 0;
+		width: 60px;
+		height: 3px;
+		background-color: var(--color-gold, #ddb967);
+	}
 
-    .sample-answer h4 {
-        font-size: 0.9rem;
-        font-weight: 600;
-        margin: 0 0 0.5rem;
-        color: var(--color-text-muted);
-    }
+	.exercise-intro {
+		font-style: italic;
+		color: var(--color-warm-gray, #a0998a);
+		margin-top: 8px;
+		line-height: 1.5;
+		font-size: 0.95rem;
+		max-width: 95%;
+	}
 
-    .assessment-guide,
-    .guidance-note {
-        font-style: italic;
-        color: var(--color-text-muted);
-        font-size: 0.9rem;
-        margin-top: 0.5rem;
-    }
+	/* Font controls styling */
+	.font-controls {
+		margin-bottom: 1.25rem;
+	}
 
-    .guidance-note h4 {
-        font-size: 0.9rem;
-        font-weight: 600;
-        margin: 0 0 0.5rem;
-    }
+	/* Section titles */
+	.section-title {
+		font-family: 'Arvo', serif;
+		font-size: 1.25rem;
+		font-weight: 600;
+		color: var(--color-navy, #34667f);
+		margin: 1.25rem 0 0.75rem 0;
+		padding-bottom: 0.375rem;
+		border-bottom: 2px dotted var(--color-gold, #ddb967);
+	}
 
-    .reflection-question {
-        margin-bottom: 2rem;
-    }
+	/* Reading content styling with vintage lined paper effect */
+	.reading-content {
+		background-color: #fcf9f0;
+		background-image: linear-gradient(rgba(220, 220, 220, 0.25) 1px, transparent 1px);
+		background-size: 100% 1.6rem;
+		padding: 1.25rem;
+		border-radius: 8px;
+		box-shadow:
+			0 1px 3px rgba(0, 0, 0, 0.1),
+			inset 0 1px 0 rgba(255, 255, 255, 0.9);
+		border: 1px solid var(--color-warm-gray, #a0998a);
+		border-left: 3px solid var(--color-terracotta, #c17c74);
+		margin-bottom: 1.5rem;
+		line-height: 1.6;
+	}
+
+	/* Tab content area */
+	.tabs-container {
+		margin-top: 1.5rem;
+	}
+
+	.tab-content {
+		margin-top: 0.5rem;
+		min-height: 300px;
+	}
+
+	/* Responsive adjustments */
+	@media (max-width: 640px) {
+		.reading-exercise {
+			padding: 1rem 0.75rem;
+		}
+
+		.exercise-title {
+			font-size: 1.25rem;
+		}
+
+		.section-title {
+			font-size: 1.125rem;
+			margin-top: 1rem;
+		}
+
+		.reading-content {
+			padding: 1rem;
+		}
+	}
 </style>

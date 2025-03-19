@@ -80,15 +80,38 @@ function createStoryPrompt(unitData, userProfile, specificFocus) {
 	const moduleId = unitData.module?.id || unitData.module_id;
 	const currentModuleResponses = userProfile?.module_responses?.[moduleId] || {};
 
+	// Format responses with clear presentation for better context
 	const formattedResponses = Object.entries(currentModuleResponses)
-		.map(([question, answer]) => `${question}: ${answer}`)
+		.map(([questionId, answer]) => `${questionId}: "${answer}"`)
 		.join('\n');
 
+	// Determine appropriate length based on level
+	let recommendedLength, sentenceComplexity;
+	switch (learningLevel.toLowerCase()) {
+		case 'beginner':
+			recommendedLength = '2-3 short paragraphs (6-10 sentences total)';
+			sentenceComplexity = 'Use simple sentence structures with basic grammar patterns';
+			break;
+		case 'intermediate':
+			recommendedLength = '3-4 paragraphs (10-15 sentences total)';
+			sentenceComplexity = 'Use a mix of simple and compound sentences';
+			break;
+		case 'advanced':
+			recommendedLength = '4-5 paragraphs (15-20 sentences total)';
+			sentenceComplexity =
+				'Use more varied sentence structures while maintaining conversational tone';
+			break;
+		default:
+			recommendedLength = '2-3 paragraphs (8-12 sentences total)';
+			sentenceComplexity = 'Use straightforward conversational structures';
+	}
+
 	return `
-Create a personalized, engaging Chinese reading passage that will help the learner practice vocabulary and grammar from this unit. Make it deeply relevant to their personal context.
+Create a personalized Chinese language story that sounds like natural conversation and connects to the learner's interests and preferences.
 
 # UNIT INFORMATION
 Unit Title: ${unitData.title}
+Description: ${unitData.description}
 Module: ${unitData.module?.title || ''}
 
 # VOCABULARY TO INCLUDE
@@ -105,21 +128,37 @@ Location: ${location}
 Hobbies: ${hobbies}
 Reason for Learning: ${reasonLearning}
 
-# USER'S MODULE RESPONSES
+# USER'S PERSONAL PREFERENCES AND INTERESTS
 ${formattedResponses}
 
 # SPECIFIC FOCUS (if any)
 ${specificFocus || 'None specified'}
 
 # INSTRUCTIONS
-1. Create a story (3-4 paragraphs) that naturally uses vocabulary and grammar from this unit
-2. Make it personally relevant to the user's life, work, location, and interests
-3. Incorporate themes from their module responses
-4. Write at an appropriate difficulty level (${learningLevel})
-5. Write ONLY the story in Chinese - no translations yet
-6. Include at least 8-10 vocabulary items from the unit naturally in the story
-7. Make the story engaging, practical and useful for real-life situations
+1. Create a CONVERSATIONAL story that sounds like natural spoken Chinese, not formal written text. There should only be one speaker.
+2. Length: ${recommendedLength}
+3. Complexity: ${sentenceComplexity}
+4. PERSONALIZATION PRIORITIES:
+   - Make the story directly relevant to the user's expressed interests and preferences
+   - Create a scenario the learner could imagine themselves in
+   - Reference their specific responses about what they enjoy or are curious about
+   - Focus on practical, everyday situations they might encounter
 
-Return ONLY the Chinese story without any additional text, explanations, or translations.
+5. LANGUAGE APPROACH:
+   - Use vocabulary and grammar from the unit naturally in context
+   - Include realistic dialogue exchanges
+   - Use speech patterns that reflect how people actually talk
+   - Maintain an engaging, friendly tone
+
+6. If the user provided minimal context, create an engaging scenario based on the module theme
+
+7. Translate the story into English
+
+Before writing the exercise story, take some time to plan the story. Plan the story inside <story_planning> tags:
+
+a. Brainstorm story themes based on the chapter and vocabulary
+b. Outline the story structure, ensuring it incorporates the DIALOGUE PATTERNS
+c. List out potential sentences, marking where vocabulary words and grammar patterns will be used
+d. Refine sentences to match the student level and character count
 `;
 }

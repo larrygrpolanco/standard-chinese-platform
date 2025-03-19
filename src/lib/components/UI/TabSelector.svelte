@@ -1,4 +1,4 @@
-<!-- TabSelector.svelte -->
+<!-- src/lib/components/UI/TabSelector.svelte -->
 <script>
 	import { createEventDispatcher } from 'svelte';
 

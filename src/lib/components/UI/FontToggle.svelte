@@ -4,7 +4,7 @@
 
 	// Optional props for customization
 	export let compact = false;
-	export let label = 'Character Style:';
+	export let label = 'Characters:';
 </script>
 
 <div class={compact ? 'compact' : ''}>

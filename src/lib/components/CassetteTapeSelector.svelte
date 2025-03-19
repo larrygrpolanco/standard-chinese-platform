@@ -28,7 +28,7 @@
 			? tapes // Skip filtering if tapeType is 'none'
 			: tapes.filter((tape) => tape.tape_type === tapeType);
 
-	$: console.log('CassetteTapeSelector filtered tapes:', filteredTapes);
+	// $: console.log('CassetteTapeSelector filtered tapes:', filteredTapes);
 
 	// Handle tape data changes and update selection when needed
 	$: {
@@ -42,7 +42,7 @@
 				const defaultTape = filteredTapes.find((tape) => tape.title.includes(initialTapePrefix));
 				// Or just use the first available tape
 				selectedTapeId = defaultTape ? defaultTape.id : filteredTapes[0].id;
-				console.log('Tape selection updated after data change:', selectedTapeId);
+				// console.log('Tape selection updated after data change:', selectedTapeId);
 			}
 		}
 	}
@@ -54,7 +54,7 @@
 			? filteredTapes[0]
 			: null;
 
-	$: console.log('CassetteTapeSelector selected tape:', selectedTape);
+	// $: console.log('CassetteTapeSelector selected tape:', selectedTape);
 
 	// Dispatch selected tape to parent
 	$: {
@@ -69,7 +69,7 @@
 			// Try to find a tape with the initial prefix
 			const defaultTape = filteredTapes.find((tape) => tape.title.includes(initialTapePrefix));
 			selectedTapeId = defaultTape ? defaultTape.id : filteredTapes[0].id;
-			console.log('Initial tape selected on mount:', selectedTapeId);
+			// console.log('Initial tape selected on mount:', selectedTapeId);
 		}
 		hasMounted = true;
 	});

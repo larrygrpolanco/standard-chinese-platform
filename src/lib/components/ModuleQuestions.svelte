@@ -10,222 +10,205 @@
 	const moduleQuestions = {
 		1: [
 			{
-				id: 'language_experience',
-				question:
-					'What previous experience have you had with learning languages, particularly tonal languages?'
+				id: 'language_interest',
+				question: 'What aspects of language learning do you find most enjoyable?'
 			},
 			{
-				id: 'learning_style',
-				question:
-					'How would you describe your preferred learning style (visual, auditory, practice-based)?'
+				id: 'chinese_curiosity',
+				question: 'What interests you most about the Chinese language or culture?'
 			},
 			{
-				id: 'chinese_motivation',
-				question: 'What specifically motivated you to begin learning Chinese?'
+				id: 'learning_preferences',
+				question: 'How do you prefer to practice new language skills?'
 			},
+			{ id: 'chinese_situations', question: 'In what situations do you imagine using Chinese?' },
 			{
-				id: 'learning_challenges',
-				question: 'What aspects of language learning have you found most challenging in the past?'
-			},
-			{
-				id: 'pronunciation_concerns',
-				question: 'Which aspects of Chinese pronunciation are you most concerned about mastering?'
+				id: 'language_goals',
+				question: 'What would feel like success to you in your Chinese learning journey?'
 			}
 		],
 		2: [
 			{
-				id: 'introduction_context',
+				id: 'introduction_comfort',
+				question: 'What topics do you feel most comfortable sharing when meeting someone new?'
+			},
+			{
+				id: 'conversation_interests',
+				question: 'What conversation topics do you find most engaging when getting to know someone?'
+			},
+			{
+				id: 'identity_expression',
+				question: 'What aspects of yourself do you most enjoy sharing in conversations?'
+			},
+			{
+				id: 'relationship_values',
+				question: 'What qualities do you value most in family or friendship relationships?'
+			},
+			{
+				id: 'meeting_scenarios',
 				question:
-					'In what contexts do you most frequently introduce yourself professionally or socially?'
-			},
-			{
-				id: 'family_structure',
-				question:
-					'How would you briefly describe your family structure and important relationships?'
-			},
-			{
-				id: 'cultural_identity',
-				question:
-					'What aspects of your cultural or personal identity feel most important when introducing yourself?'
-			},
-			{
-				id: 'conversation_topics',
-				question: 'What topics do you typically discuss when first meeting someone in your culture?'
-			},
-			{
-				id: 'formal_situations',
-				question: 'How does your self-introduction change between casual and formal situations?'
+					'What kinds of first-meeting situations would you like to feel prepared for in Chinese?'
 			}
 		],
 		3: [
 			{
-				id: 'shopping_habits',
-				question:
-					'What types of shopping do you do most frequently, and how do you approach these transactions?'
+				id: 'shopping_interests',
+				question: 'What kinds of shopping experiences do you enjoy most when visiting new places?'
 			},
 			{
-				id: 'budget_approach',
-				question:
-					'How would you describe your approach to budgeting or managing expenses when traveling?'
+				id: 'souvenir_preferences',
+				question: 'What types of items would interest you as souvenirs or gifts when traveling?'
 			},
 			{
-				id: 'negotiation_comfort',
+				id: 'market_atmosphere',
 				question:
-					'How comfortable are you with price negotiation, and how might this change in China?'
+					'How do you feel about visiting local markets or shopping districts when traveling?'
 			},
 			{
-				id: 'payment_methods',
-				question:
-					'What payment methods do you typically use, and how might this differ when traveling?'
+				id: 'purchase_interests',
+				question: 'What items would you be most interested in being able to purchase in Chinese?'
 			},
 			{
-				id: 'purchase_decisions',
-				question: 'What factors most strongly influence your decisions when making purchases?'
+				id: 'transaction_comfort',
+				question:
+					'What would help you feel more comfortable conducting transactions in another language?'
 			}
 		],
 		4: [
 			{
-				id: 'navigation_approach',
-				question: 'How do you typically find your way around unfamiliar places?'
+				id: 'navigation_feelings',
+				question: 'How do you feel about finding your way around in unfamiliar places?'
 			},
 			{
-				id: 'spatial_descriptions',
-				question:
-					'How would you describe your ability to explain locations or give directions to others?'
+				id: 'exploration_style',
+				question: 'Do you prefer planned routes or spontaneous exploration when in new places?'
 			},
 			{
-				id: 'location_landmarks',
-				question:
-					'What types of landmarks do you find most helpful when navigating new environments?'
+				id: 'location_interests',
+				question: 'What types of locations would you most want to be able to find in China?'
 			},
 			{
-				id: 'address_systems',
-				question: 'How familiar are you with different address systems and location descriptions?'
+				id: 'direction_scenarios',
+				question: 'What navigation scenarios would be most useful for you to practice in Chinese?'
 			},
 			{
-				id: 'navigation_challenges',
-				question: 'What navigation situations have you found most challenging when traveling?'
+				id: 'place_descriptions',
+				question: 'What features do you tend to notice or remember about places you visit?'
 			}
 		],
 		5: [
 			{
-				id: 'transport_preferences',
-				question: 'Which forms of transportation do you prefer when traveling, and why?'
+				id: 'transport_feelings',
+				question: 'How do you feel about using different forms of transportation when traveling?'
 			},
 			{
-				id: 'public_transit_experience',
-				question: 'What is your experience using public transportation in foreign countries?'
+				id: 'journey_preferences',
+				question: 'Do you prefer scenic, convenient, or adventurous transportation options?'
 			},
 			{
-				id: 'transportation_concerns',
-				question: 'What concerns or questions do you have about using transportation in China?'
-			},
-			{
-				id: 'travel_approach',
-				question: 'How would you describe your approach to planning transportation on trips?'
-			},
-			{
-				id: 'transit_communication',
+				id: 'travel_scenarios',
 				question:
-					'What transportation-related interactions have you found most challenging in non-English environments?'
+					'What transportation situations would you find most useful to prepare for in Chinese?'
+			},
+			{
+				id: 'journey_activities',
+				question: 'What do you enjoy doing during long journeys on buses, trains, or planes?'
+			},
+			{
+				id: 'transport_interests',
+				question: 'Which modes of transportation in China are you most curious about experiencing?'
 			}
 		],
 		6: [
 			{
-				id: 'meeting_contexts',
+				id: 'gathering_preferences',
+				question: 'What kinds of social gatherings or meetings do you most enjoy?'
+			},
+			{
+				id: 'invitation_responses',
+				question: 'How do you feel about responding to invitations or making arrangements?'
+			},
+			{
+				id: 'social_comfort',
+				question: 'What helps you feel comfortable in new social situations?'
+			},
+			{
+				id: 'meeting_interests',
 				question:
-					'What types of professional or social meetings do you typically arrange or attend?'
+					'What types of meetings or gatherings would you be interested in joining in China?'
 			},
 			{
-				id: 'scheduling_approach',
-				question: 'How do you prefer to schedule and confirm arrangements with others?'
-			},
-			{
-				id: 'invitation_preferences',
-				question:
-					'How do you typically respond to invitations, and what factors influence your decisions?'
-			},
-			{
-				id: 'social_gathering_style',
-				question: 'What kinds of social gatherings do you most enjoy hosting or attending?'
-			},
-			{
-				id: 'professional_etiquette',
-				question: 'What meeting etiquette do you consider most important in professional contexts?'
+				id: 'scheduling_style',
+				question: 'Do you prefer spontaneous get-togethers or carefully planned arrangements?'
 			}
 		],
 		7: [
 			{
-				id: 'family_traditions',
-				question:
-					'What family traditions or values from your culture might be interesting to compare with Chinese traditions?'
+				id: 'cultural_interests',
+				question: 'What aspects of daily life in other cultures do you find most interesting?'
 			},
 			{
-				id: 'social_structures',
-				question:
-					'How would you describe the social structures or hierarchies in your culture or workplace?'
+				id: 'family_values',
+				question: 'What values or traditions feel important to you in family or community life?'
 			},
 			{
-				id: 'cultural_curiosities',
-				question:
-					'What aspects of Chinese family life or social structures are you most curious about?'
+				id: 'social_curiosity',
+				question: 'What would you be curious to learn about Chinese family life or social customs?'
 			},
 			{
-				id: 'generational_perspectives',
-				question:
-					'How have social norms or family structures changed across generations in your experience?'
+				id: 'tradition_appreciation',
+				question: 'What kinds of cultural traditions or celebrations do you most appreciate?'
 			},
 			{
-				id: 'community_involvement',
-				question: 'What role do you play in your community, and how does community shape your life?'
+				id: 'community_interests',
+				question: 'What aspects of community life would you be interested in experiencing in China?'
 			}
 		],
 		8: [
 			{
-				id: 'travel_planning',
-				question: 'How do you typically plan and organize trips to new countries?'
+				id: 'travel_interests',
+				question: 'What aspects of traveling tend to bring you the most enjoyment?'
 			},
 			{
-				id: 'site_interests',
-				question: 'Which historical or cultural sites in China are you most interested in visiting?'
-			},
-			{
-				id: 'travel_concerns',
-				question: 'What aspects of traveling in China are you most concerned or curious about?'
-			},
-			{
-				id: 'cultural_experiences',
-				question: 'What kinds of authentic cultural experiences do you seek when traveling?'
-			},
-			{
-				id: 'accommodation_preferences',
+				id: 'site_curiosity',
 				question:
-					'What factors are most important to you when choosing accommodations while traveling?'
+					'What types of places or experiences would you be most eager to discover in China?'
+			},
+			{
+				id: 'travel_approach',
+				question:
+					'Do you prefer tourist highlights or off-the-beaten-path experiences when traveling?'
+			},
+			{
+				id: 'cultural_engagement',
+				question: 'How do you like to engage with local culture when visiting new places?'
+			},
+			{
+				id: 'travel_scenarios',
+				question:
+					'What travel situations would you find most helpful to be prepared for in Chinese?'
 			}
 		],
 		9: [
 			{
-				id: 'daily_routine',
-				question:
-					'What does your typical daily routine look like, and how might it adapt in a different country?'
+				id: 'routine_interests',
+				question: 'What parts of daily routine in another country would you be most curious about?'
 			},
 			{
-				id: 'urban_preferences',
-				question: 'What aspects of urban living do you most enjoy or find challenging?'
+				id: 'living_preferences',
+				question: 'What qualities make a place feel comfortable or like home to you?'
 			},
 			{
-				id: 'leisure_activities',
-				question:
-					'How do you typically spend your leisure time, and what activities bring you the most enjoyment?'
+				id: 'leisure_interests',
+				question: 'What leisure activities would you be interested in pursuing if living in China?'
 			},
 			{
-				id: 'living_arrangements',
-				question: 'How would you describe your ideal living arrangement or housing situation?'
+				id: 'adaptation_interests',
+				question: 'What aspects of life in China would you be most interested in experiencing?'
 			},
 			{
-				id: 'adaptation_approach',
-				question:
-					'How do you typically adapt to different customs and daily routines when in a new culture?'
+				id: 'cultural_curiosities',
+				question: 'What everyday aspects of Chinese life are you most curious about?'
 			}
 		]
 	};

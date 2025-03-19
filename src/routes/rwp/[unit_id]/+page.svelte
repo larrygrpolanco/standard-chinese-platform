@@ -7,7 +7,8 @@
 		getUnitBasicInfo,
 		getUserPreferences,
 		saveUserPreferences,
-		getRwpContent
+		getRwpContent,
+		getUnitVocabularyData
 	} from '$lib/supabase/client.js';
 	import { generateRwpExercise } from '$lib/rwp/rwpGenerator.js';
 	import Loader from '$lib/components/UI/Loader.svelte';
@@ -15,6 +16,7 @@
 	import { authStore } from '$lib/stores/authStore';
 	import Toast from '$lib/components/UI/Toast.svelte';
 	import ComprehensionExercise from '$lib/components/rwp/ComprehensionExercise.svelte';
+	import TapeConstruction from '$lib/components/UI/TapeConstruction.svelte';
 
 	// State variables
 	let loading = true;
@@ -26,6 +28,8 @@
 	let showAnswers = false;
 	let error = null;
 	let user;
+	let unitVocabulary = [];
+	let generationPhase = 'init';
 	let debug = false; // Set to false by default, developers can enable in UI
 
 	// Collapsible panel state - only for context panel
@@ -78,6 +82,9 @@
 					contextPanelOpen = false;
 				}
 			}
+
+			const vocabData = await getUnitVocabularyData(unitId);
+			unitVocabulary = vocabData.vocabulary || [];
 		} catch (err) {
 			console.error('Error loading data:', err);
 			error = err.message || 'Failed to load data';
@@ -123,11 +130,15 @@
 		}
 
 		generating = true;
+		generationPhase = 'init'; // Reset to initial phase
 		showAnswers = false;
 		error = null;
 
 		try {
-			rwpContent = await generateRwpExercise(unitId, specificFocus, debug);
+			// Pass the progress callback to track generation phases
+			rwpContent = await generateRwpExercise(unitId, specificFocus, debug, (phase) => {
+				generationPhase = phase;
+			});
 			showToast('Practice exercise generated successfully!');
 		} catch (err) {
 			console.error('Error generating exercise:', err);
@@ -136,11 +147,6 @@
 		} finally {
 			generating = false;
 		}
-	}
-
-	// Toggle answer visibility
-	function toggleAnswers() {
-		showAnswers = !showAnswers;
 	}
 
 	// Toggle context panel
@@ -328,22 +334,26 @@
 
 					<!-- Main Content Area -->
 					<div class="main-content">
-						{#if rwpContent}
+						{#if generating}
+							<!-- Show the interactive tape loader during generation -->
+							<div class="loading-container">
+								<TapeConstruction
+									message="Creating Your Practice"
+									submessage="This should take about a minute"
+									currentPhase={generationPhase}
+									isGenerating={true}
+								/>
+							</div>
+						{:else if rwpContent}
 							<!-- Exercise Display -->
 							<div class="exercise-wrapper">
 								<div class="exercise-controls">
-									<h3 class="exercise-title">{rwpContent.meta?.title || 'Practice Exercise'}</h3>
-									<button
-										on:click={toggleAnswers}
-										class="answer-toggle {showAnswers ? 'active' : ''}"
-									>
-										{showAnswers ? 'Hide Answers' : 'Show Answers'}
-									</button>
+									<h3 class="exercise-title">{'Story Practice'}</h3>
 								</div>
 
 								<!-- Exercise Component -->
 								<div class="exercise-container">
-									<ComprehensionExercise content={rwpContent} {showAnswers} />
+									<ComprehensionExercise content={rwpContent} vocabulary={unitVocabulary} />
 								</div>
 							</div>
 						{:else}
@@ -428,6 +438,15 @@
 		min-height: 100vh;
 		background-color: var(--color-cream-paper, #f4f1de);
 		background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23a09a8a' fill-opacity='0.05' fill-rule='evenodd'/%3E%3C/svg%3E");
+	}
+
+	.loading-container {
+		background-color: white;
+		border: 1px solid var(--color-warm-gray, #a0998a);
+		border-radius: 8px;
+		box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+		overflow: hidden;
+		padding: 1.5rem;
 	}
 
 	.page-container {
@@ -562,11 +581,6 @@
 		margin-bottom: 1rem;
 	}
 
-	.generator-panel-header {
-		padding: 0.875rem 1.25rem;
-		border-bottom: 1px solid rgba(160, 152, 138, 0.3);
-	}
-
 	.panel-toggle {
 		display: flex;
 		width: 100%;
@@ -608,9 +622,10 @@
 		position: relative;
 		width: 16px;
 		height: 16px;
+		cursor: pointer;
 	}
 
-	/* Vertical track */
+	/* Vertical track - vintage slider groove */
 	.fader-icon::before {
 		content: '';
 		position: absolute;
@@ -618,19 +633,29 @@
 		top: 0;
 		width: 2px;
 		height: 100%;
-		background-color: var(--color-warm-gray, #a0998a);
+		background-color: #837b6d; /* Darker than handle for contrast */
 		transform: translateX(-50%);
+		border-radius: 1px;
+		box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.15); /* Subtle inset shadow */
 	}
 
-	/* Horizontal handle */
+	/* Horizontal handle - vintage slider knob */
 	.fader-icon::after {
 		content: '';
 		position: absolute;
-		left: 0;
-		width: 100%;
-		height: 2px;
+		width: 8px; /* Slightly wider for better visibility */
+		height: 3px;
+		left: 50%;
+		transform: translateX(-50%);
 		background-color: var(--color-warm-gray, #a0998a);
-		transition: top 0.3s ease;
+		transition: top 0.25s ease;
+		border-radius: 1.5px;
+		box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2); /* Subtle drop shadow */
+		background-image: linear-gradient(
+			to bottom,
+			rgba(255, 255, 255, 0.1) 0%,
+			transparent 60%
+		); /* Hint of highlight */
 	}
 
 	/* Position when closed (up) */
@@ -641,36 +666,6 @@
 	/* Position when open (down) */
 	.fader-icon.open::after {
 		top: 80%;
-	}
-
-	.toggle-icon {
-		display: flex;
-		flex-direction: column;
-		gap: 3px;
-		width: 16px;
-		height: 16px;
-		padding: 2px;
-		transition: transform 0.3s;
-	}
-
-	.toggle-icon.open {
-		transform: rotate(45deg);
-	}
-
-	.toggle-line {
-		width: 100%;
-		height: 2px;
-		background-color: var(--color-warm-gray, #a0998a);
-		transition: transform 0.3s;
-	}
-
-	.toggle-icon .toggle-line:first-child {
-		transform-origin: center;
-	}
-
-	.toggle-icon .toggle-line:last-child {
-		transform: rotate(90deg) translateX(-2px);
-		transform-origin: center;
 	}
 
 	.panel-content {
@@ -897,28 +892,6 @@
 		margin: 0;
 	}
 
-	.answer-toggle {
-		display: inline-flex;
-		align-items: center;
-		padding: 0.5rem 1rem;
-		background-color: var(--color-cream-paper, #f4f1de);
-		border: 1px solid var(--color-warm-gray, #a0998a);
-		border-radius: 24px;
-		font-size: 0.875rem;
-		font-weight: 600;
-		cursor: pointer;
-		transition: all 0.2s ease;
-	}
-
-	.answer-toggle:hover {
-		background-color: rgba(221, 185, 103, 0.2);
-	}
-
-	.answer-toggle.active {
-		background-color: var(--color-gold, #ddb967);
-		color: var(--color-charcoal, #33312e);
-	}
-
 	.exercise-container {
 		padding: 0;
 		background-color: var(--color-cream-paper, #f4f1de);
@@ -1081,10 +1054,6 @@
 			flex-direction: column;
 			align-items: flex-start;
 			gap: 0.75rem;
-		}
-
-		.answer-toggle {
-			align-self: flex-end;
 		}
 	}
 
