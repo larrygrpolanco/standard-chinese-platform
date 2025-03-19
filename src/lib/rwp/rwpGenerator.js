@@ -1,13 +1,20 @@
-// src/lib/rwp/rwpGenerator.js
-import { exerciseTypes } from './exerciseTypes.js';
 import {
-	getCompleteUnit,
 	getCurrentUser,
+	getCompleteUnit,
 	getUserPreferences,
 	saveRwpContent
 } from '$lib/supabase/client.js';
 
-export async function generateRwpExercise(unitId, exerciseType, specificFocus = '', debug = false) {
+/**
+ * Generates a comprehensive practice exercise for a specific unit
+ * using a three-phase approach: story creation, question creation, and formatting
+ *
+ * @param {number} unitId - The ID of the unit to generate content for
+ * @param {string} specificFocus - Optional specific focus for the exercise
+ * @param {boolean} debug - Whether to run in debug mode
+ * @returns {Promise<Object>} The generated exercise content
+ */
+export async function generateRwpExercise(unitId, specificFocus = '', debug = false) {
 	try {
 		// 1. Get user data
 		const user = await getCurrentUser();
@@ -28,78 +35,87 @@ export async function generateRwpExercise(unitId, exerciseType, specificFocus = 
 			module_responses: userPreferences?.module_responses || {}
 		};
 
-		// 4. Get exercise type configuration
-		const exerciseTypeConfig = exerciseTypes[exerciseType];
-		if (!exerciseTypeConfig) throw new Error(`Exercise type '${exerciseType}' not supported`);
-
-		// 5. PHASE 1: Plan the exercise content
-		const plannerPrompt = exerciseTypeConfig.planTemplate(unitData, userProfile, specificFocus);
-
-		const planResponse = await fetch('/api/generate-rwp', {
+		// 4. PHASE 1: Generate the story
+		console.log('Generating story...');
+		const storyResponse = await fetch('/api/rwp/create-story', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ prompt: plannerPrompt, debug })
+			body: JSON.stringify({
+				unitData,
+				userProfile,
+				specificFocus,
+				debug
+			})
 		});
 
-		if (!planResponse.ok) {
-			const error = await planResponse.json();
-			throw new Error(error.error || 'Error generating content plan');
+		if (!storyResponse.ok) {
+			const errorData = await storyResponse.json();
+			throw new Error(errorData.error || 'Error generating story');
 		}
 
-		const planData = await planResponse.json();
-		const plan = debug ? planData.raw : planData;
+		const storyData = await storyResponse.json();
+		const story = storyData.story;
 
 		if (debug) {
-			console.log('=== PLAN PROMPT ===');
-			console.log(plannerPrompt);
-			console.log('=== PLAN RESPONSE ===');
-			console.log(plan);
+			console.log('=== STORY GENERATED ===');
+			console.log(story);
 		}
 
-		// 6. PHASE 2: Format the plan into proper JSON
-		const formatterPrompt = exerciseTypeConfig.formatTemplate(plan, userProfile, specificFocus);
-
-		const jsonResponse = await fetch('/api/generate-rwp', {
+		// 5. PHASE 2: Generate questions based on the story
+		console.log('Generating questions...');
+		const questionsResponse = await fetch('/api/rwp/create-questions', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ prompt: formatterPrompt, debug: true }) // Always use debug mode for reliable parsing
+			body: JSON.stringify({
+				story,
+				unitData,
+				userProfile,
+				specificFocus,
+				debug
+			})
 		});
 
-		if (!jsonResponse.ok) {
-			const error = await jsonResponse.json();
-			throw new Error(error.error || 'Error formatting content');
+		if (!questionsResponse.ok) {
+			const errorData = await questionsResponse.json();
+			throw new Error(errorData.error || 'Error generating questions');
 		}
 
-		// Always get both raw and parsed data for better error handling
-		const jsonData = await jsonResponse.json();
-		console.log('Response from formatting phase:', jsonData);
+		const questionsData = await questionsResponse.json();
+		const questions = questionsData.questions;
 
-		// Handle debug mode display
 		if (debug) {
-			console.log('=== FORMATTER PROMPT ===');
-			console.log(formatterPrompt);
-			console.log('=== JSON RESPONSE ===');
-			console.log(jsonData.raw);
-			console.log('=== PARSED RESULT ===');
-			console.log(jsonData.parsed);
+			console.log('=== QUESTIONS GENERATED ===');
+			console.log(questions);
 		}
 
-		// Check if we have a parsing error
-		if (jsonData.error) {
-			throw new Error(`JSON parsing error: ${jsonData.message}`);
+		// 6. PHASE 3: Format everything into JSON structure
+		console.log('Formatting exercise...');
+		const formatResponse = await fetch('/api/rwp/format-exercise', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({
+				story,
+				questions,
+				unitData,
+				debug
+			})
+		});
+
+		if (!formatResponse.ok) {
+			const errorData = await formatResponse.json();
+			throw new Error(errorData.error || 'Error formatting exercise');
 		}
 
-		// Use the parsed data in both debug and non-debug modes
-		const contentToSave = jsonData.parsed || jsonData;
+		// Get formatted data (in debug mode, we get both raw and parsed)
+		const formatData = await formatResponse.json();
+		const contentToSave = debug ? formatData.parsed : formatData;
 
-		if (!contentToSave || typeof contentToSave !== 'object') {
-			throw new Error('Generated content is not a valid object');
+		if (debug) {
+			console.log('=== FORMATTED RESULT ===');
+			console.log(formatData);
 		}
 
-		// Add exercise_type to the content
-		contentToSave.exercise_type = exerciseType;
-
-		// Save to database (in both debug and non-debug mode)
+		// Save to database
 		await saveRwpContent(unitId, contentToSave);
 
 		// Return the content
