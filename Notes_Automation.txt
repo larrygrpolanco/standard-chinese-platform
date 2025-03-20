@@ -64,10 +64,12 @@ REFERENCE LIST Database transcription:
 I need these dialogue references from this textbook screenshot transcribed for my Supabase `reference_list` table in CSV format. Enclose any definitions containing commas in double quotes and replace the commas within these fields with semicolons so that it causes no issues with CSV format, but keep the commas between columns. The table has these columns:
 id, unit_id, number, chinese_simplified, chinese_traditional, pinyin, english, notes, order_num.
 
-Important detials for this dataset
+The module and unit will be written in red at the top of each screenshot with M#U#
+
+Important details for this dataset
 Module: #
-unit_id: ##
-id will start with: ##X
+unit_id: [module #]#
+id will start with: [unti_id##]X
 
 Please follow these guidelines:
 **id:**  Generate a combined ID using the format (unit_id)(number). For example, if unit_id is 1 and reference number is 1, the id should be 11.  This ID is for your reference and does not need to be a database-generated ID.
@@ -82,25 +84,42 @@ Please follow these guidelines:
 
 Enclose all multi-line text fields in double quotes. Do not use Unicode escape sequences - use actual Chinese characters.
 
-Example output (assuming unit_id = 1):
+Example output (unit_id=41):
 id,unit_id,number,chinese_simplified,chinese_traditional,pinyin,english,notes,order_num
-11,1,1,"B：为
-A：为，你是朱可彰吗？
-B：是。您是内部人吗？
-A：我是威廉马丁。
-B：噢，马丁先生，好久不见。你好吗？","B：為
-A：為，你是朱可彰嗎？
-B：是。您是內部人嗎？
-A：我是威廉馬丁。
-B：噢，馬丁先生，好久不見。你好嗎？","B: Wéi
-A: Wài, nǐ shì Zhū Kēzhǎng ma?
-B: Shì. Nín shì nǎiwèi?
-A: Wǒ shì Wēilián Mǎdīng.
-B: Òu, Mǎdīng Xiānshēng, hǎo jiǔ bú jiàn. Nǐ hǎo a?","B: Hello.
-A: Hello. Are you Section Chief Zhū?
-B: Yes. Who is this, please?
-A: I'm William Martin.
-B: Oh, Mr. Martin—I haven't seen you for quite a while. How are you?",,1
+411,41,1,"A：你到哪里去？
+B：我到咖啡厅去。","A：你到哪裡去？
+B：我到咖啡廳去。","A: Nǐ dào nǎlǐ qù?
+B: Wǒ dào kāfēitīng qù.","A: Where are you going?
+B: I'm going to a coffeehouse.",,1
+412,41,2,"B：你知道不知道华美咖啡厅？
+A：不知道。","B：你知道不知道華美咖啡廳？
+A：不知道。","B: Nǐ zhīdào bù zhīdào Huáměi Kāfēitīng?
+A: Bù zhīdào.","B: Do you know of the Huáměi Coffeehouse?
+A: No; I don't.",,2
+413,41,3,A：到哪里去，怎么走？,A：到哪裡去，怎麼走？,A: Dào nǎlǐ qù; zěnme zǒu?,A: How do I get there?,,3
+414,41,4,C：从这里往左走。,C：從這裡往左走。,C: Cóng zhèlǐ wǎng zuǒ zǒu.,C: From here you go to the left.,,4
+415,41,5,C：到了路口，再往右走。,C：到了路口，再往右走。,C: Dàole lùkǒu; zài wǎng yòu zǒu.,C: When you have reached the intersection; then you go to the right.,,5
+416,41,6,C：到了路口，再往右走，就到了。,C：到了路口，再往右走，就到了。,C: Dàole lùkǒu; zài wǎng yòu zǒu; jiù dào le.,C: When you have reached the intersection; then you go to the right; and then you're there.,,6
+417,41,7,"A：我先往左走，对不对？
+C：对了。","A：我先往左走，對不對？
+C：對了。","A: Wǒ xiān wǎng zuǒ zǒu; duì bu duì?
+C: Duì le.","A: First I go to the left. Is that correct?
+C: That's correct.",,7
+418,41,8,"A：然后呢？
+C：然后，到了路口，再往右走。
+A：好，我知道了。谢谢。","A：然後呢？
+C：然後，到了路口，再往右走。
+A：好，我知道了。謝謝。","A: Ránhòu ne?
+C: Ránhòu; dàole lùkǒu; zài wǎng yòu zǒu.
+A: Hǎo; wǒ zhīdào le. Xièxie.","A: And after that?
+C: After that; when you have reached the intersection; then you go to the right.
+A: Good; I've got it now. Thank you.",,8
+419,41,9,"A：请问，从这里到银行去，往右走，对不对？
+D：不是，从这里一直走。","A：請問，從這裡到銀行去，往右走，對不對？
+D：不是，從這裡一直走。","A: Qǐngwèn; cóng zhèlǐ dào yínháng qù; wǎng yòu zǒu; duì bu duì?
+D: Bú shì; cóng zhèlǐ yīzhí zǒu.","A: May I ask; to get from here to the bank you go to the right. Is that correct?
+D: No; from here you go straight.",,9
+
 
 
 Refrence List Notes transciption instuctions:

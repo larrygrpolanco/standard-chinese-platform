@@ -1,6 +1,10 @@
 <script context="module">
 	function formatInstructions(text) {
 		if (!text) return '';
+
+		// Replace sequences of underscores with responsive blank elements
+		text = text.replace(/_{3,}/g, '<span class="answer-blank"></span>');
+
 		let formatted = text.replace(/\n\n/g, '</p><p>').replace(/\n/g, '<br>');
 		if (!formatted.startsWith('<p>')) {
 			formatted = `<p>${formatted}</p>`;
@@ -210,6 +214,50 @@
 			0 1px 2px rgba(0, 0, 0, 0.05),
 			0 4px 6px rgba(0, 0, 0, 0.03);
 		overflow: hidden;
+	}
+
+	/* New styles for the answer blanks */
+	.answer-blank {
+		display: inline-block;
+		width: 100%;
+		max-width: 240px;
+		height: 1px;
+		border-bottom: 1px solid var(--color-charcoal);
+		margin: 0 2px 3px;
+		vertical-align: middle;
+	}
+
+	.exercise-instructions {
+		/* Your existing styles */
+		word-wrap: break-word;
+		overflow-wrap: break-word;
+	}
+
+	/* Make sure code examples stay within boundaries */
+	.exercise-instructions pre,
+	.exercise-instructions code {
+		white-space: pre-wrap;
+		word-break: break-word;
+		overflow-wrap: break-word;
+		max-width: 100%;
+	}
+
+	/* Responsive adjustments */
+	@media (max-width: 768px) {
+		.answer-blank {
+			max-width: 180px;
+		}
+	}
+
+	@media (max-width: 480px) {
+		.answer-blank {
+			max-width: 120px;
+		}
+
+		.exercise-instructions {
+			font-size: 0.95rem;
+			padding: 0.75rem 1rem;
+		}
 	}
 
 	/* Navigation bar with vintage styling */
