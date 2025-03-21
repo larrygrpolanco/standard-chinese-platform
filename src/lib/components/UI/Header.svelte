@@ -64,7 +64,7 @@
 			dropdown: true,
 			isOpen: moduleDropdownOpen
 		},
-		{ href: '/guidebook', label: 'Guidebook' },
+		{ href: '/resource', label: 'Guide' },
 		{ href: '/rwp', label: 'RWPs' }
 	];
 </script>
@@ -100,7 +100,7 @@
 			<NavigationItem href="/" label="Home" isActive={isActive('/')} />
 
 			<!-- Other navigation items -->
-			<NavigationItem href="/guidebook" label="Guidebook" isActive={isActive('/guidebook')} />
+			<NavigationItem href="/resource" label="Guide" isActive={isActive('/resource')} />
 
 			<NavigationItem href="/rwp" label="RWPs" isActive={isActive('/rwp')} />
 

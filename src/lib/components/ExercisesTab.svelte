@@ -1,3 +1,4 @@
+<!-- ExercisesTab.svelte -->
 <script context="module">
 	function formatInstructions(text) {
 		if (!text) return '';

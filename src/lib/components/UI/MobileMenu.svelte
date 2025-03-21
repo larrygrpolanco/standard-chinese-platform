@@ -86,8 +86,8 @@
 				</div>
 
 				<!-- Additional nav items -->
-				<a href="/guidebook" class="nav-link">
-					<span class="link-text">Guidebook</span>
+				<a href="/resource" class="nav-link">
+					<span class="link-text">Guide</span>
 				</a>
 
 				<a href="/rwp" class="nav-link">
