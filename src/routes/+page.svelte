@@ -44,6 +44,8 @@
 	<!-- Hero Section -->
 	<section class="hero-section">
 		<div class="hero-content">
+			<div class="hero-background-image"></div>
+
 			<!-- Headline with retro underline -->
 			<div class="title-container" in:fade={{ duration: 400, delay: 200 }}>
 				<h1 class="main-title">Taped Chinese</h1>
@@ -320,17 +322,33 @@
 
 	/* Hero Section */
 	.hero-section {
-		padding: 3rem 1rem;
+		padding: 1rem 1rem;
 		display: flex;
 		justify-content: center;
 	}
 
 	.hero-content {
 		max-width: 1200px;
+		position: relative;
 		margin: 0 auto;
 		display: flex;
 		flex-direction: column;
 		align-items: center;
+	}
+
+	.hero-background-image {
+		position: absolute;
+		top: 0;
+		right: 5%;
+		width: 200px;
+		height: 200px;
+		background-image: url('/images/vintage-cassette.png');
+		background-size: contain;
+		background-repeat: no-repeat;
+		opacity: 0.08;
+		transform: rotate(15deg);
+		pointer-events: none;
+		z-index: 0;
 	}
 
 	.title-container {
@@ -351,10 +369,10 @@
 		position: absolute;
 		bottom: -0.5rem;
 		left: 50%;
-        margin-bottom: 0.5rem; 
-		height: 0.5rem;
-		width: 75%;
-		background: #DDB967;
+		margin-bottom: 0.5rem;
+		height: 0.3rem;
+		width: 50%;
+		background: #ddb967;
 	}
 
 	.subtitle {
@@ -369,7 +387,7 @@
 
 	.resource-guide-container {
 		margin-top: 1rem;
-		margin-bottom: 1.5rem;
+		/* margin-bottom: 1.5rem; */
 		display: flex;
 		flex-direction: column;
 		align-items: center;
@@ -440,7 +458,7 @@
 
 	/* RWP Section */
 	.rwp-section {
-		padding: 2rem 1rem;
+		padding: 1.5rem 1rem;
 		display: flex;
 		justify-content: center;
 	}
@@ -456,6 +474,23 @@
 			inset 0 1px 4px rgba(51, 49, 46, 0.15),
 			4px 4px 0 var(--color-shadow);
 		overflow: hidden;
+		background-image:
+			radial-gradient(circle at 15% 50%, rgba(193, 124, 116, 0.08) 0%, transparent 45%),
+			radial-gradient(circle at 85% 30%, rgba(52, 102, 127, 0.08) 0%, transparent 45%);
+	}
+
+	.rwp-content::before {
+		content: '';
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M50 0 v100 M30 20 v60 M70 20 v60 M10 40 v20 M90 40 v20' stroke='%23000000' stroke-opacity='0.03' stroke-width='1' fill='none'/%3E%3C/svg%3E");
+		background-size: 80px 80px;
+		z-index: -1;
+		opacity: 0.4;
+		pointer-events: none;
 	}
 
 	.tape-corner {
@@ -555,10 +590,28 @@
 
 	/* Stats Section */
 	.stats-section {
+		position: relative;
+		overflow: hidden;
 		padding: 2.5rem 1rem;
 		background-color: var(--color-cream-dark);
 		display: flex;
 		justify-content: center;
+	}
+
+	.stats-section::before {
+		content: '';
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+		width: 100%;
+		height: 100%;
+		background-image: url('/images/chinese-calligraphy.jpg');
+		background-size: cover;
+		background-position: center;
+		opacity: 0.04;
+		pointer-events: none;
+		filter: grayscale(1);
 	}
 
 	.stats-container {
@@ -795,7 +848,7 @@
 		left: 0;
 		height: 5px;
 		width: 100%;
-		background-color: #DDB967;
+		background-color: #ddb967;
 	}
 
 	.title-highlight {

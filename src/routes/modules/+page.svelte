@@ -24,32 +24,37 @@
 	onMount(async () => {
 		loading = true;
 
-		// Get all units with their module_id in one query
-		const { data: unitModuleMap, error: unitError } = await supabase
-			.from('units')
-			.select('id, module_id');
+		try {
+			// Get all units with their module_id in one query
+			const { data: unitModuleMap, error: unitError } = await supabase
+				.from('units')
+				.select('id, module_id');
 
-		if (unitError) {
-			console.error('Error fetching unit-module mapping:', unitError);
+			if (unitError) {
+				console.error('Error fetching unit-module mapping:', unitError);
+				return;
+			}
+
+			// Create a lookup map of unit_id -> module_id
+			const unitToModuleMap = {};
+			unitModuleMap.forEach((unit) => {
+				unitToModuleMap[unit.id] = unit.module_id;
+			});
+
+			// Fetch modules and user progress in parallel
+			const [modulesData, progressData] = await Promise.all([getModules(), getUserProgress()]);
+
+			// Filter out module 0 from the modules data
+			modules = modulesData.filter((module) => module.id !== 0);
+
+			// Calculate completion percentage for each module
+			moduleProgress = calculateModuleProgress(progressData, unitToModuleMap);
+		} catch (error) {
+			console.error('Error loading modules:', error);
+		} finally {
+			// Always set loading to false, even if there's an error
 			loading = false;
-			return;
 		}
-
-		// Create a lookup map of unit_id -> module_id
-		const unitToModuleMap = {};
-		unitModuleMap.forEach((unit) => {
-			unitToModuleMap[unit.id] = unit.module_id;
-		});
-
-		// Fetch modules and user progress in parallel
-		const [modulesData, progressData] = await Promise.all([getModules(), getUserProgress()]);
-
-		modules = modulesData;
-
-		// Calculate completion percentage for each module
-		moduleProgress = calculateModuleProgress(progressData, unitToModuleMap);
-
-		loading = false;
 	});
 
 	// Function to calculate module progress
@@ -104,7 +109,9 @@
 			{ border: '#DDB967', bg: '#F9F4E8', accent: '#DDB967' }, // Gold
 			{ border: '#34667F', bg: '#EAF0F3', accent: '#34667F' } // Navy
 		];
-		return colors[(moduleNumber - 1) % colors.length];
+		// Ensure we have a valid index, even for unexpected module numbers
+		const index = Math.max(0, (moduleNumber - 1) % colors.length);
+		return colors[index];
 	}
 </script>
 
@@ -271,7 +278,6 @@
 		margin-bottom: 2.5rem;
 		padding-top: 1.5rem;
 	}
-
 
 	.title-container {
 		position: relative;
