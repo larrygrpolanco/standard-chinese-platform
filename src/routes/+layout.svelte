@@ -111,6 +111,9 @@
 
 	.main-content {
 		flex: 1 0 auto;
+		padding-bottom: 0 !important; /* Force remove any padding */
+		display: flex;
+		flex-direction: column;
 	}
 
 	/* Footer Styles */

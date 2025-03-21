@@ -97,9 +97,15 @@
 				<!-- Login button (future implementation) -->
 				<div class="login-section">
 					{#if isLoggedIn}
-						<a href="/login/profile" class="mobile-nav-item">Profile</a>
+						<a href="/login/profile" class="mobile-login-button">
+							<span>Profile</span>
+							<div class="login-button-highlight"></div>
+						</a>
 					{:else}
-						<a href="/login" class="mobile-nav-item">Login</a>
+						<a href="/login" class="mobile-login-button">
+							<span>Login</span>
+							<div class="login-button-highlight"></div>
+						</a>
 					{/if}
 				</div>
 			</div>
@@ -359,5 +365,34 @@
 	.login-text {
 		color: #c17c74;
 		font-weight: 500;
+	}
+	.mobile-login-button {
+		position: relative;
+		display: flex;
+		align-items: center;
+		gap: 0.375rem;
+		border-radius: 9999px;
+		background-color: #c17c74;
+		padding: 0.375rem 1rem;
+		font-size: 0.875rem;
+		font-weight: 500;
+		color: white;
+		box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+		transition: background-color 0.15s;
+		width: fit-content;
+	}
+
+	.mobile-login-button:hover {
+		background-color: #ad6c66;
+	}
+
+	.login-button-highlight {
+		position: absolute;
+		inset: 0;
+		top: 0;
+		height: 50%;
+		border-top-left-radius: 9999px;
+		border-top-right-radius: 9999px;
+		background-color: rgba(255, 255, 255, 0.2);
 	}
 </style>
