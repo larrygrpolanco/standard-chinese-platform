@@ -1,11 +1,13 @@
 <script>
 	import { onMount, onDestroy } from 'svelte';
+	import FlashcardDeck from '$lib/components/FlashcardDeck.svelte'; // Import the component
 
 	// Props
 	export let message = 'Under Construction';
 	export let submessage = "We're recording more content";
 	export let currentPhase = 'init'; // 'init', 'story', 'questions', 'formatting'
 	export let isGenerating = false;
+	export let vocabulary = []; // Add this prop to accept vocabulary data
 
 	// Interactive states
 	let clickCounter = 0;
@@ -26,6 +28,43 @@
 		{ id: 'questions', label: 'Questions', percentage: 60 },
 		{ id: 'formatting', label: 'Format', percentage: 100 }
 	];
+
+	// Fallback vocabulary if none is provided
+	const fallbackVocabulary = [
+		{
+			chinese_simplified: '你好',
+			chinese_traditional: '你好',
+			pinyin: 'nǐ hǎo',
+			english: 'Hello'
+		},
+		{
+			chinese_simplified: '谢谢',
+			chinese_traditional: '謝謝',
+			pinyin: 'xiè xiè',
+			english: 'Thank you'
+		},
+		{
+			chinese_simplified: '再见',
+			chinese_traditional: '再見',
+			pinyin: 'zài jiàn',
+			english: 'Goodbye'
+		},
+		{
+			chinese_simplified: '学习',
+			chinese_traditional: '學習',
+			pinyin: 'xué xí',
+			english: 'To study'
+		},
+		{
+			chinese_simplified: '中国',
+			chinese_traditional: '中國',
+			pinyin: 'zhōng guó',
+			english: 'China'
+		}
+	];
+
+	// Use provided vocabulary or fallback if empty
+	$: activeVocabulary = vocabulary.length > 0 ? vocabulary : fallbackVocabulary;
 
 	// Reactive calculations
 	$: currentPhaseInfo = phases.find((p) => p.id === currentPhase) || phases[0];
@@ -83,16 +122,6 @@
 		requestAnimationFrame(animateReels);
 	}
 
-	// Chinese tips rotation
-	let tipIndex = 0;
-	const chineseTips = [
-		'Chinese has over 50,000 characters, but you only need about 2,500 for daily use.',
-		"Mandarin Chinese is the world's most spoken first language.",
-		"Chinese characters are called 'Hanzi' (汉字) in Mandarin.",
-		'Chinese is a tonal language with 4 tones in Mandarin.',
-		'Many Chinese characters are pictographs derived from ancient drawings.'
-	];
-
 	// Interactive feedback messages
 	$: clickMessage =
 		clickCounter > 10
@@ -103,22 +132,9 @@
 					? 'That helps!'
 					: 'Click or drag the reels to speed up recording';
 
-	// Tip rotation interval
-	let tipInterval;
-
 	onMount(() => {
 		// Start reel animation
 		requestAnimationFrame(animateReels);
-
-		if (isGenerating) {
-			tipInterval = setInterval(() => {
-				tipIndex = (tipIndex + 1) % chineseTips.length;
-			}, 8000);
-		}
-	});
-
-	onDestroy(() => {
-		if (tipInterval) clearInterval(tipInterval);
 	});
 </script>
 
@@ -130,6 +146,14 @@
 />
 
 <div class="construction-container">
+	{#if isGenerating}
+		<!-- Flashcard section moved above the cassette tape -->
+		<div class="flashcard-section">
+			<h3 class="flashcard-heading">Practice while you wait</h3>
+			<FlashcardDeck vocabulary={activeVocabulary} />
+		</div>
+	{/if}
+
 	<div class="cassette-wrapper">
 		<div class="cassette" class:pulse={isPulsing || speedBoost > 1.5}>
 			<div class="cassette-body">
@@ -205,10 +229,6 @@
 			<div class="click-helper">
 				<p class="helper-text">{clickMessage}</p>
 			</div>
-
-			<div class="chinese-tip">
-				<p class="tip-text">💡 {chineseTips[tipIndex]}</p>
-			</div>
 		</div>
 	{/if}
 </div>
@@ -231,12 +251,32 @@
 		justify-content: center;
 		padding: 2rem;
 		margin: 2rem auto;
-		max-width: 500px;
+		max-width: 640px; /* Increased max-width to accommodate wider content */
+	}
+
+	/* Flashcard section styling */
+	.flashcard-section {
+		width: 100%;
+		margin-bottom: 2rem;
+		padding: 1rem;
+		border-radius: 0.5rem;
+		background-color: rgba(255, 255, 255, 0.05);
+		box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+	}
+
+	.flashcard-heading {
+		font-size: 1.25rem;
+		margin-bottom: 1rem;
+		text-align: center;
+		font-weight: 500;
+		color: #d6a461;
+		letter-spacing: 0.05em;
 	}
 
 	.cassette-wrapper {
 		animation: slight-wobble 5s ease-in-out infinite;
 		filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.15));
+		margin-bottom: 2rem;
 	}
 
 	.cassette {
@@ -412,7 +452,6 @@
 
 	/* Progress indicator */
 	.progress-section {
-		margin-top: 2rem;
 		width: 100%;
 		max-width: 280px;
 	}
@@ -520,24 +559,6 @@
 		margin: 0;
 	}
 
-	/* Chinese tip */
-	.chinese-tip {
-		margin-top: 1.5rem;
-		animation: fade-in 0.5s ease;
-		background-color: var(--tape-light);
-		padding: 12px;
-		border-radius: 8px;
-		border-left: 4px solid var(--tape-accent);
-		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-	}
-
-	.tip-text {
-		font-size: 0.9rem;
-		color: var(--tape-dark);
-		margin: 0;
-		line-height: 1.4;
-	}
-
 	/* Animations */
 	@keyframes slight-wobble {
 		0%,
@@ -609,14 +630,6 @@
 
 		.step-label {
 			font-size: 0.55rem;
-		}
-
-		.chinese-tip {
-			padding: 10px;
-		}
-
-		.tip-text {
-			font-size: 0.8rem;
 		}
 	}
 </style>

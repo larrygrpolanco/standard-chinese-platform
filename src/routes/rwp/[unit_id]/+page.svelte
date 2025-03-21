@@ -269,13 +269,13 @@
 										</div>
 
 										<!-- Debug toggle (for developers) -->
-										<div class="form-group checkbox-group">
+										<!-- <div class="form-group checkbox-group">
 											<label class="vintage-checkbox">
 												<input type="checkbox" bind:checked={debug} hidden />
 												<span class="checkbox-custom"></span>
 												<span class="checkbox-label">Debug Mode</span>
 											</label>
-										</div>
+										</div> -->
 
 										<!-- Generate Button -->
 										<button
@@ -342,6 +342,7 @@
 									submessage="This should take about a minute"
 									currentPhase={generationPhase}
 									isGenerating={true}
+									vocabulary= {unitVocabulary}
 								/>
 							</div>
 						{:else if rwpContent}
@@ -670,12 +671,12 @@
 	}
 
 	.panel-content {
-		padding: 1rem 1.25rem 1.5rem;
+		padding: 1rem 1.25rem 1rem;
 	}
 
 	/* Form elements styling */
 	.form-group {
-		margin-bottom: 1.25rem;
+		margin-bottom: 1rem;
 	}
 
 	.form-label {

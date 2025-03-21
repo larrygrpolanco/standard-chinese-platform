@@ -53,6 +53,9 @@
 				traditional={content.meta?.title_traditional || ''}
 				pinyin={content.meta?.title_pinyin || ''}
 				english={content.meta?.title_english || ''}
+				containerClass="title-container"
+				chineseClass="title-chinese-text"
+				englishClass="title-english-text"
 			/>
 		</h2>
 		{#if content.meta?.introduction}
@@ -156,6 +159,26 @@
 		line-height: 1.5;
 		font-size: 0.95rem;
 		max-width: 95%;
+	}
+
+	.title-container {
+		margin-bottom: 0.5rem;
+	}
+
+	/* Use :global() to target elements rendered by child components */
+	:global(.title-chinese-text) {
+		font-family:
+			'Arvo', serif !important; /* !important may be needed to override component styles */
+		font-size: 2rem !important;
+		font-weight: 700 !important;
+		color: var(--color-terracotta, #c17c74) !important;
+	}
+
+	:global(.title-english-text) {
+		font-style: italic !important;
+		font-size: 1.2rem !important;
+		color: var(--color-terracotta, #c17c74) !important;
+		opacity: 0.85 !important;
 	}
 
 	/* Font controls styling */

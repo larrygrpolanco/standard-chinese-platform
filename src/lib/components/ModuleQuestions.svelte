@@ -263,12 +263,12 @@
 					id={`${moduleId}-${question.id}`}
 					bind:value={answers[question.id]}
 					class="question-input"
-					rows="3"
-					maxlength="250"
+					rows="2"
+					maxlength="200"
 					placeholder="Your answer here..."
 				></textarea>
-				<div class="char-count {answers[question.id]?.length >= 225 ? 'near-limit' : ''}">
-					{answers[question.id]?.length || 0}/250
+				<div class="char-count {answers[question.id]?.length >= 180 ? 'near-limit' : ''}">
+					{answers[question.id]?.length || 0}/200
 				</div>
 			</div>
 		</div>

@@ -1,9 +1,16 @@
+// src/routes/api/format-exercise/+server.js
 import { json } from '@sveltejs/kit';
-import { OPENAI_API_KEY } from '$env/static/private';
+import { createApiClient } from '$lib/apiClient.js';
 
 export async function POST({ request }) {
 	try {
-		const { story, questions, unitData, debug = false } = await request.json();
+		const {
+			story,
+			questions,
+			unitData,
+			apiProvider = 'openai',
+			debug = false
+		} = await request.json();
 
 		if (!story || !questions) {
 			return json({ error: 'Story and questions must be provided' }, { status: 400 });
@@ -12,38 +19,32 @@ export async function POST({ request }) {
 		if (debug) {
 			console.log('Formatter received:', {
 				story: story.substring(0, 100) + '...',
-				questions: questions.substring(0, 100) + '...'
+				questions: questions.substring(0, 100) + '...',
+				apiProvider
 			});
 		}
 
-		const response = await fetch('https://api.openai.com/v1/chat/completions', {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-				Authorization: `Bearer ${OPENAI_API_KEY}`
+		const apiClient = createApiClient(apiProvider);
+		const messages = [
+			{
+				role: 'system',
+				content:
+					'You are a Chinese language education expert specializing in preparing well-structured educational materials. Your task is to format content into a precise JSON structure with all required translations and annotations.'
 			},
-			body: JSON.stringify({
-				model: 'gpt-4o-mini-2024-07-18',
-				messages: [
-					{
-						role: 'system',
-						content:
-							'You are a Chinese language education expert specializing in preparing well-structured educational materials. Your task is to format content into a precise JSON structure with all required translations and annotations.'
-					},
-					{
-						role: 'user',
-						content: createFormatPrompt(story, questions, unitData)
-					}
-				],
-				temperature: 0.3 // Lower temperature for more precise formatting
-			})
-		});
+			{
+				role: 'user',
+				content: createFormatPrompt(story, questions, unitData)
+			}
+		];
 
-		const data = await response.json();
+		const { response, data } = await apiClient.fetchCompletion(messages, {
+			temperature: 0.3, // Lower temperature for more precise formatting
+			model: 'gpt-4o-mini-2024-07-18'
+		});
 
 		if (!response.ok) {
 			return json(
-				{ error: data.error?.message || 'OpenAI API error' },
+				{ error: data.error?.message || `${apiClient.provider} API error` },
 				{ status: response.status }
 			);
 		}
@@ -75,17 +76,19 @@ export async function POST({ request }) {
 			if (debug) {
 				return json({
 					raw: content,
-					parsed: parsedContent
+					parsed: parsedContent,
+					provider: apiClient.provider
 				});
 			}
 
-			return json(parsedContent);
+			return json({ ...parsedContent, provider: apiClient.provider });
 		} catch (e) {
 			console.error('JSON parsing error:', e, 'Content:', content);
 			return json(
 				{
 					error: 'Failed to parse formatted content',
-					raw: content.substring(0, 500) // Include part of the raw content for debugging
+					raw: content.substring(0, 500), // Include part of the raw content for debugging
+					provider: apiClient.provider
 				},
 				{ status: 400 }
 			);

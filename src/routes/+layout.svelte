@@ -3,6 +3,7 @@
 	import { onMount } from 'svelte';
 	import { authStore } from '$lib/stores/authStore';
 	import Header from '$lib/components/UI/Header.svelte';
+	import Breadcrumb from '$lib/components/UI/Breadcrumb.svelte';
 
 	onMount(() => {
 		authStore.initialize();
@@ -11,7 +12,8 @@
 
 <div class="flex min-h-screen flex-col bg-[#F4F1DE] font-['Work_Sans',sans-serif] text-[#33312E]">
 	<Header />
-
+	<Breadcrumb />
+	
 	<main class="flex-grow">
 		<slot />
 	</main>

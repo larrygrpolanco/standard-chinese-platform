@@ -17,7 +17,7 @@
 		// Digital counter animation
 		counterInterval = setInterval(() => {
 			counter = (counter + 1) % 1000;
-		}, 150);
+		}, 200);
 
 		// Animated dots
 		dotsInterval = setInterval(() => {

@@ -28,25 +28,15 @@ fsi-chinese-learning/
 │   │   │   ├── UnitContent.svelte               # Main content display for units
 │   │   │   ├── UnitProgressButton.svelte
 │   │   │   ├── VocabularyTab.svelte
-│   │   │   ├── QuestionTypes/
-│   │   │   |   ├── DisplayOnlyQuestion.svelte
-│   │   │   |   ├── MultipleChoiceQuestion.svelte
-│   │   │   |   ├── ShortAnswerQuestion.svelte
-│   │   │   |   └── TableRowQuestion.svelte
+│   │   │   ├── ...
 │   │   │   └── rwp/
 │   │   │       ├── ExerciseGenerator.svelte
-│   │   │       ├── ReadingExercise.svelte
-│   │   │       ├── RWPHeader.svelte
+│   │   │       ├── ComprehensionExercise.svelte
+│   │   │       └── ...
 │   │   └── rwp/
-│   │   │   ├── exerciseTypes.js
-│   │   │   ├── rwpGenerator.js
-│   │   │   └── templates/
-│   │   │       ├── readingComprehension.js
-│   │   │       ├── QuestionDisplay.js
-│   │   │       ├── ReadingExercise.js
-│   │   │       └── multipleChoice.js
+│   │   │   └── rwpGenerator.js
 │   │   ├── stores/
-│   │   │   └── fontPreferences.js               # Store for font settings
+│   │   │   ├── fontPreferences.js               # Store for font settings
 │   │   │   └── authStore.js 
 │   │   └── supabase/
 │   │       └── client.js                        # Supabase connection and functions
@@ -57,8 +47,8 @@ fsi-chinese-learning/
 │       │       └── server.js
 │       ├── rwp/
 │       ├── +page.svelte                         # Home page
-│       ├── guidebook/
-│       │   ├── +page.svelte             # Blog type guidebook with helpful langauge learning write-ups
+│       ├── resource/
+│       │   └── +page.svelte            
 │       ├── modules/
 │       │   ├── +page.svelte                     # All modules listing
 │       │   └── [id]/                            # Single module view

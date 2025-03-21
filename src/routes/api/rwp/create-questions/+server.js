@@ -1,9 +1,17 @@
+// src/routes/api/create-questions/+server.js
 import { json } from '@sveltejs/kit';
-import { OPENAI_API_KEY } from '$env/static/private';
+import { createApiClient } from '$lib/apiClient.js';
 
 export async function POST({ request }) {
 	try {
-		const { story, unitData, userProfile, specificFocus, debug = false } = await request.json();
+		const {
+			story,
+			unitData,
+			userProfile,
+			specificFocus,
+			apiProvider = 'deepseek',
+			debug = false
+		} = await request.json();
 
 		if (!story) {
 			return json({ error: 'No story provided' }, { status: 400 });
@@ -13,45 +21,39 @@ export async function POST({ request }) {
 			console.log('Question generator received:', {
 				story: story.substring(0, 100) + '...',
 				unitData,
-				userProfile
+				userProfile,
+				apiProvider
 			});
 		}
 
-		const response = await fetch('https://api.openai.com/v1/chat/completions', {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-				Authorization: `Bearer ${OPENAI_API_KEY}`
+		const apiClient = createApiClient(apiProvider);
+		const messages = [
+			{
+				role: 'system',
+				content:
+					"You are a Chinese language education expert specializing in creating effective, personalized assessment questions. Your task is to create various types of questions based on a provided reading passage that connect to both the unit content and the learner's personal context."
 			},
-			body: JSON.stringify({
-				model: 'gpt-4o-mini-2024-07-18',
-				messages: [
-					{
-						role: 'system',
-						content:
-							"You are a Chinese language education expert specializing in creating effective, personalized assessment questions. Your task is to create various types of questions based on a provided reading passage that connect to both the unit content and the learner's personal context."
-					},
-					{
-						role: 'user',
-						content: createQuestionsPrompt(story, unitData, userProfile, specificFocus)
-					}
-				],
-				temperature: 0.7
-			})
-		});
+			{
+				role: 'user',
+				content: createQuestionsPrompt(story, unitData, userProfile, specificFocus)
+			}
+		];
 
-		const data = await response.json();
+		const { response, data } = await apiClient.fetchCompletion(messages, {
+			temperature: 0.7,
+			model: 'gpt-4o-mini-2024-07-18'
+		});
 
 		if (!response.ok) {
 			return json(
-				{ error: data.error?.message || 'OpenAI API error' },
+				{ error: data.error?.message || `${apiClient.provider} API error` },
 				{ status: response.status }
 			);
 		}
 
 		const content = data.choices[0].message.content;
 
-		return json({ questions: content });
+		return json({ questions: content, provider: apiClient.provider });
 	} catch (error) {
 		console.error('Error generating questions:', error);
 		return json({ error: 'Failed to generate questions' }, { status: 500 });

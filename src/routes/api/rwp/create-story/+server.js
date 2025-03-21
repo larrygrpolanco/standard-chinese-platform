@@ -1,53 +1,58 @@
+// src/routes/api/create-story/+server.js
 import { json } from '@sveltejs/kit';
-import { OPENAI_API_KEY } from '$env/static/private';
+import { createApiClient } from '$lib/apiClient.js';
 
 export async function POST({ request }) {
 	try {
-		const { unitData, userProfile, specificFocus, debug = false } = await request.json();
+		const {
+			unitData,
+			userProfile,
+			specificFocus,
+			apiProvider = 'deepseek',
+			debug = false
+		} = await request.json();
 
 		if (!unitData) {
 			return json({ error: 'No unit data provided' }, { status: 400 });
 		}
 
 		if (debug) {
-			console.log('Story generator received:', { unitData, userProfile, specificFocus });
+			console.log('Story generator received:', {
+				unitData,
+				userProfile,
+				specificFocus,
+				apiProvider
+			});
 		}
 
-		const response = await fetch('https://api.openai.com/v1/chat/completions', {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-				Authorization: `Bearer ${OPENAI_API_KEY}`
+		const apiClient = createApiClient(apiProvider);
+		const messages = [
+			{
+				role: 'system',
+				content:
+					"You are a Chinese language education expert specializing in creating personalized, relevant learning materials. Your task is to create engaging stories that incorporate vocabulary and grammar from the lesson while connecting to the learner's personal context."
 			},
-			body: JSON.stringify({
-				model: 'gpt-4o-mini-2024-07-18',
-				messages: [
-					{
-						role: 'system',
-						content:
-							"You are a Chinese language education expert specializing in creating personalized, relevant learning materials. Your task is to create engaging stories that incorporate vocabulary and grammar from the lesson while connecting to the learner's personal context."
-					},
-					{
-						role: 'user',
-						content: createStoryPrompt(unitData, userProfile, specificFocus)
-					}
-				],
-				temperature: 0.8 // Higher temperature for more creative stories
-			})
-		});
+			{
+				role: 'user',
+				content: createStoryPrompt(unitData, userProfile, specificFocus)
+			}
+		];
 
-		const data = await response.json();
+		const { response, data } = await apiClient.fetchCompletion(messages, {
+			temperature: 0.8, // Higher temperature for more creative stories
+			model: 'gpt-4o-mini-2024-07-18' // Will be mapped to deepseek-chat if using DeepSeek
+		});
 
 		if (!response.ok) {
 			return json(
-				{ error: data.error?.message || 'OpenAI API error' },
+				{ error: data.error?.message || `${apiClient.provider} API error` },
 				{ status: response.status }
 			);
 		}
 
 		const content = data.choices[0].message.content;
 
-		return json({ story: content });
+		return json({ story: content, provider: apiClient.provider });
 	} catch (error) {
 		console.error('Error generating story:', error);
 		return json({ error: 'Failed to generate story' }, { status: 500 });
@@ -107,58 +112,101 @@ function createStoryPrompt(unitData, userProfile, specificFocus) {
 	}
 
 	return `
-Create a personalized Chinese language story that sounds like natural conversation and connects to the learner's interests and preferences.
+## OBJECTIVE
+Create a first-person narrative Chinese language practice story that:
+1. Uses vocabulary and grammar patterns from the current unit
+2. Authentically connects to the learner's personal context and interests
+3. Presents language in natural, practical situations
+4. Feels personally relevant and engaging to the learner
 
-# UNIT INFORMATION
+## UNIT INFORMATION
 Unit Title: ${unitData.title}
 Description: ${unitData.description}
 Module: ${unitData.module?.title || ''}
 
-# VOCABULARY TO INCLUDE
-${formattedVocabulary}
-
-# DIALOGUE PATTERNS TO INCORPORATE
-${formattedDialogues}
-
-# USER PROFILE
+## LEARNER PROFILE
 Name: ${fullName}
 Level: ${learningLevel}
 Occupation: ${occupation}
 Location: ${location}
 Hobbies: ${hobbies}
 Reason for Learning: ${reasonLearning}
-
-# USER'S PERSONAL PREFERENCES AND INTERESTS
+Personal Preferences: 
 ${formattedResponses}
 
-# SPECIFIC FOCUS (if any)
-${specificFocus || 'None specified'}
+## CONTENT REQUIREMENTS
+### Core Vocabulary to Include
+${formattedVocabulary}
 
-# INSTRUCTIONS
-1. Create a CONVERSATIONAL story that sounds like natural spoken Chinese, not formal written text. There should only be one speaker.
-2. Length: ${recommendedLength}
-3. Complexity: ${sentenceComplexity}
-4. PERSONALIZATION PRIORITIES:
-   - Make the story directly relevant to the user's expressed interests and preferences
-   - Create a scenario the learner could imagine themselves in
-   - Reference their specific responses about what they enjoy or are curious about
-   - Focus on practical, everyday situations they might encounter
+### Key Grammatical Patterns to Practice
+${formattedDialogues}
 
-5. LANGUAGE APPROACH:
-   - Use vocabulary and grammar from the unit naturally in context
-   - Include realistic dialogue exchanges
-   - Use speech patterns that reflect how people actually talk
-   - Maintain an engaging, friendly tone
+## STORY PARAMETERS
+Length: ${recommendedLength}
+Complexity: ${sentenceComplexity}
+Format: First-person narrative (single speaker)
+Specific Focus (if any): ${specificFocus || 'None specified'}
 
-6. If the user provided minimal context, create an engaging scenario based on the module theme
+## PRE-WRITING ANALYSIS
 
-7. Translate the story into English
+Before writing the story, carefully analyze how to create a relevant, engaging narrative by completing the following analysis inside <story_planning> tags:
 
-Before writing the exercise story, take some time to plan the story. Plan the story inside <story_planning> tags:
+1. **Learner Context Analysis**:
+   - Based on the profile, what aspects of this person's life would make language practice most relevant?
+   - What real scenarios might they encounter where this unit's language would be useful?
+   - What tone and style might resonate with this particular learner?
 
-a. Brainstorm story themes based on the chapter and vocabulary
-b. Outline the story structure, ensuring it incorporates the DIALOGUE PATTERNS
-c. List out potential sentences, marking where vocabulary words and grammar patterns will be used
-d. Refine sentences to match the student level and character count
+2. **Core Language Pattern Identification**:
+   - Identify 3-5 key grammatical structures from the dialogues (not just vocabulary)
+   - Note how these patterns could be used in contexts relevant to the learner
+
+3. **Interest Integration Opportunities**:
+   - List 2-3 natural ways to incorporate the learner's specific interests as background elements
+   - Identify connections between the unit topic and the learner's life/interests
+
+4. **Setting & Scenario Design**:
+   - Create a realistic scenario set in the learner's location that would require using this unit's language
+   - Ensure the scenario aligns with their occupation, daily activities, or learning goals
+
+5. **Engagement Strategy**:
+   - Based on their profile, identify what would make this story particularly engaging for this learner
+   - Note how to incorporate decision-making or personal agency in the narrative
+
+## STORY CREATION GUIDELINES
+
+After completing your analysis, write a first-person narrative story that:
+
+1. **Begins with authentic context**:
+   - Start from the learner's real-life situation (location, occupation)
+   - Establish a scenario where the language would naturally be used
+
+2. **Integrates language patterns naturally**:
+   - Incorporate the unit's language patterns in contextually appropriate ways
+   - Occasionally add metacognitive elements that highlight the language being practiced
+
+3. **Incorporates interests subtly**:
+   - Weave in references to the learner's interests as background elements
+   - Use these references to enhance the story rather than forcing them into the main plot
+
+4. **Uses appropriate complexity**:
+   - Match sentence structure to the specified learning level
+   - Ensure vocabulary beyond the unit list is appropriate to their level
+
+5. **Creates practical relevance**:
+   - Show how the language connects to real-life situations they might encounter
+   - Demonstrate the practical utility of what they're learning
+
+After writing the Chinese story, provide an English translation.
+
+## QUALITY CHECKLIST
+Before submitting, verify the story meets these criteria:
+- [ ] Uses first-person perspective consistently
+- [ ] Set in the learner's actual location
+- [ ] References their true occupation or daily activities
+- [ ] Incorporates at least one specific interest from their profile
+- [ ] Uses all required vocabulary/grammar naturally in context
+- [ ] Maintains appropriate language level throughout
+- [ ] Includes elements of decision-making or personal agency
+- [ ] Feels like an authentic scenario, not a contrived exercise
 `;
 }

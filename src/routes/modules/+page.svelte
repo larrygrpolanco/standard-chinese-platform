@@ -1,91 +1,88 @@
 <!-- src/routes/modules/+page.svelte -->
 <script>
-  import { onMount } from 'svelte';
-  import { getModules, getUserProgress, supabase } from '$lib/supabase/client';
-  import Loader from '$lib/components/UI/Loader.svelte';
+	import { onMount } from 'svelte';
+	import { getModules, getUserProgress, supabase } from '$lib/supabase/client';
+	import Loader from '$lib/components/UI/Loader.svelte';
 
-  let modules = [];
-  let loading = true;
-  let moduleProgress = {};
+	let modules = [];
+	let loading = true;
+	let moduleProgress = {};
 
-  // Define total units per module (based on your counts)
-  const totalUnitsPerModule = {
-    1: 4,
-    2: 8,
-    3: 6,
-    4: 5,
-    5: 8,
-    6: 8,
-    7: 8,
-    8: 8,
-    9: 8
-  };
+	// Define total units per module (based on your counts)
+	const totalUnitsPerModule = {
+		1: 4,
+		2: 8,
+		3: 6,
+		4: 5,
+		5: 8,
+		6: 8,
+		7: 8,
+		8: 8,
+		9: 8
+	};
 
-  onMount(async () => {
-    loading = true;
-    
-    // Get all units with their module_id in one query
-    const { data: unitModuleMap, error: unitError } = await supabase
-      .from('units')
-      .select('id, module_id');
-      
-    if (unitError) {
-      console.error('Error fetching unit-module mapping:', unitError);
-      loading = false;
-      return;
-    }
-    
-    // Create a lookup map of unit_id -> module_id
-    const unitToModuleMap = {};
-    unitModuleMap.forEach(unit => {
-      unitToModuleMap[unit.id] = unit.module_id;
-    });
-    
-    // Fetch modules and user progress in parallel
-    const [modulesData, progressData] = await Promise.all([
-      getModules(),
-      getUserProgress()
-    ]);
-    
-    modules = modulesData;
-    
-    // Calculate completion percentage for each module
-    moduleProgress = calculateModuleProgress(progressData, unitToModuleMap);
-    
-    loading = false;
-  });
+	onMount(async () => {
+		loading = true;
 
-  // Function to calculate module progress
-  function calculateModuleProgress(progressData, unitToModuleMap) {
-    // Create empty object to store progress
-    const progress = {};
+		// Get all units with their module_id in one query
+		const { data: unitModuleMap, error: unitError } = await supabase
+			.from('units')
+			.select('id, module_id');
 
-    // Initialize all modules with 0 completed units
-    for (const moduleId in totalUnitsPerModule) {
-      progress[moduleId] = {
-        completed: 0,
-        total: totalUnitsPerModule[moduleId],
-        percentage: 0
-      };
-    }
-    
-    // Count completed units by module
-    progressData.forEach((item) => {
-      if (item.status === 'completed') {
-        // Look up which module this unit belongs to
-        const moduleId = unitToModuleMap[item.unit_id];
-        
-        if (moduleId && progress[moduleId]) {
-          progress[moduleId].completed++;
-          // Recalculate percentage
-          progress[moduleId].percentage =
-            (progress[moduleId].completed / progress[moduleId].total) * 100;
-        }
-      }
-    });
+		if (unitError) {
+			console.error('Error fetching unit-module mapping:', unitError);
+			loading = false;
+			return;
+		}
 
-    return progress;
-  }
+		// Create a lookup map of unit_id -> module_id
+		const unitToModuleMap = {};
+		unitModuleMap.forEach((unit) => {
+			unitToModuleMap[unit.id] = unit.module_id;
+		});
+
+		// Fetch modules and user progress in parallel
+		const [modulesData, progressData] = await Promise.all([getModules(), getUserProgress()]);
+
+		modules = modulesData;
+
+		// Calculate completion percentage for each module
+		moduleProgress = calculateModuleProgress(progressData, unitToModuleMap);
+
+		loading = false;
+	});
+
+	// Function to calculate module progress
+	function calculateModuleProgress(progressData, unitToModuleMap) {
+		// Create empty object to store progress
+		const progress = {};
+
+		// Initialize all modules with 0 completed units
+		for (const moduleId in totalUnitsPerModule) {
+			progress[moduleId] = {
+				completed: 0,
+				total: totalUnitsPerModule[moduleId],
+				percentage: 0
+			};
+		}
+
+		// Count completed units by module
+		progressData.forEach((item) => {
+			if (item.status === 'completed') {
+				// Look up which module this unit belongs to
+				const moduleId = unitToModuleMap[item.unit_id];
+
+				if (moduleId && progress[moduleId]) {
+					progress[moduleId].completed++;
+					// Recalculate percentage
+					progress[moduleId].percentage =
+						(progress[moduleId].completed / progress[moduleId].total) * 100;
+				}
+			}
+		});
+
+		return progress;
+	}
 
 	// Function to get progress status text
 	function getProgressStatusText(moduleId) {
@@ -124,16 +121,6 @@
 	<section class="container mx-auto px-4">
 		<!-- Vintage-inspired header -->
 		<header class="page-header">
-			<!-- Decorative cassette tape icon -->
-			<div class="decorative-tape">
-				<div class="tape-body">
-					<div class="tape-reels">
-						<div class="tape-reel"></div>
-						<div class="tape-reel"></div>
-					</div>
-				</div>
-			</div>
-
 			<!-- Title with retro underline -->
 			<div class="title-container">
 				<h1 class="page-title">Learning Modules</h1>
@@ -285,57 +272,6 @@
 		padding-top: 1.5rem;
 	}
 
-	.decorative-tape {
-		position: absolute;
-		top: -0.5rem;
-		right: 2rem;
-		height: 4rem;
-		width: 6rem;
-		transform: rotate(12deg);
-		opacity: 0.3;
-		display: none;
-	}
-
-	@media (min-width: 768px) {
-		.decorative-tape {
-			display: block;
-		}
-	}
-
-	.tape-body {
-		position: relative;
-		height: 100%;
-		width: 100%;
-		border-radius: 0.375rem;
-		border: 2px solid #33312e;
-		background-color: #e8e5d7;
-	}
-
-	.tape-reels {
-		position: absolute;
-		top: 50%;
-		left: 50%;
-		height: 2rem;
-		width: 2.5rem;
-		transform: translate(-50%, -50%);
-	}
-
-	.tape-reel {
-		position: absolute;
-		top: 0;
-		height: 1rem;
-		width: 1rem;
-		border-radius: 50%;
-		border: 1px solid #33312e;
-	}
-
-	.tape-reel:first-child {
-		left: 0;
-	}
-
-	.tape-reel:last-child {
-		right: 0;
-	}
 
 	.title-container {
 		position: relative;

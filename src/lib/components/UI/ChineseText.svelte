@@ -1,44 +1,42 @@
 <!-- src/lib/components/UI/ChineseText.svelte -->
 <script>
 	import { fontPreferences } from '$lib/stores/fontPreferences';
+	import ChunkByPinyin from './ChunkByPinyin.svelte';
 
 	// Props
 	export let simplified = '';
 	export let traditional = '';
 	export let pinyin = '';
 	export let english = '';
+	export let containerClass = ''; // Class for the main container
+	export let chineseClass = ''; // Class specifically for Chinese text
+	export let englishClass = ''; // Class specifically for English text
 
 	// Use appropriate text based on user preference
 	$: displayText =
-		$fontPreferences.displayMode === 'traditional' && traditional
-			? traditional.replace(/ /g, '\u00A0')
-			: simplified.replace(/ /g, '\u00A0');
-
-	$: displayPinyin = pinyin.replace(/ /g, '\u00A0');
+		$fontPreferences.displayMode === 'traditional' && traditional ? traditional : simplified;
 </script>
 
-<div class="chinese-content">
+<div class="chinese-content {containerClass}">
 	<div class="content-layout">
 		<div class="chinese-section">
-			<!-- Improved Chinese text and pinyin container -->
-			<div class="chinese-display">
-				{#if $fontPreferences.showPinyin && pinyin}
-					<p class="pinyin-text">{displayPinyin}</p>
-				{/if}
-				<p class="chinese-text" lang="zh">{displayText}</p>
-			</div>
+			{#if $fontPreferences.showPinyin && pinyin}
+				<ChunkByPinyin text={displayText} {pinyin} customClass={chineseClass} />
+			{:else}
+				<p class="chinese-text {chineseClass}" lang="zh">{displayText}</p>
+			{/if}
 		</div>
 
-		<!-- English translation - only show if it exists and fits design -->
 		{#if english && $fontPreferences.showEnglish}
 			<div class="english-section">
-				<p class="english-text whitespace-pre-line">{english}</p>
+				<p class="english-text whitespace-pre-line {englishClass}">{english}</p>
 			</div>
 		{/if}
 	</div>
 </div>
 
 <style>
+	/* Keep your existing styles */
 	.chinese-content {
 		margin-bottom: 0.75rem;
 		width: 100%;
@@ -54,22 +52,6 @@
 		width: 100%;
 		flex: 1;
 		min-width: 0; /* Allows flex item to shrink below content size */
-	}
-
-	.chinese-display {
-		width: 100%;
-	}
-
-	.pinyin-text {
-		font-family: 'Work Sans', sans-serif;
-		color: var(--color-warm-gray, #a0998a);
-		font-size: 0.8rem;
-		line-height: 1.5;
-		margin-bottom: 0.125rem;
-		overflow-wrap: break-word;
-		word-wrap: break-word;
-		word-break: break-word;
-		hyphens: auto;
 	}
 
 	.chinese-text {
@@ -102,12 +84,6 @@
 	@media (max-width: 640px) {
 		.chinese-content {
 			margin-bottom: 0.5rem;
-		}
-
-		.pinyin-text {
-			font-size: 0.75rem;
-			line-height: 1.4;
-			margin-bottom: 0.0625rem;
 		}
 
 		.chinese-text {
