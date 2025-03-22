@@ -1,67 +1,207 @@
 <script>
 	import { page } from '$app/stores';
+	import { getModuleById, getUnitBasicInfo, getCurrentUser } from '$lib/supabase/client';
 	import { onMount } from 'svelte';
-	import { getModuleById } from '$lib/supabase/client';
 
 	// Dynamic breadcrumb generation
 	let breadcrumbs = [];
-	let moduleData = null;
 	let loading = true;
+	let currentUser = null;
 
 	// Mapping of path segments to display names
 	const pathDisplayNames = {
 		modules: 'Modules',
 		units: 'Units',
-		guidebook: 'Guidebook',
-		rwp: 'RWP',
-		login: 'Login',
-		profile: 'Profile'
+		rwp: 'Relevant World Practice',
+		resource: 'Resources',
+		'more-info': 'More Information',
+		'time-dates': 'Time & Dates'
 	};
+
+	// Check if user is logged in
+	async function checkUserLoggedIn() {
+		try {
+			currentUser = await getCurrentUser();
+			return !!currentUser;
+		} catch (error) {
+			console.error('Error checking authentication:', error);
+			return false;
+		}
+	}
+
+	onMount(async () => {
+		await checkUserLoggedIn();
+	});
 
 	// Create breadcrumbs based on current path
 	async function generateBreadcrumbs(pathname) {
 		const paths = pathname.split('/').filter(Boolean);
-		let currentPath = '';
 		loading = true;
 
 		// Always start with Home
 		breadcrumbs = [{ name: 'Home', path: '/', last: paths.length === 0 }];
 
-		// Handle special case for module pages
-		if (paths[0] === 'modules' && paths.length > 1 && !isNaN(paths[1])) {
-			// Fetch module title from the database
-			const moduleId = paths[1];
-			try {
-				moduleData = await getModuleById(moduleId);
-			} catch (err) {
-				console.error('Error fetching module data:', err);
-			}
-		}
-
-		// Add path segments as breadcrumbs
-		for (let i = 0; i < paths.length; i++) {
-			const segment = paths[i];
-			currentPath += `/${segment}`;
-
-			let name = pathDisplayNames[segment] || segment;
-			let path = currentPath;
-
-			// Handle module IDs - use data from the database if available
-			if (paths[0] === 'modules' && i === 1 && !isNaN(segment) && moduleData) {
-				name = moduleData.title;
+		try {
+			// Route: /modules
+			if (paths[0] === 'modules' && paths.length === 1) {
+				breadcrumbs.push({ name: 'Modules', path: '/modules', last: true });
+				loading = false;
+				return;
 			}
 
-			// Handle unit IDs - these require a different approach
-			if (paths[0] === 'modules' && paths[2] === 'units' && i === 3 && !isNaN(segment)) {
-				// Could fetch unit title from database here if needed
-				name = `Unit ${segment}`;
+			// Route: /modules/:id
+			if (paths[0] === 'modules' && paths.length === 2 && !isNaN(paths[1])) {
+				const moduleId = paths[1];
+				const moduleData = await getModuleById(moduleId);
+
+				breadcrumbs.push({ name: 'Modules', path: '/modules', last: false });
+				breadcrumbs.push({
+					name: moduleData ? moduleData.title : `Module ${moduleId}`,
+					path: `/modules/${moduleId}`,
+					last: true
+				});
+				loading = false;
+				return;
 			}
 
-			breadcrumbs.push({
-				name,
-				path,
-				last: i === paths.length - 1
-			});
+			// Route: /units/:id
+			if (paths[0] === 'units' && paths.length === 2 && !isNaN(paths[1])) {
+				const unitId = paths[1];
+				const unitData = await getUnitBasicInfo(unitId);
+
+				if (unitData && unitData.module_id) {
+					const moduleData = await getModuleById(unitData.module_id);
+
+					breadcrumbs.push({ name: 'Modules', path: '/modules', last: false });
+
+					if (moduleData) {
+						breadcrumbs.push({
+							name: moduleData.title,
+							path: `/modules/${moduleData.id}`,
+							last: false
+						});
+					}
+				}
+
+				breadcrumbs.push({
+					name: unitData ? `Unit ${unitData.order_num}` : `Unit ${unitId}`,
+					path: `/units/${unitId}`,
+					last: true
+				});
+				loading = false;
+				return;
+			}
+
+			// Route: /rwp
+			if (paths[0] === 'rwp' && paths.length === 1) {
+				breadcrumbs.push({ name: 'Relevant World Practice', path: '/rwp', last: true });
+				loading = false;
+				return;
+			}
+
+			// Route: /rwp/:unitId
+			if (paths[0] === 'rwp' && paths.length === 2 && !isNaN(paths[1])) {
+				const unitId = paths[1];
+				const isLoggedIn = await checkUserLoggedIn();
+				const unitData = await getUnitBasicInfo(unitId);
+
+				if (isLoggedIn) {
+					// If logged in: Home > Modules > Module X > Unit Y > RWP
+					if (unitData && unitData.module_id) {
+						const moduleData = await getModuleById(unitData.module_id);
+
+						breadcrumbs.push({ name: 'Modules', path: '/modules', last: false });
+
+						if (moduleData) {
+							breadcrumbs.push({
+								name: moduleData.title,
+								path: `/modules/${moduleData.id}`,
+								last: false
+							});
+						}
+
+						breadcrumbs.push({
+							name: unitData ? `Unit ${unitData.order_num}` : `Unit ${unitId}`,
+							path: `/units/${unitId}`,
+							last: false
+						});
+					}
+
+					breadcrumbs.push({
+						name: 'RWP Practice',
+						path: `/rwp/${unitId}`,
+						last: true
+					});
+				} else {
+					// If not logged in: Home > RWP > Unit Example
+					breadcrumbs.push({ name: 'Relevant World Practice', path: '/rwp', last: false });
+					breadcrumbs.push({
+						name: unitData ? `Unit ${unitData.order_num} Example` : `Unit ${unitId} Example`,
+						path: `/rwp/${unitId}`,
+						last: true
+					});
+				}
+				loading = false;
+				return;
+			}
+
+			// Route: /resource
+			if (paths[0] === 'resource' && paths.length === 1) {
+				breadcrumbs.push({ name: 'Resources', path: '/resource', last: true });
+				loading = false;
+				return;
+			}
+
+			// Route: /resource/:id
+			if (paths[0] === 'resource' && paths.length === 2) {
+				// Convert kebab-case to Title Case for nicer display
+				const resourceName =
+					pathDisplayNames[paths[1]] ||
+					paths[1]
+						.split('-')
+						.map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+						.join(' ');
+
+				breadcrumbs.push({ name: 'Resources', path: '/resource', last: false });
+				breadcrumbs.push({ name: resourceName, path: `/${paths[0]}/${paths[1]}`, last: true });
+				loading = false;
+				return;
+			}
+
+			// Fallback for unhandled routes
+			let currentPath = '';
+			for (let i = 0; i < paths.length; i++) {
+				const segment = paths[i];
+				currentPath += `/${segment}`;
+
+				let name =
+					pathDisplayNames[segment] ||
+					segment
+						.split('-')
+						.map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+						.join(' ');
+
+				breadcrumbs.push({
+					name,
+					path: currentPath,
+					last: i === paths.length - 1
+				});
+			}
+		} catch (err) {
+			console.error('Error generating breadcrumbs:', err);
+
+			// Fallback on error
+			let currentPath = '';
+			for (let i = 0; i < paths.length; i++) {
+				const segment = paths[i];
+				currentPath += `/${segment}`;
+
+				breadcrumbs.push({
+					name: pathDisplayNames[segment] || segment,
+					path: currentPath,
+					last: i === paths.length - 1
+				});
+			}
 		}
 
 		loading = false;
