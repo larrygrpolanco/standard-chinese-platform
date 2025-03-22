@@ -38,7 +38,7 @@
 				alert('Check your email to confirm your account');
 			} else {
 				await signIn(email, password);
-				goto('/'); // Redirect to home after login
+				goto('/login/profile'); // Redirect to profile after login
 			}
 		} catch (e) {
 			console.error('Auth error:', e);
@@ -120,6 +120,7 @@
 		justify-content: center;
 		align-items: center;
 		width: 100%;
+        margin-bottom: 2rem;
 	}
 
 	.auth-form {

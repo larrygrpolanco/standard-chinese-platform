@@ -6,10 +6,10 @@
 	import { goto } from '$app/navigation';
 
 	onMount(() => {
-		// If user is already logged in, redirect to home
+		// If user is already logged in, redirect to profile
 		const unsubscribe = authStore.subscribe((user) => {
 			if (user) {
-				goto('/');
+				goto('/login/profile');
 			}
 		});
 

@@ -1,15 +1,43 @@
-// src/routes/protected/+layout.js
-import { redirect } from '@sveltejs/kit';
-import { getCurrentUser } from '$lib/supabase/client';
+// async function checkRWPAccess(userId, unitId) {
+// 	// Check if user has paid subscription
+// 	const { data: subscription } = await supabase
+// 		.from('subscriptions')
+// 		.select('*')
+// 		.eq('user_id', userId)
+// 		.single();
 
-export async function load({ url }) {
-	const user = await getCurrentUser();
+// 	if (subscription?.status === 'active') return true;
 
-	if (!user) {
-		throw redirect(303, `/login?redirectTo=${url.pathname}`);
-	}
+// 	// Check if user has used their free daily generation
+// 	const today = new Date().toISOString().split('T')[0]; // Get today's date
 
-	return {
-		user
-	};
-}
+// 	const { count } = await supabase
+// 		.from('rwp_content')
+// 		.select('id', { count: 'exact' })
+// 		.eq('user_id', userId)
+// 		.gte('created_at', today);
+
+// 	return count === 0; // Allow if they haven't used their free generation today
+// }
+
+// async function checkRWPAccess(userId, unitId) {
+// 	// Check if user has paid subscription
+// 	const { data: subscription } = await supabase
+// 		.from('subscriptions')
+// 		.select('*')
+// 		.eq('user_id', userId)
+// 		.single();
+
+// 	if (subscription?.status === 'active') return true;
+
+// 	// Check if user has used their free daily generation
+// 	const today = new Date().toISOString().split('T')[0]; // Get today's date
+
+// 	const { count } = await supabase
+// 		.from('rwp_content')
+// 		.select('id', { count: 'exact' })
+// 		.eq('user_id', userId)
+// 		.gte('created_at', today);
+
+// 	return count === 0; // Allow if they haven't used their free generation today
+// }
