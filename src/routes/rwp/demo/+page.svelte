@@ -27,7 +27,7 @@
 	// Demo user profile state
 	let fullName = 'Dracula';
 	let learningLevel = 'beginner';
-	let learningGoals = 'be able to order blood sausage at the night market';
+	let learningGoals = 'buy blood sausage at the night market';
 
 	// Personal context state variables
 	let occupation = 'Not a Vampire Lord';
