@@ -8,6 +8,16 @@
 	export let duration = 3000;
 	export let visible = false;
 
+	let timer;
+
+	// React to changes in the visible prop
+	$: if (visible && duration > 0) {
+		clearTimeout(timer);
+		timer = setTimeout(() => {
+			visible = false;
+		}, duration);
+	}
+
 	onMount(() => {
 		if (visible && duration > 0) {
 			const timer = setTimeout(() => {

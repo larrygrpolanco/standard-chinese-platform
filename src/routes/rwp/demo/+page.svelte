@@ -1,19 +1,13 @@
-<!-- src/routes/rwp/[unit_id]/+page.svelte -->
+<!-- src/routes/rwp/demo/+page.svelte -->
 <script>
-	import { page } from '$app/stores';
 	import { onMount } from 'svelte';
 	import { slide } from 'svelte/transition';
 	import {
 		getUnitBasicInfo,
-		getUserPreferences,
-		saveUserPreferences,
-		getRwpContent,
-		getUnitVocabularyData
+		getUnitVocabularyData,
+		getCompleteUnit
 	} from '$lib/supabase/client.js';
-	import { generateRwpExercise } from '$lib/rwp/rwpGenerator.js';
 	import Loader from '$lib/components/UI/Loader.svelte';
-	import ModuleQuestions from '$lib/components/ModuleQuestions.svelte';
-	import { authStore } from '$lib/stores/authStore';
 	import Toast from '$lib/components/UI/Toast.svelte';
 	import ComprehensionExercise from '$lib/components/rwp/ComprehensionExercise.svelte';
 	import TapeConstruction from '$lib/components/UI/TapeConstruction.svelte';
@@ -22,31 +16,36 @@
 	let loading = true;
 	let generating = false;
 	let unitData = null;
-	let userPreferences = null;
 	let rwpContent = null;
 	let specificFocus = '';
 	let showAnswers = false;
 	let error = null;
-	let user;
 	let unitVocabulary = [];
 	let generationPhase = 'init';
-	let debug = true; // Set to false by default, developers can enable in UI
+	let debug = true;
 
-	// Collapsible panel state - only for context panel
-	let contextPanelOpen = true; // Open by default for first-time users
-	let generatorPanelOpen = true; // Open by default
+	// Demo user profile state
+	let fullName = 'Dracula';
+	let learningLevel = 'beginner';
+	let learningGoals = 'be able to order blood sausage at the night market';
+
+	// Personal context state variables
+	let occupation = 'Not a Vampire Lord';
+	let location = 'Transylvania';
+	let hobbies = 'midnight beach walks, bat watching';
+	let reasonLearning = 'planning a trip to Taiwan for their famous night markets';
+
+	// Collapsible panel states
+	let profilePanelOpen = true;
+	let contextPanelOpen = false;
+	let generatorPanelOpen = false;
 
 	// Toast state
 	let toastVisible = false;
 	let toastMessage = '';
 
-	// Get unit ID from URL parameter
-	const unitId = parseInt($page.params.unit_id);
-
-	// Subscribe to auth store
-	authStore.subscribe((value) => {
-		user = value;
-	});
+	// Hardcoded unit ID for Module 3, Unit 2
+	const unitId = 32;
 
 	onMount(async () => {
 		loading = true;
@@ -58,29 +57,6 @@
 			if (!unitData) {
 				error = 'Unit not found';
 				return;
-			}
-
-			if (user) {
-				// Load user preferences
-				userPreferences = await getUserPreferences();
-
-				// Initialize empty preferences if needed
-				if (!userPreferences) {
-					userPreferences = {
-						personal_context: {},
-						module_responses: {}
-					};
-				}
-
-				// Load existing RWP content
-				const rwpData = await getRwpContent(unitId);
-				if (rwpData) {
-					console.log('Loaded existing RWP content');
-					rwpContent = rwpData.content;
-
-					// Close context panel if user already has content
-					contextPanelOpen = false;
-				}
 			}
 
 			const vocabData = await getUnitVocabularyData(unitId);
@@ -102,43 +78,114 @@
 		}, 3000);
 	}
 
-	// Save module responses
-	async function saveModuleResponses(event) {
-		try {
-			const updatedResponses = event.detail;
-
-			// Update preferences in database
-			await saveUserPreferences({
-				...userPreferences,
-				module_responses: updatedResponses
-			});
-
-			// Update local state
-			userPreferences.module_responses = updatedResponses;
-			showToast('Your responses have been saved!');
-		} catch (err) {
-			console.error('Error saving responses:', err);
-			showToast('Failed to save your responses');
-		}
-	}
-
 	// Generate a new exercise
 	async function generateExercise() {
-		if (!user) {
-			window.location.href = `/login?redirect=/rwp/${unitId}`;
-			return;
-		}
-
 		generating = true;
-		generationPhase = 'init'; // Reset to initial phase
+		generationPhase = 'init';
 		showAnswers = false;
 		error = null;
 
 		try {
-			// Pass the progress callback to track generation phases
-			rwpContent = await generateRwpExercise(unitId, specificFocus, debug, (phase) => {
-				generationPhase = phase;
+			// Build the user profile from form inputs with personal context
+			const userProfile = {
+				full_name: fullName || 'Demo User',
+				learning_level: learningLevel,
+				learning_goals: learningGoals || 'Learning Chinese',
+				personal_context: {
+					occupation: occupation || 'not specified',
+					location: location || 'not specified',
+					hobbies: hobbies || 'not specified',
+					reason_learning: reasonLearning || 'not specified'
+				},
+				// Empty module responses - keeping structure but not using
+				module_responses: { 3: {} }
+			};
+
+			console.log('User profile being sent:', userProfile);
+
+			// Get complete unit data
+			const completeUnitData = await getCompleteUnit(unitId);
+
+			// PHASE 1: Generate the story
+			generationPhase = 'story';
+			console.log('Generating story...');
+			const storyResponse = await fetch('/api/rwp/create-story', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
+					unitData: completeUnitData,
+					userProfile,
+					specificFocus,
+					debug
+				})
 			});
+
+			if (!storyResponse.ok) {
+				const errorData = await storyResponse.json();
+				throw new Error(errorData.error || 'Error generating story');
+			}
+
+			const storyData = await storyResponse.json();
+			const story = storyData.story;
+
+			// Log the full story text
+			console.log('=== GENERATED STORY ===');
+			console.log(story);
+
+			// PHASE 2: Generate questions based on the story
+			generationPhase = 'questions';
+			console.log('Generating questions...');
+			const questionsResponse = await fetch('/api/rwp/create-questions', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
+					story,
+					unitData: completeUnitData,
+					userProfile,
+					specificFocus,
+					debug
+				})
+			});
+
+			if (!questionsResponse.ok) {
+				const errorData = await questionsResponse.json();
+				throw new Error(errorData.error || 'Error generating questions');
+			}
+
+			const questionsData = await questionsResponse.json();
+			const questions = questionsData.questions;
+
+			// Log the full questions text
+			console.log('=== GENERATED QUESTIONS ===');
+			console.log(questions);
+
+			// PHASE 3: Format everything into JSON structure
+			generationPhase = 'formatting';
+			console.log('Formatting exercise...');
+			const formatResponse = await fetch('/api/rwp/format-exercise', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
+					story,
+					questions,
+					unitData: completeUnitData,
+					debug
+				})
+			});
+
+			if (!formatResponse.ok) {
+				const errorData = await formatResponse.json();
+				throw new Error(errorData.error || 'Error formatting exercise');
+			}
+
+			// Get formatted data
+			const formatData = await formatResponse.json();
+			rwpContent = debug ? formatData.parsed : formatData;
+
+			// Log the formatted output
+			console.log('=== FORMATTED OUTPUT ===');
+			console.log(formatData);
+
 			showToast('Practice exercise generated successfully!');
 		} catch (err) {
 			console.error('Error generating exercise:', err);
@@ -149,7 +196,11 @@
 		}
 	}
 
-	// Toggle context panel
+	// Toggle panels
+	function toggleProfilePanel() {
+		profilePanelOpen = !profilePanelOpen;
+	}
+
 	function toggleContextPanel() {
 		contextPanelOpen = !contextPanelOpen;
 	}
@@ -160,7 +211,7 @@
 </script>
 
 <svelte:head>
-	<title>{unitData ? `RWP: ${unitData.title}` : 'Practice'} | Taped Chinese</title>
+	<title>Demo: Personalized Practice | Taped Chinese</title>
 </svelte:head>
 
 <div class="page-wrapper">
@@ -207,7 +258,8 @@
 				</div>
 
 				<p class="page-description">
-					Apply what you've learned with content that connects to your personal context.
+					This is a demo of the personalized practice feature. Try it out by filling out the
+					learning profile and contexts
 				</p>
 			</header>
 
@@ -216,121 +268,203 @@
 				<div class="practice-layout">
 					<!-- Sidebar -->
 					<div class="sidebar">
-						{#if user}
-							<!-- Context Panel -->
-							<div class="vintage-panel">
-								<button class="panel-toggle" on:click={toggleContextPanel}>
-									<div class="toggle-header">
-										<h3 class="panel-title">Step 1: Your Learning Context</h3>
-										<p class="panel-subtitle">
-											Tell us about yourself to personalize your practice
-										</p>
-									</div>
-									<div class="fader-icon {contextPanelOpen ? 'open' : ''}"></div>
-								</button>
-
-								{#if contextPanelOpen}
-									<div class="panel-content" transition:slide={{ duration: 300 }}>
-										{#if userPreferences}
-											<ModuleQuestions
-												moduleId={unitData.module.id}
-												moduleResponses={userPreferences.module_responses}
-												on:save={saveModuleResponses}
-											/>
-										{/if}
-									</div>
-								{/if}
-							</div>
-
-							<!-- Generator Panel -->
-							<div class="vintage-panel">
-								<button class="panel-toggle" on:click={toggleGeneratorPanel}>
-									<div class="toggle-header">
-										<h3 class="panel-title">Step 2: Generate Practice</h3>
-										<p class="panel-subtitle">Create a personalized exercise for this unit</p>
-									</div>
-									<div class="fader-icon {generatorPanelOpen ? 'open' : ''}"></div>
-								</button>
-
-								{#if generatorPanelOpen}
-									<div class="panel-content" transition:slide={{ duration: 300 }}>
-										<!-- Specific Focus Input -->
-										<div class="form-group">
-											<label for="specific-focus" class="form-label">
-												And... <span class="optional-text">(optional)</span>
-											</label>
-											<input
-												id="specific-focus"
-												type="text"
-												bind:value={specificFocus}
-												placeholder="Add anything you want to practice or include"
-												class="vintage-input"
-											/>
-											<p class="input-hint">Specific grammar, vocabulary, situations, etc.</p>
-										</div>
-
-										<!-- Debug toggle (for developers) -->
-										<!-- <div class="form-group checkbox-group">
-											<label class="vintage-checkbox">
-												<input type="checkbox" bind:checked={debug} hidden />
-												<span class="checkbox-custom"></span>
-												<span class="checkbox-label">Debug Mode</span>
-											</label>
-										</div> -->
-
-										<!-- Generate Button -->
-										<button
-											class="generate-button {generating ? 'generating' : ''}"
-											on:click={generateExercise}
-											disabled={generating}
-										>
-											<div class="button-content">
-												{#if generating}
-													<div class="tape-spinner"></div>
-													<span>Creating your practice...</span>
-												{:else if rwpContent}
-													<svg class="button-icon" viewBox="0 0 24 24">
-														<path
-															d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-															stroke="currentColor"
-															stroke-width="2"
-														/>
-													</svg>
-													<span>Regenerate Practice</span>
-												{:else}
-													<svg class="button-icon" viewBox="0 0 24 24">
-														<path d="M19 12H5M12 19V5" stroke="currentColor" stroke-width="2" />
-													</svg>
-													<span>Create Practice</span>
-												{/if}
-											</div>
-										</button>
-									</div>
-								{/if}
-							</div>
-						{:else}
-							<!-- Sign-in prompt -->
-							<div class="vintage-panel">
-								<div class="panel-content signup-prompt">
-									<div class="tape-icon">
-										<svg viewBox="0 0 24 24" class="cassette-icon">
-											<rect x="2" y="6" width="20" height="12" rx="2" />
-											<circle cx="8" cy="12" r="2" />
-											<circle cx="16" cy="12" r="2" />
-											<path d="M8 12h8" />
-										</svg>
-									</div>
-									<h3 class="prompt-title">Create Your Personal Language Practice</h3>
-									<p class="prompt-text">
-										Sign in to save your preferences and generate exercises tailored to your
-										learning style and interests.
-									</p>
-									<a href="/login?redirect=/rwp/{unitId}" class="vintage-button full-width">
-										<span class="button-text">Sign In or Create Account</span>
-									</a>
+						<!-- Profile Panel (Demo-specific) -->
+						<div class="vintage-panel">
+							<button class="panel-toggle" on:click={toggleProfilePanel}>
+								<div class="toggle-header">
+									<h3 class="panel-title">Step 1: Your Learning Profile</h3>
+									<p class="panel-subtitle">Tell us about yourself to personalize your practice</p>
 								</div>
-							</div>
-						{/if}
+								<div class="fader-icon {profilePanelOpen ? 'open' : ''}"></div>
+							</button>
+
+							{#if profilePanelOpen}
+								<div class="panel-content" transition:slide={{ duration: 300 }}>
+									<div class="question-card">
+										<label for="fullName" class="question-label">Name</label>
+										<div class="input-wrapper">
+											<input
+												type="text"
+												id="fullName"
+												bind:value={fullName}
+												class="question-input"
+												maxlength="50"
+												placeholder="Your name (or preferred name)"
+											/>
+										</div>
+									</div>
+
+									<div class="question-card">
+										<label for="learningLevel" class="question-label">Your Chinese Level</label>
+										<div class="input-wrapper">
+											<select id="learningLevel" bind:value={learningLevel} class="question-input">
+												<option value="beginner">Beginner</option>
+												<option value="intermediate">Intermediate</option>
+												<option value="advanced">Advanced</option>
+											</select>
+										</div>
+									</div>
+
+									<div class="question-card">
+										<label for="learningGoals" class="question-label">Learning Goals</label>
+										<div class="input-wrapper">
+											<textarea
+												id="learningGoals"
+												bind:value={learningGoals}
+												class="question-input"
+												maxlength="250"
+												placeholder="What do you hope to achieve by learning Chinese? What topics are you most interested in learning?"
+												rows="4"
+											></textarea>
+											<div class="char-count">
+												{learningGoals.length}/250
+											</div>
+										</div>
+									</div>
+								</div>
+							{/if}
+						</div>
+
+						<!-- Context Panel - Now with Personal Context Questions -->
+						<div class="vintage-panel">
+							<button class="panel-toggle" on:click={toggleContextPanel}>
+								<div class="toggle-header">
+									<h3 class="panel-title">Step 2: Your Personal Context</h3>
+									<p class="panel-subtitle">Help us understand more about you</p>
+								</div>
+								<div class="fader-icon {contextPanelOpen ? 'open' : ''}"></div>
+							</button>
+
+							{#if contextPanelOpen}
+								<div class="panel-content" transition:slide={{ duration: 300 }}>
+									<!-- Occupation -->
+									<div class="question-card">
+										<label for="occupation" class="question-label">Occupation</label>
+										<div class="input-wrapper">
+											<input
+												type="text"
+												id="occupation"
+												bind:value={occupation}
+												class="question-input"
+												maxlength="100"
+												placeholder="What do you do? (job, student, etc.)"
+											/>
+										</div>
+									</div>
+
+									<!-- Location -->
+									<div class="question-card">
+										<label for="location" class="question-label">Where you live</label>
+										<div class="input-wrapper">
+											<input
+												type="text"
+												id="location"
+												bind:value={location}
+												class="question-input"
+												maxlength="100"
+												placeholder="City, country or region"
+											/>
+										</div>
+									</div>
+
+									<!-- Hobbies -->
+									<div class="question-card">
+										<label for="hobbies" class="question-label">Hobbies & Interests</label>
+										<div class="input-wrapper">
+											<textarea
+												id="hobbies"
+												bind:value={hobbies}
+												class="question-input"
+												maxlength="200"
+												placeholder="What do you enjoy doing in your free time?"
+												rows="3"
+											></textarea>
+											<div class="char-count">
+												{hobbies.length}/200
+											</div>
+										</div>
+									</div>
+
+									<!-- Reason for Learning -->
+									<div class="question-card">
+										<label for="reasonLearning" class="question-label">
+											Why are you learning Chinese?
+										</label>
+										<div class="input-wrapper">
+											<textarea
+												id="reasonLearning"
+												bind:value={reasonLearning}
+												class="question-input"
+												maxlength="200"
+												placeholder="Travel plans? Business? Interest in the culture?"
+												rows="3"
+											></textarea>
+											<div class="char-count">
+												{reasonLearning.length}/200
+											</div>
+										</div>
+									</div>
+								</div>
+							{/if}
+						</div>
+
+						<!-- Generator Panel -->
+						<div class="vintage-panel">
+							<button class="panel-toggle" on:click={toggleGeneratorPanel}>
+								<div class="toggle-header">
+									<h3 class="panel-title">Step 3: Generate Practice</h3>
+									<p class="panel-subtitle">Create a personalized exercise for this unit</p>
+								</div>
+								<div class="fader-icon {generatorPanelOpen ? 'open' : ''}"></div>
+							</button>
+
+							{#if generatorPanelOpen}
+								<div class="panel-content" transition:slide={{ duration: 300 }}>
+									<!-- Specific Focus Input -->
+									<div class="form-group">
+										<label for="specific-focus" class="form-label">
+											And... <span class="optional-text">(optional)</span>
+										</label>
+										<input
+											id="specific-focus"
+											type="text"
+											bind:value={specificFocus}
+											placeholder="Add anything you want to practice or include"
+											class="vintage-input"
+										/>
+										<p class="input-hint">Specific grammar, vocabulary, situations, etc.</p>
+									</div>
+
+									<!-- Generate Button -->
+									<button
+										class="generate-button {generating ? 'generating' : ''}"
+										on:click={generateExercise}
+										disabled={generating}
+									>
+										<div class="button-content">
+											{#if generating}
+												<div class="tape-spinner"></div>
+												<span>Creating your practice...</span>
+											{:else if rwpContent}
+												<svg class="button-icon" viewBox="0 0 24 24">
+													<path
+														d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+														stroke="currentColor"
+														stroke-width="2"
+													/>
+												</svg>
+												<span>Regenerate Practice</span>
+											{:else}
+												<svg class="button-icon" viewBox="0 0 24 24">
+													<path d="M19 12H5M12 19V5" stroke="currentColor" stroke-width="2" />
+												</svg>
+												<span>Create Practice</span>
+											{/if}
+										</div>
+									</button>
+								</div>
+							{/if}
+						</div>
 					</div>
 
 					<!-- Main Content Area -->
@@ -395,32 +529,26 @@
 								</div>
 								<h3 class="empty-state-title">Ready to Practice?</h3>
 								<p class="empty-state-text">
-									Generate a personalized exercise based on what you've learned in this unit. It
-									will be tailored to your interests and learning goals.
+									This demo lets you generate a personalized exercise based on your responses. Try
+									it without creating an account!
 								</p>
-								{#if user}
-									<button
-										class="generate-button large {generating ? 'generating' : ''}"
-										on:click={generateExercise}
-										disabled={generating}
-									>
-										<div class="button-content">
-											{#if generating}
-												<div class="tape-spinner"></div>
-												<span>Creating your practice...</span>
-											{:else}
-												<svg class="button-icon" viewBox="0 0 24 24">
-													<path d="M19 12H5M12 19V5" stroke="currentColor" stroke-width="2" />
-												</svg>
-												<span>Create Practice Exercise</span>
-											{/if}
-										</div>
-									</button>
-								{:else}
-									<a href="/login?redirect=/rwp/{unitId}" class="vintage-button large">
-										<span class="button-text">Sign In to Create Practice</span>
-									</a>
-								{/if}
+								<button
+									class="generate-button large {generating ? 'generating' : ''}"
+									on:click={generateExercise}
+									disabled={generating}
+								>
+									<div class="button-content">
+										{#if generating}
+											<div class="tape-spinner"></div>
+											<span>Creating your practice...</span>
+										{:else}
+											<svg class="button-icon" viewBox="0 0 24 24">
+												<path d="M19 12H5M12 19V5" stroke="currentColor" stroke-width="2" />
+											</svg>
+											<span>Create Practice Exercise</span>
+										{/if}
+									</div>
+								</button>
 							</div>
 						{/if}
 					</div>
@@ -531,6 +659,13 @@
 		color: #33312e;
 	}
 
+	.module-title {
+		font-size: 1rem;
+		font-weight: 500;
+		color: #a0998a;
+		font-style: italic;
+	}
+
 	.module-info {
 		display: flex;
 		align-items: center;
@@ -544,10 +679,7 @@
 	}
 
 	.module-title {
-		font-size: 1rem;
-		font-weight: 500;
-		color: #a0998a;
-		font-style: italic;
+		color: var(--color-warm-gray, #a0998a);
 	}
 
 	.page-description {
@@ -579,7 +711,7 @@
 	.sidebar {
 		display: flex;
 		flex-direction: column;
-		gap: 1.5rem;
+		/* gap: .5rem; */
 	}
 
 	/* Vintage panel styling */
@@ -728,43 +860,6 @@
 		color: var(--color-warm-gray, #a0998a);
 	}
 
-	/* Checkbox styling */
-	.checkbox-group {
-		margin-bottom: 1.5rem;
-	}
-
-	.vintage-checkbox {
-		display: flex;
-		align-items: center;
-		cursor: pointer;
-	}
-
-	.checkbox-custom {
-		position: relative;
-		width: 18px;
-		height: 18px;
-		border: 1px solid var(--color-warm-gray, #a0998a);
-		border-radius: 3px;
-		background-color: var(--color-cream-paper, #f4f1de);
-		margin-right: 0.5rem;
-	}
-
-	.vintage-checkbox input:checked + .checkbox-custom::after {
-		content: '';
-		position: absolute;
-		top: 3px;
-		left: 3px;
-		width: 10px;
-		height: 10px;
-		background-color: var(--color-navy, #34667f);
-		border-radius: 1px;
-	}
-
-	.checkbox-label {
-		font-size: 0.875rem;
-		color: var(--color-charcoal, #33312e);
-	}
-
 	/* Generate button styling */
 	.generate-button {
 		position: relative;
@@ -831,49 +926,6 @@
 		to {
 			transform: rotate(360deg);
 		}
-	}
-
-	/* Sign-up prompt styling */
-	.signup-prompt {
-		text-align: center;
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		padding: 1.5rem;
-	}
-
-	.tape-icon {
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		width: 60px;
-		height: 60px;
-		background-color: var(--color-gold, #ddb967);
-		border-radius: 50%;
-		margin-bottom: 1rem;
-		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-	}
-
-	.cassette-icon {
-		width: 32px;
-		height: 32px;
-		color: var(--color-charcoal, #33312e);
-		stroke-width: 1.5;
-	}
-
-	.prompt-title {
-		font-family: 'Arvo', 'DM Serif Display', serif;
-		font-size: 1.125rem;
-		color: var(--color-charcoal, #33312e);
-		margin-top: 0;
-		margin-bottom: 0.75rem;
-	}
-
-	.prompt-text {
-		color: var(--color-warm-gray, #a0998a);
-		font-size: 0.875rem;
-		margin-bottom: 1.25rem;
-		line-height: 1.5;
 	}
 
 	/* ===== MAIN CONTENT STYLES ===== */
@@ -1022,11 +1074,6 @@
 		transform: translateY(0);
 	}
 
-	.vintage-button.large {
-		padding: 1rem 1.5rem;
-		font-size: 1rem;
-	}
-
 	.vintage-button::before {
 		content: '';
 		position: absolute;
@@ -1056,8 +1103,105 @@
 		box-shadow: 0 0 0 0 var(--color-button-shadow, #826d5b);
 	}
 
-	.full-width {
+	.char-count {
+		position: absolute;
+		right: 0.5rem;
+		bottom: 0.5rem;
+		font-size: 0.75rem;
+		font-family: 'Courier New', monospace;
+		color: var(--color-warm-gray, #a0998a);
+		background-color: rgba(255, 255, 255, 0.8);
+		padding: 0.125rem 0.375rem;
+		border-radius: 3px;
+	}
+
+	.vintage-button {
+		position: relative;
+		align-self: flex-end;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		background-color: var(--color-terracotta, #c17c74);
+		color: white;
+		border: none;
+		border-radius: 24px;
+		padding: 0.625rem 1.25rem;
+		font-weight: 600;
+		font-size: 0.875rem;
+		cursor: pointer;
+		transition: all 0.2s;
+		box-shadow: 0 3px 0 var(--color-terracotta-hover, #ad6c66);
+		transform: translateY(0);
+	}
+
+	.vintage-button:hover {
+		transform: translateY(-1px);
+		box-shadow: 0 4px 0 var(--color-terracotta-hover, #ad6c66);
+		background-color: #b06b64;
+	}
+
+	.vintage-button:active {
+		transform: translateY(3px);
+		box-shadow: 0 0 0 var(--color-terracotta-hover, #ad6c66);
+	}
+
+	.button-text {
+		position: relative;
+		z-index: 1;
+	}
+
+	.question-card {
+		background-color: var(--color-cream-paper, #f4f1de);
+		background-image: linear-gradient(to bottom, rgba(255, 255, 255, 0.2), rgba(0, 0, 0, 0.01));
+		border: 1px solid var(--color-warm-gray, #a0998a);
+		border-radius: 6px;
+		padding: 0.75rem;
+		margin-bottom: 1rem;
+	}
+
+	.question-label {
+		display: block;
+		font-weight: 500;
+		color: var(--color-charcoal, #33312e);
+		margin-bottom: 0.5rem;
+		font-size: 0.9375rem;
+	}
+
+	.input-wrapper {
+		position: relative;
+		background-color: white;
+		border: 1px solid var(--color-warm-gray, #a0998a);
+		border-radius: 4px;
+		box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
+		transition:
+			border-color 0.2s,
+			box-shadow 0.2s;
+	}
+
+	.input-wrapper:focus-within {
+		border-color: var(--color-gold, #ddb967);
+		box-shadow: 0 0 0 3px rgba(221, 185, 103, 0.2);
+	}
+
+	.question-input {
 		width: 100%;
+		padding: 0.625rem;
+		padding-right: 3.5rem; /* Space for character count */
+		background-color: transparent;
+		border: none;
+		font-family: inherit;
+		font-size: 0.875rem;
+		color: var(--color-charcoal, #33312e);
+		resize: vertical;
+	}
+
+	.question-input:focus {
+		outline: none;
+	}
+
+	.question-input::placeholder {
+		color: rgba(160, 152, 138, 0.6);
+		font-style: italic;
 	}
 
 	/* ===== RESPONSIVE ADJUSTMENTS ===== */

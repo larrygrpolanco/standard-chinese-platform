@@ -5,7 +5,7 @@ import { OPENAI_API_KEY } from '$env/static/private';
 export async function POST({ request }) {
 	try {
 		// Get request data
-		const { text, voice, language = 'zh' } = await request.json();
+		const { text, voice, language = 'zh', instructions = '' } = await request.json();
 
 		if (!text) {
 			return json({ error: 'Text is required' }, { status: 400 });
@@ -15,7 +15,7 @@ export async function POST({ request }) {
 			`Generating TTS: ${voice} voice, ${language} language, text length: ${text.length} chars`
 		);
 
-		// Generate audio with OpenAI API
+		// Generate audio with OpenAI API - UPDATED TO USE gpt-4o-mini-tts
 		const response = await fetch('https://api.openai.com/v1/audio/speech', {
 			method: 'POST',
 			headers: {
@@ -23,10 +23,11 @@ export async function POST({ request }) {
 				Authorization: `Bearer ${OPENAI_API_KEY}`
 			},
 			body: JSON.stringify({
-				model: 'tts-1',
+				model: 'gpt-4o-mini-tts',
 				voice: voice,
 				input: text,
-				response_format: 'mp3'
+				response_format: 'mp3',
+				instructions: instructions // Added support for instructions
 			})
 		});
 

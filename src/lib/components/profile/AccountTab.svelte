@@ -113,9 +113,6 @@
 </script>
 
 <div class="account-tab">
-	<div class="">
-		<button class="tape-button danger" on:click={() => dispatch('signOut')}> Sign Out </button>
-	</div>
 	<!-- I don't think it is doing much now I may edit this later -->
 	<!-- <section class="account-section">
 		<h2 class="section-title">Account Information</h2>
@@ -138,10 +135,10 @@
 	</section> -->
 
 	<section class="account-section">
-		<h2 class="section-title">Subscription </h2>
-        <div class="subscription-message">
-				RWP features completely free during this prototyping phase 
-			</div>
+		<h2 class="section-title">Subscription</h2>
+		<div class="subscription-message">
+			RWP features completely free during this prototyping phase
+		</div>
 		<div class="subscription-card">
 			<div class="sub-status">
 				<span class="sub-status-label">Current Plan:</span>
@@ -199,54 +196,61 @@
 	</section>
 
 	<section class="account-section">
-		<h2 class="section-title">Passoword Managment</h2>
+		<!-- <h2 class="section-title">Passoword Managment</h2> -->
+		<div class="flex-row gap-2 my-2">
+			<button class="tape-button danger" on:click={() => dispatch('signOut')}> Sign Out </button>
 
-		{#if !changePasswordVisible}
-			<button class="tape-button secondary" on:click={() => (changePasswordVisible = true)}>
-				Change Password
-			</button>
-		{:else}
-			<div class="password-form">
-				<div class="form-group">
-					<label for="newPassword">New Password</label>
-					<input
-						type="password"
-						id="newPassword"
-						class="form-input"
-						bind:value={newPassword}
-						placeholder="Enter new password"
-					/>
+			{#if !changePasswordVisible}
+				<button class="tape-button secondary" on:click={() => (changePasswordVisible = true)}>
+					Change Password
+				</button>
+			{:else}
+				<div class="password-form">
+					<div class="form-group">
+						<label for="newPassword">New Password</label>
+						<input
+							type="password"
+							id="newPassword"
+							class="form-input"
+							bind:value={newPassword}
+							placeholder="Enter new password"
+						/>
+					</div>
+
+					<div class="form-group">
+						<label for="confirmPassword">Confirm New Password</label>
+						<input
+							type="password"
+							id="confirmPassword"
+							class="form-input"
+							bind:value={confirmPassword}
+							placeholder="Confirm new password"
+						/>
+					</div>
+
+					{#if passwordError}
+						<div class="error-message">{passwordError}</div>
+					{/if}
+
+					<div class="form-actions">
+						<button
+							class="tape-button secondary"
+							on:click={cancelPasswordChange}
+							disabled={changing}
+						>
+							Cancel
+						</button>
+						<button
+							class="tape-button"
+							on:click={handleChangePassword}
+							disabled={changing || !newPassword || !confirmPassword}
+						>
+							{changing ? 'Changing...' : 'Save New Password'}
+						</button>
+					</div>
 				</div>
-
-				<div class="form-group">
-					<label for="confirmPassword">Confirm New Password</label>
-					<input
-						type="password"
-						id="confirmPassword"
-						class="form-input"
-						bind:value={confirmPassword}
-						placeholder="Confirm new password"
-					/>
-				</div>
-
-				{#if passwordError}
-					<div class="error-message">{passwordError}</div>
-				{/if}
-
-				<div class="form-actions">
-					<button class="tape-button secondary" on:click={cancelPasswordChange} disabled={changing}>
-						Cancel
-					</button>
-					<button
-						class="tape-button"
-						on:click={handleChangePassword}
-						disabled={changing || !newPassword || !confirmPassword}
-					>
-						{changing ? 'Changing...' : 'Save New Password'}
-					</button>
-				</div>
-			</div>
-		{/if}
+			{/if}
+		</div>
 	</section>
 
 	<section class="account-section danger-section">
@@ -291,7 +295,7 @@
 <style>
 	.account-tab {
 		padding: 1.5rem;
-		background-color: var(--color-cream-dark);
+		/* background-color: var(--color-cream-dark); */
 		box-shadow:
 			inset 0 1px 4px rgba(51, 49, 46, 0.15),
 			4px 4px 0 var(--color-shadow);

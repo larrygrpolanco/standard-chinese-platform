@@ -9,7 +9,7 @@ export async function POST({ request }) {
 			userProfile,
 			specificFocus,
 			apiProvider = 'deepseek',
-			debug = false
+			debug = true
 		} = await request.json();
 
 		if (!unitData) {
@@ -40,7 +40,7 @@ export async function POST({ request }) {
 
 		const { response, data } = await apiClient.fetchCompletion(messages, {
 			temperature: 0.8, // Higher temperature for more creative stories
-			model: 'gpt-4o-mini-2024-07-18' // Will be mapped to deepseek-chat if using DeepSeek
+			model: 'o3-mini-2025-01-31' // Will be mapped to deepseek-chat if using DeepSeek
 		});
 
 		if (!response.ok) {
@@ -118,6 +118,7 @@ Create a first-person narrative Chinese language practice story that:
 2. Authentically connects to the learner's personal context and interests
 3. Presents language in natural, practical situations
 4. Feels personally relevant and engaging to the learner
+5. Is comprehensible! Try to use as simple language as you can while only using harder vocabulary for words related to the learners interest. They are more likely to learn words that interest them.
 
 ## UNIT INFORMATION
 Unit Title: ${unitData.title}
@@ -131,11 +132,11 @@ Occupation: ${occupation}
 Location: ${location}
 Hobbies: ${hobbies}
 Reason for Learning: ${reasonLearning}
-Personal Preferences: 
+Personal Preferences and interests: 
 ${formattedResponses}
 
 ## CONTENT REQUIREMENTS
-### Core Vocabulary to Include
+### Vocabulary to Include
 ${formattedVocabulary}
 
 ### Key Grammatical Patterns to Practice
@@ -152,61 +153,57 @@ Specific Focus (if any): ${specificFocus || 'None specified'}
 Before writing the story, carefully analyze how to create a relevant, engaging narrative by completing the following analysis inside <story_planning> tags:
 
 1. **Learner Context Analysis**:
-   - Based on the profile, what aspects of this person's life would make language practice most relevant?
+   - Based on the profile, what aspects of this person's life would make a relevant language practice scenerio/story?
    - What real scenarios might they encounter where this unit's language would be useful?
    - What tone and style might resonate with this particular learner?
 
 2. **Core Language Pattern Identification**:
    - Identify 3-5 key grammatical structures from the dialogues (not just vocabulary)
    - Note how these patterns could be used in contexts relevant to the learner
+   - The vocabulary and formatted dialogues are more than 50 years old how can you make it more modern while keeping it easy?
 
 3. **Interest Integration Opportunities**:
-   - List 2-3 natural ways to incorporate the learner's specific interests as background elements
-   - Identify connections between the unit topic and the learner's life/interests
+   - List 3-4 natural ways to incorporate the learner's specific interests as background elements
+   - Identify 2-3 possible connections between the unit topic and the learner's life/interests
 
 4. **Setting & Scenario Design**:
-   - Create a realistic scenario set in the learner's location that would require using this unit's language
+   - Create an interesting scenario set in the learner's location that would require using this unit's language
    - Ensure the scenario aligns with their occupation, daily activities, or learning goals
 
-5. **Engagement Strategy**:
-   - Based on their profile, identify what would make this story particularly engaging for this learner
-   - Note how to incorporate decision-making or personal agency in the narrative
 
 ## STORY CREATION GUIDELINES
 
 After completing your analysis, write a first-person narrative story that:
 
 1. **Begins with authentic context**:
-   - Start from the learner's real-life situation (location, occupation)
-   - Establish a scenario where the language would naturally be used
+   - Start from the learner's life situation (location, occupation)
+   - Establish an interesting scenario where the language would naturally be used
+   - Show how the language connects to real-life situations and possibly their reason for learning if appropriate
 
 2. **Integrates language patterns naturally**:
-   - Incorporate the unit's language patterns in contextually appropriate ways
+   - Incorporate the unit's language patterns in contextually appropriate and more modern ways
    - Occasionally add metacognitive elements that highlight the language being practiced
 
 3. **Incorporates interests subtly**:
    - Weave in references to the learner's interests as background elements
-   - Use these references to enhance the story rather than forcing them into the main plot
+   - Use these references to enhance the story rather than forcing them into the main plot unless the plot can naturally center around it
 
 4. **Uses appropriate complexity**:
    - Match sentence structure to the specified learning level
-   - Ensure vocabulary beyond the unit list is appropriate to their level
+   - Ensure vocabulary beyond the unit list is easy to their level
+   
 
-5. **Creates practical relevance**:
-   - Show how the language connects to real-life situations they might encounter
-   - Demonstrate the practical utility of what they're learning
 
-After writing the Chinese story, provide an English translation.
+After writing the Chinese story, provide an simple English translation.
 
 ## QUALITY CHECKLIST
 Before submitting, verify the story meets these criteria:
 - [ ] Uses first-person perspective consistently
-- [ ] Set in the learner's actual location
-- [ ] References their true occupation or daily activities
-- [ ] Incorporates at least one specific interest from their profile
-- [ ] Uses all required vocabulary/grammar naturally in context
-- [ ] Maintains appropriate language level throughout
-- [ ] Includes elements of decision-making or personal agency
-- [ ] Feels like an authentic scenario, not a contrived exercise
+- [ ] Set around the learner's context and interests
+- [ ] References their reason for learning or personal prefrences
+- [ ] Incorporates at least one specific detail from their profile
+- [ ] Uses some required vocabulary/grammar naturally in context
+- [ ] Maintains appropriate easy language level throughout
+- [ ] Feels like an fun and engaging scenario, not just a contrived exercise
 `;
 }

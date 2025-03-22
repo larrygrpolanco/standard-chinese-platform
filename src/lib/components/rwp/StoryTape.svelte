@@ -9,18 +9,23 @@
 	export let storyText = ''; // Text to be converted to speech
 	export let storyTitle = ''; // For reference
 	export let language = 'zh'; // Default language (Chinese)
+	export let instructions = ''; // Optional instructions for speech style
 
 	// Cache settings
 	const MAX_CACHE_SIZE = 5 * 1024 * 1024; // 5MB max cache size
 	const MAX_CACHE_ENTRIES = 10; // Max number of cached audios
 
-	// OpenAI TTS voice options
+	// UPDATED: OpenAI TTS voice options for GPT-4o-mini-tts
 	const voices = [
 		{ id: 'alloy', name: 'Alloy' },
+		{ id: 'ash', name: 'Ash' },
+		{ id: 'ballad', name: 'Ballad' },
+		{ id: 'coral', name: 'Coral' },
 		{ id: 'echo', name: 'Echo' },
 		{ id: 'fable', name: 'Fable' },
 		{ id: 'onyx', name: 'Onyx' },
 		{ id: 'nova', name: 'Nova' },
+		{ id: 'sage', name: 'Sage' },
 		{ id: 'shimmer', name: 'Shimmer' }
 	];
 
@@ -29,13 +34,16 @@
 	let audioUrl = null;
 	let isLoading = false;
 	let error = null;
+	let showAdvancedOptions = false;
+	let customInstructions = instructions || '';
 
 	// Generate a unique cache key for this story/voice combination
-	$: cacheKey = `tts_${storyTitle.substring(0, 20)}_${selectedVoice}`
-		.replace(/\s+/g, '_')
-		.toLowerCase();
+	$: cacheKey =
+		`tts_${storyTitle.substring(0, 20)}_${selectedVoice}_${customInstructions.substring(0, 20)}`
+			.replace(/\s+/g, '_')
+			.toLowerCase();
 
-	// Cache management functions
+	// Cache management functions (keeping your existing functions)
 	function getSessionStorageSize() {
 		let total = 0;
 		for (let i = 0; i < sessionStorage.length; i++) {
@@ -111,7 +119,8 @@
 				body: JSON.stringify({
 					text: storyText,
 					voice: selectedVoice,
-					language: language
+					language: language,
+					instructions: customInstructions // Added instructions
 				})
 			});
 
@@ -215,31 +224,59 @@
 				<div class="audio-placeholder-container">
 					<p class="mb-3 text-sm">Hear this story read aloud in Chinese</p>
 
-					<button class="generate-button" on:click={generateSpeech}>
-						<svg
-							class="mr-2 h-5 w-5"
-							viewBox="0 0 24 24"
-							fill="none"
-							stroke="currentColor"
-							stroke-width="2"
-						>
-							<path d="M15.5 8.5a7 7 0 110 7m-9-7v7m0 0l3-3m-3 3l-3-3"></path>
-						</svg>
-						Create Audio
-					</button>
+					<div class="flex flex-col space-y-3">
+						<!-- Voice selector before button when no audio yet -->
+						<div class="voice-select-container">
+							<label for="voice-select-initial" class="text-warm-gray text-xs">Voice:</label>
+							<select
+								id="voice-select-initial"
+								class="voice-select border-warm-gray bg-cream-paper ml-2 rounded border p-1 text-xs"
+								bind:value={selectedVoice}
+							>
+								{#each voices as voice}
+									<option value={voice.id}>{voice.name}</option>
+								{/each}
+							</select>
+						</div>
 
-					<!-- Voice selector below button when no audio yet -->
-					<div class="voice-select-container mt-3">
-						<label for="voice-select-initial" class="text-warm-gray text-xs">Voice:</label>
-						<select
-							id="voice-select-initial"
-							class="voice-select border-warm-gray bg-cream-paper ml-2 rounded border p-1 text-xs"
-							bind:value={selectedVoice}
-						>
-							{#each voices as voice}
-								<option value={voice.id}>{voice.name}</option>
-							{/each}
-						</select>
+						<!-- Advanced options toggle -->
+						<div class="flex items-center">
+							<button
+								class="text-warm-gray text-xs underline"
+								on:click={() => (showAdvancedOptions = !showAdvancedOptions)}
+							>
+								{showAdvancedOptions ? 'Hide' : 'Show'} advanced options
+							</button>
+						</div>
+
+						<!-- Advanced options (instructions) -->
+						{#if showAdvancedOptions}
+							<div class="mt-2">
+								<label for="custom-instructions" class="text-warm-gray mb-1 block text-xs">
+									Speech instructions (optional):
+								</label>
+								<textarea
+									id="custom-instructions"
+									class="border-warm-gray bg-cream-paper w-full rounded border p-2 text-xs"
+									rows="2"
+									placeholder="E.g., 'Speak slowly and clearly' or 'Use a cheerful tone'"
+									bind:value={customInstructions}
+								></textarea>
+							</div>
+						{/if}
+
+						<button class="generate-button mt-2" on:click={generateSpeech}>
+							<svg
+								class="mr-2 h-5 w-5"
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="2"
+							>
+								<path d="M15.5 8.5a7 7 0 110 7m-9-7v7m0 0l3-3m-3 3l-3-3"></path>
+							</svg>
+							Create Audio
+						</button>
 					</div>
 				</div>
 			{/if}
@@ -331,5 +368,54 @@
 	.audio-player-container {
 		display: flex;
 		flex-direction: column;
+	}
+
+	.generate-button {
+		background-color: var(--terracotta, #d97706);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		border-radius: 0.375rem;
+		padding: 0.5rem 1rem;
+		font-size: 0.875rem;
+		font-weight: 500;
+		color: white;
+		transition: background-color 0.2s ease;
+	}
+
+	.generate-button:hover {
+		background-color: var(--terracotta-dark, #b45309);
+	}
+
+	.retry-button {
+		background-color: var(--terracotta, #d97706);
+		border-radius: 0.375rem;
+		padding: 0.5rem 1rem;
+		font-size: 0.875rem;
+		font-weight: 500;
+		color: white;
+		transition: background-color 0.2s ease;
+	}
+
+	.retry-button:hover {
+		background-color: var(--terracotta-dark, #b45309);
+	}
+
+	.loading-state {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		gap: 0.75rem;
+	}
+
+	.error-message {
+		color: var(--terracotta, #d97706);
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		text-align: center;
+		gap: 0.25rem;
 	}
 </style>

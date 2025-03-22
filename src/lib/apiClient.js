@@ -17,8 +17,8 @@ const apiProviders = {
 
 // Model mapping from OpenAI to DeepSeek
 const modelMapping = {
-  'gpt-4o-mini-2024-07-18': 'deepseek-chat',
-  'gpt-4': 'deepseek-reasoner'
+	'gpt-4o-mini-2024-07-18': 'deepseek-chat',
+	'o3-mini-2025-01-31': 'deepseek-reasoner'
 };
 
 /**

@@ -2,6 +2,7 @@
 	import { slide, fly } from 'svelte/transition';
 	import { elasticOut } from 'svelte/easing';
 	import { fontPreferences } from '$lib/stores/fontPreferences';
+	import ChunkByPinyin from './UI/ChunkByPinyin.svelte'; // Import the component
 
 	export let dialogue = {};
 	export let expanded = false;
@@ -28,7 +29,7 @@
 		<!-- Dialogue header with vintage styling -->
 		<div class="dialogue-header mb- flex flex-wrap items-center justify-between gap-y-2">
 			<!-- Left side with dialogue number and title -->
-			<div class="flex items-center ">
+			<div class="flex items-center">
 				<div class="dialogue-number-badge">
 					<span class="dialogue-number">{dialogue.number}</span>
 				</div>

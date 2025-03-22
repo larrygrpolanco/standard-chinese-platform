@@ -250,18 +250,18 @@
 		align-items: center;
 		justify-content: center;
 		padding: 2rem;
-		margin: 2rem auto;
+		margin: 1rem auto;
 		max-width: 640px; /* Increased max-width to accommodate wider content */
 	}
 
 	/* Flashcard section styling */
 	.flashcard-section {
 		width: 100%;
-		margin-bottom: 2rem;
-		padding: 1rem;
-		border-radius: 0.5rem;
+		/* margin-bottom: 2rem; */
+		/* padding: 1rem; */
+		/* border-radius: 0.5rem; */
 		background-color: rgba(255, 255, 255, 0.05);
-		box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+		/* box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); */
 	}
 
 	.flashcard-heading {

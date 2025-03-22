@@ -101,12 +101,12 @@
 					id="learningGoals"
 					bind:value={learningGoals}
 					class="form-textarea"
-					maxlength="500"
+					maxlength="250"
 					placeholder="What do you hope to achieve by learning Chinese? What topics are you most interested in learning?"
 					rows="4"
 				></textarea>
 				<div class="char-count">
-					{learningGoals.length}/500
+					{learningGoals.length}/250
 				</div>
 			</div>
 
@@ -126,7 +126,7 @@
 <style>
 	.learning-profile-tab {
 		padding: 1.5rem;
-		background-color: var(--color-cream-dark);
+		/* background-color: var(--color-cream-dark); */
 		box-shadow:
 			inset 0 1px 4px rgba(51, 49, 46, 0.15),
 			4px 4px 0 var(--color-shadow);

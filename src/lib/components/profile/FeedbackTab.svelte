@@ -127,7 +127,7 @@
 			<div class="support-icon">♥</div>
 			<h3 class="support-heading">Why Your Support Matters</h3>
 			<p class="support-text">
-				FSI Chinese was created to make quality Chinese learning materials accessible to everyone.
+				Taped Chinese was created to make the FSI learning materials accessible to everyone.
 				The core course materials will always remain free, but your subscription helps cover server
 				costs, development time, and enables new features like the Relevant World Practice (RWP)
 				exercises.
@@ -146,7 +146,7 @@
 <style>
 	.feedback-tab {
 		padding: 1.5rem;
-		background-color: var(--color-cream-dark);
+		/* background-color: var(--color-cream-dark); */
 		box-shadow:
 			inset 0 1px 4px rgba(51, 49, 46, 0.15),
 			4px 4px 0 var(--color-shadow);

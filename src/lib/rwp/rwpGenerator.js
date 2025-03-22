@@ -1,3 +1,4 @@
+// rwpGenerator.js
 import {
 	getCurrentUser,
 	getCompleteUnit,

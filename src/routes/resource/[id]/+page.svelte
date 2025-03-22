@@ -745,29 +745,7 @@
 		margin: 0 0.5rem;
 	}
 
-	.exercise-instructions p {
-		margin-bottom: 1rem;
-	}
 
-	.exercise-instructions p:last-child {
-		margin-bottom: 0;
-	}
-
-	.exercise-instructions .questions-header {
-		display: block;
-		margin: 1.25rem 0 0.75rem;
-		font-size: 1.1rem;
-		color: #34667f;
-		font-weight: 600;
-		border-bottom: 2px dotted #ddb967;
-		padding-bottom: 0.375rem;
-	}
-
-	.exercise-instructions .choice-option {
-		font-family: 'Courier New', monospace;
-		margin-right: 0.25rem;
-		letter-spacing: 0.03em;
-	}
 
 	/* Vintage photo frame for images */
 	.exercise-display-image {
