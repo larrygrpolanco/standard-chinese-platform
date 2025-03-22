@@ -198,7 +198,7 @@
 		display: inline-flex;
 		align-items: center;
 		justify-content: center;
-		padding: 0.75rem 1.25rem;
+		padding: 0.5rem 1rem;
 		font-family: 'Work Sans', sans-serif;
 		font-weight: 600;
 		color: #33312e;
@@ -215,8 +215,8 @@
 	}
 
 	.tape-button.inactive {
-		background-color: #e8e5d7;
-		color: #a0998a;
+		background-color: #a0998a;
+		color: white;
 		opacity: 0.7;
 		cursor: not-allowed;
 	}

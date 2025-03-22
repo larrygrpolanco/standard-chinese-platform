@@ -44,6 +44,16 @@
 		}, 3000);
 	}
 
+	async function handleSignOut() {
+		try {
+			await authStore.signOut();
+			goto('/');
+		} catch (error) {
+			console.error('Error signing out:', error);
+			showToast('Failed to sign out', 'error');
+		}
+	}
+
 	onMount(async () => {
 		// Redirect if not logged in
 		if (!$authStore) {
@@ -100,6 +110,7 @@
 					on:userUpdated={() => {
 						user = $authStore;
 					}}
+					on:signOut={handleSignOut}
 				/>
 			{:else if activeTab === 'profile'}
 				<LearningProfileTab

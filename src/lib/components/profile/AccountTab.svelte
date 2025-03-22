@@ -24,7 +24,7 @@
 	// Subscription info - this would be retrieved from your actual subscription service
 	// For now, we'll simulate it based on fake data
 	let subscriptionInfo = {
-		status: 'free', // 'free', 'monthly', 'yearly'
+		status: 'yearly', // 'free', 'monthly', 'yearly'
 		nextBillingDate: null,
 		// This would come from your Stripe integration
 		managementUrl: null
@@ -113,7 +113,10 @@
 </script>
 
 <div class="account-tab">
-    <!-- I don't think it is doing much now I may edit this later -->
+	<div class="">
+		<button class="tape-button danger" on:click={() => dispatch('signOut')}> Sign Out </button>
+	</div>
+	<!-- I don't think it is doing much now I may edit this later -->
 	<!-- <section class="account-section">
 		<h2 class="section-title">Account Information</h2>
 		<div class="info-grid">
@@ -135,7 +138,10 @@
 	</section> -->
 
 	<section class="account-section">
-		<h2 class="section-title">Subscription</h2>
+		<h2 class="section-title">Subscription </h2>
+        <div class="subscription-message">
+				RWP features completely free during this prototyping phase 
+			</div>
 		<div class="subscription-card">
 			<div class="sub-status">
 				<span class="sub-status-label">Current Plan:</span>
@@ -193,7 +199,7 @@
 	</section>
 
 	<section class="account-section">
-		<h2 class="section-title">Security</h2>
+		<h2 class="section-title">Passoword Managment</h2>
 
 		{#if !changePasswordVisible}
 			<button class="tape-button secondary" on:click={() => (changePasswordVisible = true)}>
@@ -365,10 +371,11 @@
 
 	/* Updated button classes to match the style guide */
 	.tape-button {
+		/* width: 100%; */
 		display: inline-flex;
 		align-items: center;
 		justify-content: center;
-		padding: 0.75rem 1.25rem;
+		padding: 0.5rem 1rem;
 		font-family: 'Work Sans', sans-serif;
 		font-weight: 600;
 		color: #33312e;
@@ -390,7 +397,7 @@
 	}
 
 	.tape-button.secondary {
-		background-color: #e8e5d7;
+		background-color: var(--color-cream-paper);
 		color: #33312e;
 	}
 
@@ -402,6 +409,24 @@
 	.tape-button.upgrade {
 		background-color: #ddb967;
 		color: #33312e;
+	}
+
+	.tape-button:hover {
+		filter: brightness(0.95);
+	}
+
+	.tape-button:active {
+		transform: translateY(2px);
+		box-shadow: 0 0 0 rgba(0, 0, 0, 0.1);
+	}
+
+	.tape-button:disabled {
+		opacity: 0.7;
+		cursor: not-allowed;
+	}
+
+	.tape-button.manage {
+		background-color: #a0998a;
 	}
 
 	.danger-section {
@@ -503,24 +528,6 @@
 	.danger-text {
 		margin-bottom: 1rem;
 		color: #70594a;
-	}
-
-	.tape-button:hover {
-		filter: brightness(0.95);
-	}
-
-	.tape-button:active {
-		transform: translateY(2px);
-		box-shadow: 0 0 0 rgba(0, 0, 0, 0.1);
-	}
-
-	.tape-button:disabled {
-		opacity: 0.7;
-		cursor: not-allowed;
-	}
-
-	.tape-button.manage {
-		background-color: #a0998a;
 	}
 
 	@media (max-width: 640px) {
