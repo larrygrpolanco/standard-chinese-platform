@@ -6,7 +6,7 @@ export async function POST({ request }) {
 	try {
 		const {
 			story,
-            analysis,
+			analysis,
 			unitData,
 			userProfile,
 			specificFocus,
@@ -62,19 +62,17 @@ export async function POST({ request }) {
 }
 
 function createQuestionsPrompt(story, analysis, unitData, userProfile, specificFocus) {
-	// Extract vocabulary
+	// Keep vocabulary and dialogues as reference
 	const vocabulary = unitData.vocabulary || [];
+	const dialogues = unitData.dialogues || [];
 	const formattedVocabulary = vocabulary
 		.map((v) => `- ${v.chinese_simplified || ''}: ${v.english || ''}`)
 		.join('\n');
-
-	// Extract dialogues to focus on grammar patterns
-	const dialogues = unitData.dialogues || [];
 	const formattedDialogues = dialogues
 		.map((d) => `- ${d.chinese_simplified || ''}: ${d.english || ''}`)
 		.join('\n');
 
-	// Extract user profile information with more detail
+	// User profile information
 	const learningLevel = userProfile?.learning_level || 'beginner';
 	const fullName = userProfile?.full_name || 'Student';
 	const occupation = userProfile?.personal_context?.occupation || 'not specified';
@@ -82,16 +80,14 @@ function createQuestionsPrompt(story, analysis, unitData, userProfile, specificF
 	const hobbies = userProfile?.personal_context?.hobbies || 'not specified';
 	const reasonLearning = userProfile?.personal_context?.reason_learning || 'not specified';
 
-	// Get module responses relevant to this unit
+	// Module responses
 	const moduleId = unitData.module?.id || unitData.module_id;
 	const currentModuleResponses = userProfile?.module_responses?.[moduleId] || {};
-
-	// Format responses with clear presentation for better context
 	const formattedResponses = Object.entries(currentModuleResponses)
 		.map(([questionId, answer]) => `${questionId}: "${answer}"`)
 		.join('\n');
 
-	// Determine question complexity based on level
+	// Complexity based on level
 	let questionComplexity;
 	switch (learningLevel.toLowerCase()) {
 		case 'beginner':
@@ -117,16 +113,17 @@ Create a comprehensive set of assessment questions based on the following Chines
 # READING PASSAGE
 ${story}
 
-# STORY PLANNING ANALYSIS
+# STORY ANALYSIS
 ${analysis}
 
-# VOCABULARY FROM THE UNIT
+# REFERENCE MATERIALS
+## Unit Vocabulary (for reference)
 ${formattedVocabulary}
 
-# DIALOGUE PATTERNS AND GRAMMAR STRUCTURES
+## Dialogue Patterns and Grammar Structures (for reference)
 ${formattedDialogues}
 
-# USER'S PROFILE
+# LEARNER PROFILE
 Name: ${fullName}
 Level: ${learningLevel}
 Occupation: ${occupation}
@@ -143,39 +140,40 @@ ${specificFocus || 'None specified'}
 # QUESTION COMPLEXITY GUIDELINE
 ${questionComplexity}
 
-# INSTRUCTIONS
-Create a total of 10 questions of the following types:
+# ASSESSMENT DESIGN
+Create a focused set of high-quality assessment questions:
 
-## Multiple Choice Questions (6 questions)
-- Create 6 multiple-choice questions about the reading passage
-- Each question should have exactly 4 options (A, B, C, D) with only one correct answer
-- Include a mix of:
-  * 2 literal comprehension questions (facts directly stated in the text)
-  * 2 inferential questions (drawing conclusions from the text)
-  * 2 questions testing grammar patterns from the unit dialogues (how grammar structures are used)
-- IMPORTANT: Make at least 2 questions connect to the user's personal interests or context
+## Multiple Choice Questions (3 questions)
+- Create 3 multiple-choice questions about the reading passage
+- Each question must have exactly 4 options (A, B, C, D) with one correct answer
+- Aim for a mix of question types:
+  * Literal comprehension (testing basic understanding of facts)
+  * Grammar application (testing how grammar structures are used)
+  * Inferential (drawing conclusions or making connections)
+- Make at least one question connect to the learner's personal context or interests
 - For each question, provide:
   * The question in Chinese & English
-  * 4 answer options in Chinese
+  * 4 answer options in Chinese & English
   * The correct answer (A, B, C, or D)
-  * A brief explanation in English of why the answer is correct
+  * A brief explanation of why the answer is correct
 
-## Short Answer Questions (3 questions)
-- Create 3 short answer questions that require 1-2 sentence responses
-- Questions should explicitly encourage application of grammar patterns from the dialogues
-- At least 1 question should relate to the user's personal context or interests
+## Short Answer Questions (2 questions)
+- Create 2 thoughtful short answer questions requiring 1-2 sentence responses
+- Questions should encourage application of vocabulary or grammar from the unit
+- At least one question should relate to the learner's personal context
 - For each question, provide:
   * The question in Chinese & English
-  * A sample correct answer in Chinese & English
-  * A brief note in English about what grammar patterns to look for in a good answer
+  * A correct answer in Chinese & English labeled as an example answer, but not the only answer
+  * A brief note about what to look for in a good answer
 
-## Open-Ended Reflection Question (1 question)
-- Create 1 reflective question that connects the content to the learner's personal experience
+## Reflection Question (1 question)
+- Create 1 meaningful reflection question connecting the content to the learner's life
+- The question should invite personal application of unit language
 - The question should promote using vocabulary AND specific grammar patterns from the unit
 - The question should explicitly connect to the user's stated interests or learning goals
 - Provide:
   * The question in Chinese & English
-  * A brief guidance note in English (what this question aims to practice, specifying both vocabulary and grammar elements)
+  * A brief guidance note (what this question aims to practice)
 
 Format your response as follows:
 
@@ -188,22 +186,24 @@ Format your response as follows:
    Correct: [A/B/C/D]
    Explanation: [Brief explanation in English]
 
-[Continue for all 6 multiple choice questions]
+[Continue for all 3 multiple choice questions]
 
 # SHORT ANSWER QUESTIONS
-1. [Question in Chinese]
+1. [Question in Chinese & English]
    Sample Answer: [Sample answer in Chinese & English]
-   Assessment Guide: [Brief note in English, specifying grammar patterns to look for]
+   Assessment Guide: [Brief note in English about what to look for]
 
-[Continue for all 3 short answer questions]
+[Continue for all 2 short answer questions]
 
 # REFLECTION QUESTION
 [Question in Chinese & English]
 Guidance: [Brief guidance note in English, specifying both vocabulary and grammar elements to practice]
 
-IMPORTANT REMINDER:
+QUALITY GUIDELINES:
+- Focus on quality over quantity - each question should be pedagogically meaningful
+- Connect to the learner's contexts where natural, but don't force connections
 - Make questions directly relevant to the user's interests and context wherever possible
-- Ensure questions test both vocabulary AND grammar patterns from the unit
-- Adapt the difficulty to the user's specified level: ${learningLevel}
+- Questions should feel relevant and useful, not academic exercises
+- Adapt complexity to the learner's specified level: ${learningLevel}
 `;
 }

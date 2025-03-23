@@ -75,12 +75,12 @@ function createStoryAnalysisPrompt(unitData, userProfile, specificFocus) {
 		.join('\n');
 
 	return `
-## OBJECTIVE
-Analyze how to create a first-person narrative Chinese language practice story that:
-1. Uses vocabulary and grammar patterns from the current unit
-2. Authentically connects to the learner's personal context and interests
-3. Presents language in natural, practical situations
-4. Is comprehensible! Uses simple language with harder vocabulary only for words related to the learner's interests.
+## ANALYSIS OBJECTIVE
+Analyze the unit content and learner profile to to create a first-person narrative Chinese language practice story that:
+- Uses vocabulary and grammar patterns from the current unit
+- Authentically connects to the learner's personal context and interests
+- Presents language in relevant situations
+- Is comprehensible! Uses simple language with harder vocabulary only for words related to the learner's interests.
 
 ## UNIT INFORMATION
 Unit Title: ${unitData.title}
@@ -94,46 +94,40 @@ Occupation: ${occupation}
 Location: ${location}
 Hobbies: ${hobbies}
 Reason for Learning: ${reasonLearning}
-Personal Preferences and interests: 
-${formattedResponses}
 
-## CONTENT TO WORK WITH
-### Vocabulary to Include
+## Personal Preferences and interests: 
+Personal Responses: ${formattedResponses}
+
+## UNIT CONTENT
+### Key Vocabulary (include at least 5)
 ${formattedVocabulary}
 
-### Key Grammatical Patterns to Practice
+### Dialogue Patterns (Analyze Key Grammatical Patterns to Practice)
 ${formattedDialogues}
 
 ## SPECIFIC FOCUS (if any)
 ${specificFocus || 'None specified'}
 
-## ANALYSIS TASK
+## ANALYSIS TASKS
+Provide an analysis of how to create an effective, personalized language practice story by addressing the following:
 
-Provide a comprehensive analysis of how to create an effective, personalized language practice story by addressing the following:
+1. **Grammar Pattern Identification**:
+   - Identify 3-4 key grammatical structures from the dialogues
+   - Explain how these patterns could be applied in contexts relevant to the learner
 
-1. **Learner Context Analysis**:
-   - Based on the profile, what aspects of this person's life would make a relevant language practice scenario/story?
-   - What real scenarios might they encounter where this unit's language would be useful?
+2. **Vocabulary Selection**:
+   - Select 5-8 vocabulary items most relevant to the learner's context
+   - The vocabulary and formatted dialogues are more than 50 years old. How can you make them more modern while keeping them relevant to the learner?
+
+3. **Learner Context Integration**:
+   - Based on the learner profile, how could the unit's grammar and vocabulary be used to connect to this learner?
    - What tone and style might resonate with this particular learner?
+   - Based on the learner's level, suggest specific ways to improve this stories comprehensibility (repetition, simplified structures, etc.)
 
-2. **Core Language Pattern Identification**:
-   - Identify 3-5 key grammatical structures from the dialogues (not just vocabulary)
-   - Note how these patterns could be used in contexts relevant to the learner
-   - The vocabulary and formatted dialogues are more than 50 years old - how can you make them more modern while keeping them accessible?
+4. **Interest Integration Opportunities**:
+   - List a natural way to incorporate the learner's specific interests as background elements
+   - Identify a possible connections between the unit topic and the learner's life/interests
 
-3. **Interest Integration Opportunities**:
-   - List 3-4 natural ways to incorporate the learner's specific interests as background elements
-   - Identify 2-3 possible connections between the unit topic and the learner's life/interests
-
-4. **Setting & Scenario Design**:
-   - Create an interesting scenario set in the learner's location that would require using this unit's language
-   - Ensure the scenario aligns with their occupation, daily activities, or learning goals
-
-5. **Question Planning for Later Assessment**:
-   - Outline 3-4 potential question topics that would test comprehension of both language patterns AND the story content
-   - Note how these questions could connect to the learner's personal context
-   - Suggest 1-2 reflection questions that would help the learner apply this language to their own goals
-
-Format your analysis in clear sections with the headings above. Be specific and concrete in your recommendations for story elements, but do NOT write the actual story. Focus on planning an optimal approach.
+Format your analysis in clear sections with the headings above. Be specific and concrete in your recommendations for story elements, but do NOT write the actual story. Focus on planning an pedagogical approach to creating a relevant and engaging practice story for the learner.
 `;
 }

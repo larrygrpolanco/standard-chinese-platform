@@ -54,57 +54,41 @@ export async function POST({ request }) {
 }
 
 function createStoryGenerationPrompt(analysis, unitData, userProfile, specificFocus) {
-	// Extract data
-	const vocabulary = unitData.vocabulary || [];
-	const dialogues = unitData.dialogues || [];
-	const formattedVocabulary = vocabulary
-		.map((v) => `- ${v.chinese_simplified || ''}: ${v.english || ''}`)
-		.join('\n');
-	const formattedDialogues = dialogues
-		.map((d) => `- ${d.chinese_simplified || ''}: ${d.english || ''}`)
-		.join('\n');
-
 	// Extract user profile
 	const fullName = userProfile?.full_name || 'Student';
-	const learningLevel = userProfile?.learning_level || 'beginner';
 	const occupation = userProfile?.personal_context?.occupation || 'not specified';
 	const location = userProfile?.personal_context?.location || 'not specified';
 	const hobbies = userProfile?.personal_context?.hobbies || 'not specified';
 	const reasonLearning = userProfile?.personal_context?.reason_learning || 'not specified';
 
 	// Determine appropriate length based on level
+	const learningLevel = userProfile?.learning_level || 'beginner';
 	let recommendedLength, sentenceComplexity;
+
 	switch (learningLevel.toLowerCase()) {
 		case 'beginner':
-			recommendedLength = '2-3 short paragraphs (6-10 sentences total)';
-			sentenceComplexity = 'Use simple sentence structures with basic grammar patterns';
+			recommendedLength = '2 short paragraphs (5-7 sentences total)';
+			sentenceComplexity = 'Use simple sentence structures with basic patterns';
 			break;
 		case 'intermediate':
-			recommendedLength = '3-4 paragraphs (10-15 sentences total)';
-			sentenceComplexity = 'Use a mix of simple and compound sentences';
+			recommendedLength = '2-3 paragraphs (7-10 sentences total)';
+			sentenceComplexity = 'Use mostly simple sentences with occasional compound structures';
 			break;
 		case 'advanced':
-			recommendedLength = '4-5 paragraphs (15-20 sentences total)';
-			sentenceComplexity =
-				'Use more varied sentence structures while maintaining conversational tone';
+			recommendedLength = '3-4 paragraphs (10-15 sentences total)';
+			sentenceComplexity = 'Use natural variety of sentence structures while ensuring clarity';
 			break;
 		default:
-			recommendedLength = '2-3 paragraphs (8-12 sentences total)';
+			recommendedLength = '2-3 paragraphs (6-9 sentences total)';
 			sentenceComplexity = 'Use straightforward conversational structures';
 	}
 
 	return `
-## OBJECTIVE
-Create a first-person narrative Chinese language practice story based on the provided analysis that:
-1. Uses vocabulary and grammar patterns from the current unit
-2. Authentically connects to the learner's personal context and interests
-3. Presents language in natural, practical situations
-4. Is comprehensible! Try to use simple language with harder vocabulary only for words related to the learner's interests.
+## STORY CREATION TASK
+Create a first-person narrative in Chinese that applies the previous analysis to create a personalized, comprehensible language practice experience.
 
-## UNIT INFORMATION
-Unit Title: ${unitData.title}
-Description: ${unitData.description}
-Module: ${unitData.module?.title || ''}
+## PREVIOUS ANALYSIS
+${analysis}
 
 ## LEARNER PROFILE
 Name: ${fullName}
@@ -114,53 +98,32 @@ Location: ${location}
 Hobbies: ${hobbies}
 Reason for Learning: ${reasonLearning}
 
-## CONTENT REQUIREMENTS
-### Vocabulary to Include
-${formattedVocabulary}
-
-### Key Grammatical Patterns to Practice
-${formattedDialogues}
-
 ## STORY PARAMETERS
-Length: ${recommendedLength}
-Complexity: ${sentenceComplexity}
-Format: First-person narrative (single speaker)
-Specific Focus (if any): ${specificFocus || 'None specified'}
+- First-person perspective (as if the learner is speaking)
+- Length: ${recommendedLength}
+- Complexity: ${sentenceComplexity}
+- Special focus: ${specificFocus || 'None specified'}
 
-## PREVIOUS ANALYSIS
-The following analysis was created to guide your story creation. Use these insights to craft your narrative:
+## CREATION GUIDELINES
+1. **Prioritize comprehensibility** - make it accessible for the learner's level
+2. **Use the specific grammar patterns and vocabulary identified** in the analysis
+3. **Set the story in a relevant context** from the learner's life where Chinese would be used
+4. **Incorporate natural repetition** of important language patterns
+5. **Make connections explicit** between the language and the learner's interests or daily activities
 
-${analysis}
-
-## STORY CREATION GUIDELINES
-Write a first-person narrative story that:
-
-1. **Begins with authentic context**:
-   - Start from the learner's life situation (location, occupation)
-   - Establish an interesting scenario where the language would naturally be used
-
-2. **Integrates language patterns naturally**:
-   - Incorporate the unit's language patterns in contextually appropriate and more modern ways
-   - Occasionally add metacognitive elements that highlight the language being practiced
-
-3. **Incorporates interests subtly**:
-   - Weave in references to the learner's interests as background elements
-   - Use these references to enhance the story rather than forcing them into the main plot
-
-4. **Uses appropriate complexity**:
-   - Match sentence structure to the specified learning level
-   - Ensure vocabulary beyond the unit list is accessible to their level
-
-After writing the Chinese story, provide a simple English translation.
+The goal is to help the learner experience how the Chinese they're learning connects directly to their life, making it feel practical and meaningful rather than just academic.
 
 ## QUALITY CHECKLIST
 Before submitting, verify the story meets these criteria:
 - [ ] Uses first-person perspective consistently
-- [ ] Set around the learner's context and interests
+- [ ] Incorporate the unit's language patterns in contextually appropriate and more modern ways
 - [ ] References their reason for learning or personal preferences
 - [ ] Incorporates at least one specific detail from their profile
 - [ ] Uses required vocabulary/grammar naturally in context
 - [ ] Maintains easy and appropriate language level throughout
 - [ ] Feels like an engaging scenario, not just a contrived exercise
+- [ ] Weave in references to the learner's interests as background elements
+
+After writing the Chinese story, provide a simple English translation.
 `;
 }
