@@ -50,13 +50,41 @@ export async function generateRwpExercise(
 			module_responses: userPreferences?.module_responses || {}
 		};
 
-		// 4. PHASE 1: Generate the story
-		updateProgress('story'); // Update to story phase
-		console.log('Generating story...');
-		const storyResponse = await fetch('/api/rwp/create-story', {
+		// 4. PHASE 1A: Analyze story requirements
+		updateProgress('analysis'); // Update to analysis phase
+		console.log('Analyzing story requirements...');
+		const analysisResponse = await fetch('/api/rwp/analyze-story', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
+				unitData,
+				userProfile,
+				specificFocus,
+				debug
+			})
+		});
+
+		if (!analysisResponse.ok) {
+			const errorData = await analysisResponse.json();
+			throw new Error(errorData.error || 'Error analyzing story requirements');
+		}
+
+		const analysisData = await analysisResponse.json();
+		const analysis = analysisData.analysis;
+
+		if (debug) {
+			console.log('=== STORY ANALYSIS COMPLETED ===');
+			console.log(analysis);
+		}
+
+		// 5. PHASE 1B: Generate the story based on analysis
+		updateProgress('story'); // Update to story generation phase
+		console.log('Generating story based on analysis...');
+		const storyResponse = await fetch('/api/rwp/generate-story', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({
+				analysis,
 				unitData,
 				userProfile,
 				specificFocus,
@@ -77,14 +105,15 @@ export async function generateRwpExercise(
 			console.log(story);
 		}
 
-		// 5. PHASE 2: Generate questions based on the story
-        updateProgress('questions');
+		// 6. PHASE 2: Generate questions based on the story and analysis
+		updateProgress('questions');
 		console.log('Generating questions...');
 		const questionsResponse = await fetch('/api/rwp/create-questions', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
 				story,
+				analysis, // Pass the analysis as well
 				unitData,
 				userProfile,
 				specificFocus,
@@ -92,6 +121,7 @@ export async function generateRwpExercise(
 			})
 		});
 
+		// Continue with the rest of the function as before
 		if (!questionsResponse.ok) {
 			const errorData = await questionsResponse.json();
 			throw new Error(errorData.error || 'Error generating questions');
@@ -105,8 +135,8 @@ export async function generateRwpExercise(
 			console.log(questions);
 		}
 
-		// 6. PHASE 3: Format everything into JSON structure
-        updateProgress('formatting');
+		// 7. PHASE 3: Format everything into JSON structure
+		updateProgress('formatting');
 		console.log('Formatting exercise...');
 		const formatResponse = await fetch('/api/rwp/format-exercise', {
 			method: 'POST',
@@ -124,7 +154,7 @@ export async function generateRwpExercise(
 			throw new Error(errorData.error || 'Error formatting exercise');
 		}
 
-		// Get formatted data (in debug mode, we get both raw and parsed)
+		// Get formatted data
 		const formatData = await formatResponse.json();
 		const contentToSave = debug ? formatData.parsed : formatData;
 

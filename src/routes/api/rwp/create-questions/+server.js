@@ -6,6 +6,7 @@ export async function POST({ request }) {
 	try {
 		const {
 			story,
+            analysis,
 			unitData,
 			userProfile,
 			specificFocus,
@@ -35,7 +36,7 @@ export async function POST({ request }) {
 			},
 			{
 				role: 'user',
-				content: createQuestionsPrompt(story, unitData, userProfile, specificFocus)
+				content: createQuestionsPrompt(story, analysis, unitData, userProfile, specificFocus)
 			}
 		];
 
@@ -60,7 +61,7 @@ export async function POST({ request }) {
 	}
 }
 
-function createQuestionsPrompt(story, unitData, userProfile, specificFocus) {
+function createQuestionsPrompt(story, analysis, unitData, userProfile, specificFocus) {
 	// Extract vocabulary
 	const vocabulary = unitData.vocabulary || [];
 	const formattedVocabulary = vocabulary
@@ -115,6 +116,9 @@ Create a comprehensive set of assessment questions based on the following Chines
 
 # READING PASSAGE
 ${story}
+
+# STORY PLANNING ANALYSIS
+${analysis}
 
 # VOCABULARY FROM THE UNIT
 ${formattedVocabulary}

@@ -23,7 +23,7 @@
 
 	// Define generation phases
 	const phases = [
-		{ id: 'init', label: 'Init', percentage: 5 },
+		{ id: 'init', label: 'Analyzing', percentage: 15 },
 		{ id: 'story', label: 'Story', percentage: 30 },
 		{ id: 'questions', label: 'Questions', percentage: 60 },
 		{ id: 'formatting', label: 'Format', percentage: 100 }

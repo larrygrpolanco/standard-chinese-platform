@@ -78,7 +78,7 @@
 		}, 3000);
 	}
 
-	// Generate a new exercise
+	// Generate a new exercise with split LLM calls
 	async function generateExercise() {
 		generating = true;
 		generationPhase = 'init';
@@ -106,13 +106,40 @@
 			// Get complete unit data
 			const completeUnitData = await getCompleteUnit(unitId);
 
-			// PHASE 1: Generate the story
-			generationPhase = 'story';
-			console.log('Generating story...');
-			const storyResponse = await fetch('/api/rwp/create-story', {
+			// PHASE 1A: Analyze story requirements
+			generationPhase = 'analysis';
+			console.log('Analyzing story requirements...');
+			const analysisResponse = await fetch('/api/rwp/analyze-story', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({
+					unitData: completeUnitData,
+					userProfile,
+					specificFocus,
+					debug
+				})
+			});
+
+			if (!analysisResponse.ok) {
+				const errorData = await analysisResponse.json();
+				throw new Error(errorData.error || 'Error analyzing story requirements');
+			}
+
+			const analysisData = await analysisResponse.json();
+			const analysis = analysisData.analysis;
+
+			// Log the analysis
+			console.log('=== STORY ANALYSIS ===');
+			console.log(analysis);
+
+			// PHASE 1B: Generate the story based on analysis
+			generationPhase = 'story';
+			console.log('Generating story based on analysis...');
+			const storyResponse = await fetch('/api/rwp/generate-story', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
+					analysis,
 					unitData: completeUnitData,
 					userProfile,
 					specificFocus,
@@ -132,7 +159,7 @@
 			console.log('=== GENERATED STORY ===');
 			console.log(story);
 
-			// PHASE 2: Generate questions based on the story
+			// PHASE 2: Generate questions based on the story and analysis
 			generationPhase = 'questions';
 			console.log('Generating questions...');
 			const questionsResponse = await fetch('/api/rwp/create-questions', {
@@ -140,6 +167,7 @@
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({
 					story,
+					analysis, // Pass the analysis to the questions endpoint
 					unitData: completeUnitData,
 					userProfile,
 					specificFocus,
