@@ -114,25 +114,24 @@
 
 <div class="account-tab">
 	<!-- I don't think it is doing much now I may edit this later -->
-	<!-- <section class="account-section">
+	<section class="account-section">
 		<h2 class="section-title">Account Information</h2>
 		<div class="info-grid">
 			<div class="info-item">
 				<span class="info-label">Email</span>
 				<span class="info-value">{user.email}</span>
 			</div>
-			{#if user.last_sign_in_at}
-				<div class="info-item">
-					<span class="info-label">Last Sign In</span>
-					<span class="info-value">{new Date(user.last_sign_in_at).toLocaleString()}</span>
-				</div>
-			{/if}
+
 			<div class="info-item">
 				<span class="info-label">Account Created</span>
 				<span class="info-value">{new Date(user.created_at).toLocaleString()}</span>
 			</div>
 		</div>
-	</section> -->
+		<div class="profile-reminder">
+			<h3>Make Your Practice More Relevant</h3>
+			<div>Make sure to edit your <em>Learning Profile <em> for better RWP quizzes</em></em></div>p>
+		</div>
+	</section>
 
 	<section class="account-section">
 		<h2 class="section-title">Subscription</h2>
@@ -196,10 +195,8 @@
 	</section>
 
 	<section class="account-section">
-		<!-- <h2 class="section-title">Passoword Managment</h2> -->
-		<div class="flex-row gap-2 my-2">
-			<button class="tape-button danger" on:click={() => dispatch('signOut')}> Sign Out </button>
-
+		<h2 class="section-title">Account Managment</h2>
+		<div class="flex-box my-2 gap-2">
 			{#if !changePasswordVisible}
 				<button class="tape-button secondary" on:click={() => (changePasswordVisible = true)}>
 					Change Password
@@ -250,6 +247,11 @@
 					</div>
 				</div>
 			{/if}
+			<div>
+				<button class="tape-button danger my-2" on:click={() => dispatch('signOut')}>
+					Sign Out
+				</button>
+			</div>
 		</div>
 	</section>
 
@@ -332,6 +334,26 @@
 		background-color: #e8e5d7;
 		border-radius: 8px;
 		box-shadow: inset 0 1px 3px rgba(51, 49, 46, 0.1);
+	}
+
+	/* Profile reminder */
+	.profile-reminder {
+		background-color: rgba(52, 102, 127, 0.1);
+		border-left: 4px solid #34667f;
+		border-radius: 0.25rem;
+		padding-top: 1rem;
+		padding-left: 1rem;
+		padding-right: 1rem;
+		padding-bottom: 0.1rem;
+		margin-top: 0.5rem;
+	}
+
+	.profile-reminder h3 {
+		font-family: 'Arvo', serif;
+		font-size: 1.1rem;
+		margin-top: 0;
+		margin-bottom: 0.5rem;
+		color: #34667f;
 	}
 
 	.subscription-card {
