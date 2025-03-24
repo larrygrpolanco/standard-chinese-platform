@@ -1,32 +1,9 @@
-<!-- ExercisesTab.svelte -->
-<script context="module">
-	function formatInstructions(text) {
-		if (!text) return '';
-
-		// Replace sequences of underscores with responsive blank elements
-		text = text.replace(/_{3,}/g, '<span class="answer-blank"></span>');
-
-		let formatted = text.replace(/\n\n/g, '</p><p>').replace(/\n/g, '<br>');
-		if (!formatted.startsWith('<p>')) {
-			formatted = `<p>${formatted}</p>`;
-		}
-		formatted = formatted.replace(
-			/QUESTIONS/g,
-			'<strong class="questions-header">QUESTIONS</strong>'
-		);
-		formatted = formatted.replace(/\(\s*\)\s/g, '<span class="choice-option">( ) </span>');
-		return formatted;
-	}
-</script>
-
 <script>
 	import { onMount } from 'svelte';
 	import { fly } from 'svelte/transition';
 	import { elasticOut } from 'svelte/easing';
-	import { getExerciseQuestions } from '$lib/supabase/client';
-	import { createEventDispatcher } from 'svelte';
 	import CassetteTapeSelector from './CassetteTapeSelector.svelte';
-	// Other imports...
+	import { createEventDispatcher } from 'svelte';
 
 	const dispatch = createEventDispatcher();
 	export let exercises = [];
@@ -34,50 +11,98 @@
 
 	let currentTape = null;
 	let currentExerciseIndex = 0;
-	let currentQuestions = [];
-	let isLoadingQuestions = false;
-	let userAnswers = {};
-	let imageLoaded = false;
+	let imagesLoaded = {}; // Track loading status for multiple images
+	let imageWidths = {}; // Store user's preferred widths
+	let isDragging = false;
+	let startX = 0;
+	let startWidth = 0;
+	let currentImageId = null;
+	let defaultImageWidth = '85%'; // Initial readable size
 
-	// Reset the imageLoaded state when the current exercise changes
-	$: if (currentExercise) {
-		imageLoaded = false;
-	}
+	// Parse display URLs into arrays for multi-page exercises
+	$: workbookTapes = tapes.filter((tape) => tape.tape_type === 'workbook');
 
-	// Component logic remains the same...
+	$: filteredExercises = currentTape
+		? exercises
+				.filter((ex) => ex.tape_id === currentTape.id)
+				.sort((a, b) => a.order_num - b.order_num)
+				.map((exercise) => ({
+					...exercise,
+					displayUrls: exercise.display_url
+						? exercise.display_url.split(',').map((url) => url.trim())
+						: []
+				}))
+		: [];
+
+	$: currentExercise = filteredExercises[currentExerciseIndex] || null;
+
 	onMount(() => {
-		const workbookTapes = tapes.filter((tape) => tape.tape_type === 'workbook');
 		if (workbookTapes.length > 0) {
 			const c2Tape = workbookTapes.find((tape) => tape.title.includes('C-2'));
 			currentTape = c2Tape || workbookTapes[0];
 		}
 	});
 
-	// Other reactive declarations and functions stay unchanged...
-	$: workbookTapes = tapes.filter((tape) => tape.tape_type === 'workbook');
-	$: filteredExercises = currentTape
-		? exercises
-				.filter((ex) => ex.tape_id === currentTape.id)
-				.sort((a, b) => a.order_num - b.order_num)
-		: [];
-	$: currentExercise = filteredExercises[currentExerciseIndex] || null;
-	$: hasDisplayImage = currentExercise?.display_url && currentExercise.display_url.trim() !== '';
+	// Image resize functions
+	function startResize(e, imageId) {
+		isDragging = true;
+		startX = e.clientX || e.touches?.[0].clientX;
+		currentImageId = imageId;
+
+		// Get current width - either from stored value or default
+		const currentWidth = imageWidths[imageId];
+		startWidth = currentWidth ? parseInt(currentWidth) : 85;
+
+		// Add event listeners
+		window.addEventListener('mousemove', handleMouseMove);
+		window.addEventListener('mouseup', stopResize);
+		window.addEventListener('touchmove', handleMouseMove);
+		window.addEventListener('touchend', stopResize);
+		e.preventDefault();
+	}
+
+	function handleMouseMove(e) {
+		if (!isDragging) return;
+		const clientX = e.clientX || e.touches?.[0].clientX;
+		const delta = clientX - startX;
+
+		// Calculate new width with constraints (50% to 100%)
+		const newWidth = Math.max(50, Math.min(100, startWidth + delta * 0.5));
+		imageWidths[currentImageId] = `${newWidth}%`;
+		imageWidths = { ...imageWidths }; // Trigger reactivity
+	}
+
+	function stopResize() {
+		isDragging = false;
+		window.removeEventListener('mousemove', handleMouseMove);
+		window.removeEventListener('mouseup', stopResize);
+		window.removeEventListener('touchmove', handleMouseMove);
+		window.removeEventListener('touchend', stopResize);
+	}
 
 	function handleTapeChange(event) {
 		currentTape = event.detail;
 		currentExerciseIndex = 0;
+		imagesLoaded = {}; // Reset loading states
 	}
 
 	function previousExercise() {
 		if (currentExerciseIndex > 0) {
 			currentExerciseIndex--;
+			imagesLoaded = {}; // Reset loading states
 		}
 	}
 
 	function nextExercise() {
 		if (currentExerciseIndex < filteredExercises.length - 1) {
 			currentExerciseIndex++;
+			imagesLoaded = {}; // Reset loading states
 		}
+	}
+
+	function handleImageLoad(imageId) {
+		imagesLoaded[imageId] = true;
+		imagesLoaded = { ...imagesLoaded }; // Trigger reactivity
 	}
 </script>
 
@@ -120,8 +145,7 @@
 						</button>
 
 						<div class="exercise-counter">
-							<span class="counter-text"
-								>{currentExerciseIndex + 1} of {filteredExercises.length}</span
+							<span class="counter-text">{currentExerciseIndex + 1}/{filteredExercises.length}</span
 							>
 						</div>
 
@@ -149,33 +173,57 @@
 						class="exercise-content"
 						in:fly={{ x: 300, duration: 400, delay: 100, easing: elasticOut }}
 					>
-						<h4 class="exercise-title">{currentExercise.title}</h4>
+						<!-- <h4 class="exercise-title">{currentExercise.title}</h4> -->
 
-						<div class="exercise-instructions-container">
-							<div class="exercise-instructions">
-								{@html formatInstructions(currentExercise.instructions)}
-							</div>
-						</div>
+						<!-- Display all pages vertically -->
+						{#if currentExercise.displayUrls.length > 0}
+							<div class="exercise-pages">
+								{#each currentExercise.displayUrls as url, index}
+									<div
+										class="exercise-page-container"
+										style="width: {imageWidths[`${currentExercise.id}-${index}`] ||
+											defaultImageWidth}"
+									>
+										<div class="exercise-page">
+											{#if !imagesLoaded[`${currentExercise.id}-${index}`]}
+												<div class="image-loader">
+													<div class="spinner"></div>
+													<span>Developing image...</span>
+												</div>
+											{/if}
 
-						{#if hasDisplayImage}
-							<div class="exercise-display-image">
-								{#if !imageLoaded}
-									<div class="image-loader">
-										<div class="spinner"></div>
-										<span>Developing image...</span>
+											<img
+												src={url}
+												alt={`Exercise ${currentExercise.title} - Page ${index + 1}`}
+												class="exercise-image"
+												style="opacity: {imagesLoaded[`${currentExercise.id}-${index}`] ? 1 : 0}"
+												on:load={() => handleImageLoad(`${currentExercise.id}-${index}`)}
+											/>
+
+											<!-- Resize handle -->
+											<div
+												class="resize-handle"
+												on:mousedown={(e) => startResize(e, `${currentExercise.id}-${index}`)}
+												on:touchstart={(e) => startResize(e, `${currentExercise.id}-${index}`)}
+											>
+												<div class="handle-bar"></div>
+											</div>
+										</div>
+
+										<!-- {#if currentExercise.displayUrls.length > 1}
+											<div class="page-indicator">
+												Page {index + 1} of {currentExercise.displayUrls.length}
+											</div>
+										{/if} -->
 									</div>
-								{/if}
-								<img
-									src={currentExercise.display_url}
-									alt="Exercise visual aid"
-									class="exercise-image"
-									style="opacity: {imageLoaded ? 1 : 0}"
-									on:load={() => (imageLoaded = true)}
-								/>
+								{/each}
+							</div>
+						{:else}
+							<div class="empty-state">
+								<div class="empty-state-icon">?</div>
+								<p class="empty-state-text">No exercise pages available.</p>
 							</div>
 						{/if}
-
-						<!-- Questions will be displayed here -->
 					</div>
 				</div>
 			{:else}
@@ -217,50 +265,6 @@
 		overflow: hidden;
 	}
 
-	/* New styles for the answer blanks */
-	.answer-blank {
-		display: inline-block;
-		width: 100%;
-		max-width: 240px;
-		height: 1px;
-		border-bottom: 1px solid var(--color-charcoal);
-		margin: 0 2px 3px;
-		vertical-align: middle;
-	}
-
-	.exercise-instructions {
-		/* Your existing styles */
-		word-wrap: break-word;
-		overflow-wrap: break-word;
-	}
-
-	/* Make sure code examples stay within boundaries */
-	.exercise-instructions pre,
-	.exercise-instructions code {
-		white-space: pre-wrap;
-		word-break: break-word;
-		overflow-wrap: break-word;
-		max-width: 100%;
-	}
-
-	/* Responsive adjustments */
-	@media (max-width: 768px) {
-		.answer-blank {
-			max-width: 180px;
-		}
-	}
-
-	@media (max-width: 480px) {
-		.answer-blank {
-			max-width: 120px;
-		}
-
-		.exercise-instructions {
-			font-size: 0.95rem;
-			padding: 0.75rem 1rem;
-		}
-	}
-
 	/* Navigation bar with vintage styling */
 	.exercise-navigation {
 		display: flex;
@@ -278,7 +282,7 @@
 		display: flex;
 		align-items: center;
 		gap: 0.5rem;
-		padding: 0.5rem 0.75rem;
+		padding: 0.25rem 0.5rem;
 		background-color: var(--color-cream-paper);
 		border: 1px solid var(--color-warm-gray);
 		border-radius: 4px;
@@ -343,7 +347,7 @@
 		background-color: rgba(255, 255, 255, 0.5);
 		border: 1px solid rgba(160, 152, 138, 0.3);
 		border-radius: 12px;
-		padding: 0.25rem 0.75rem;
+		padding: 0.25rem 0.5rem;
 		box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
 	}
 
@@ -351,11 +355,11 @@
 		font-family: 'Courier New', monospace;
 		font-size: 0.875rem;
 		color: var(--color-charcoal);
-		letter-spacing: 0.05em;
+		letter-spacing: 0.025em;
 	}
 
 	.exercise-content {
-		padding: 1.5rem;
+		padding: 1rem 1.5em;
 	}
 
 	.exercise-title {
@@ -368,72 +372,155 @@
 		border-bottom: 1px dashed var(--color-warm-gray);
 	}
 
-	/* Vintage lined paper effect for instructions */
-	.exercise-instructions-container {
-		margin-bottom: 1.5rem;
+	/* New styles for multiple page display */
+	.exercise-pages {
+		display: flex;
+		flex-direction: column;
+		gap: 2rem;
+		align-items: center;
+		margin: 1.5rem 0;
 	}
 
-	.exercise-instructions {
+	.exercise-page-container {
 		position: relative;
-		font-size: 1rem;
-		line-height: 1.6;
-		color: var(--color-charcoal);
-		background-color: #fcf9f0;
-		background-image: linear-gradient(rgba(220, 220, 220, 0.25) 1px, transparent 1px);
-		background-size: 100% 1.6rem;
-		border-radius: 6px;
-		box-shadow:
-			0 1px 3px rgba(0, 0, 0, 0.1),
-			inset 0 1px 0 rgba(255, 255, 255, 0.9);
-		border: 1px solid var(--color-warm-gray);
-		border-left: 3px solid var(--color-terracotta, #c26e5a);
-		padding: 1rem 1.5rem;
-		margin: 0 0.5rem;
+		width: 85%; /* Default width - will be overridden by dynamic styles */
+		margin: 0 auto;
+		transition: width 0.3s ease;
 	}
 
-	.exercise-instructions p {
-		margin-bottom: 1rem;
-	}
-
-	.exercise-instructions p:last-child {
-		margin-bottom: 0;
-	}
-
-	.exercise-instructions .questions-header {
-		display: block;
-		margin: 1.25rem 0 0.75rem;
-		font-size: 1.1rem;
-		color: var(--color-navy);
-		font-weight: 600;
-		border-bottom: 2px dotted var(--color-gold);
-		padding-bottom: 0.375rem;
-	}
-
-	.exercise-instructions .choice-option {
-		font-family: 'Courier New', monospace;
-		margin-right: 0.25rem;
-		letter-spacing: 0.03em;
-	}
-
-	/* Vintage photo frame for images */
-	.exercise-display-image {
-		margin: 1.5rem auto;
-		text-align: center;
-		max-width: 90%;
-	}
-
-	.exercise-image {
+	.exercise-page {
+		position: relative;
+		display: flex;
+		justify-content: center;
 		border: 1px solid var(--color-warm-gray);
 		border-radius: 4px;
-		max-width: 100%;
-		height: auto;
+		background-color: #fff;
 		box-shadow:
 			0 2px 4px rgba(0, 0, 0, 0.1),
 			0 0 0 4px rgba(255, 255, 255, 0.8),
 			0 0 0 5px rgba(160, 152, 138, 0.2);
+		overflow: hidden;
 	}
 
-	/* Vintage empty state styling */
+	.exercise-image {
+		width: 100%;
+		height: auto;
+		display: block;
+		transition: opacity 0.3s ease;
+	}
+
+	/* Resize handle styling */
+	.resize-handle {
+		position: absolute;
+		top: 0;
+		right: -12px;
+		width: 24px; /* Wide touch area */
+		height: 100%;
+		cursor: ew-resize;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		z-index: 10;
+	}
+
+	.handle-bar {
+		height: 90%; /* Taller to be more visible */
+		width: 16px;
+		/* background-color: var(--color-terracotta, #c26e5a); */
+		background-color: var(--color-cream-paper);
+		border-radius: 6px;
+		opacity: 0.4;
+		transition:
+			opacity 0.2s ease,
+			background-color 0.2s ease;
+		background-image: repeating-linear-gradient(
+			45deg,
+			transparent,
+			transparent 5px,
+			rgba(0, 0, 0, 0.1) 6px,
+			rgba(0, 0, 0, 0.1) 10px
+		);
+	}
+
+	.resize-handle:hover .handle-bar {
+		background-color: var(--color-terracotta, #c26e5a);
+		width: 20px;
+		box-shadow:
+			0 0 6px rgba(194, 110, 90, 0.4),
+			inset 0 1px 3px rgba(0, 0, 0, 0.3);
+	}
+
+	.resize-handle:active .handle-bar {
+		background-color: #ad6c66;
+	}
+
+	/* Add a tooltip hint on hover */
+	.resize-handle::after {
+		content: 'Drag to resize';
+		position: absolute;
+		top: 10px;
+		right: 20px;
+		background: var(--color-charcoal, #33312e);
+		color: var(--color-cream-paper, #f7f3e3);
+		padding: 4px 8px;
+		border-radius: 4px;
+		font-size: 11px;
+		white-space: nowrap;
+		opacity: 0;
+		transform: translateX(-10px);
+		transition: all 0.3s ease;
+		pointer-events: none;
+	}
+
+	.resize-handle:hover::after {
+		opacity: 0.9;
+		transform: translateX(0);
+	}
+
+	.page-indicator {
+		text-align: center;
+		font-size: 0.875rem;
+		color: var(--color-charcoal);
+		opacity: 0.7;
+		margin-top: 0.5rem;
+		font-family: 'Courier New', monospace;
+	}
+
+	/* Image loader styling */
+	.image-loader {
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 0.75rem;
+		background-color: var(--color-cream-paper, #f7f3e3);
+		border: 1px solid var(--color-warm-gray, #a09a8a);
+		border-radius: 8px;
+		padding: 1rem;
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+		z-index: 1;
+	}
+
+	.spinner {
+		width: 40px;
+		height: 40px;
+		border: 3px solid rgba(194, 110, 90, 0.3);
+		border-radius: 50%;
+		border-top-color: var(--color-terracotta, #c26e5a);
+		animation: spin 1s linear infinite;
+	}
+
+	.image-loader span {
+		font-family: 'Courier New', monospace;
+		font-size: 0.875rem;
+		color: var(--color-charcoal, #33312e);
+		font-style: italic;
+	}
+
+	/* Empty state styling */
 	.empty-state {
 		display: flex;
 		flex-direction: column;
@@ -471,54 +558,29 @@
 		color: var(--color-warm-gray);
 	}
 
-	.exercise-display-image {
-		position: relative;
-		margin: 1.5rem auto;
-		text-align: center;
-		max-width: 90%;
-		min-height: 100px; /* Ensures space for loader */
-	}
-
-	.image-loader {
-		position: absolute;
-		top: 50%;
-		left: 50%;
-		transform: translate(-50%, -50%);
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		gap: 0.75rem;
-		background-color: var(--color-cream-paper, #f7f3e3);
-		border: 1px solid var(--color-warm-gray, #a09a8a);
-		border-radius: 8px;
-		padding: 1rem;
-		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-		z-index: 1;
-	}
-
-	.spinner {
-		width: 40px;
-		height: 40px;
-		border: 3px solid rgba(194, 110, 90, 0.3);
-		border-radius: 50%;
-		border-top-color: var(--color-terracotta, #c26e5a);
-		animation: spin 1s linear infinite;
-	}
-
-	.image-loader span {
-		font-family: 'Courier New', monospace;
-		font-size: 0.875rem;
-		color: var(--color-charcoal, #33312e);
-		font-style: italic;
-	}
-
-	.exercise-image {
-		transition: opacity 0.3s ease;
-	}
-
 	@keyframes spin {
 		to {
 			transform: rotate(360deg);
+		}
+	}
+
+	/* Mobile optimizations */
+	@media (max-width: 768px) {
+		.exercise-page-container {
+			width: 95%; /* Wider on mobile by default */
+		}
+
+		.resize-handle {
+			right: -8px;
+			width: 16px; /* Smaller but still touchable */
+		}
+
+		.resize-handle::after {
+			display: none; /* Hide tooltip on mobile */
+		}
+
+		.handle-bar {
+			width: 14px;
 		}
 	}
 </style>

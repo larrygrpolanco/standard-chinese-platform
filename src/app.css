@@ -62,8 +62,8 @@ h5,
 h6 {
 	font-family: 'Arvo', serif;
 	font-weight: bold;
-	margin-top: var(--space-5);
-	margin-bottom: var(--space-3);
+	margin-top: var(--space-3);
+	margin-bottom: var(--space-1);
 	line-height: 1.3;
 }
 
