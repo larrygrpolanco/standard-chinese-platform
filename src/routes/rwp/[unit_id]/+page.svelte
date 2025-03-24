@@ -12,7 +12,7 @@
 	} from '$lib/supabase/client.js';
 	import { authStore } from '$lib/stores/authStore';
 
-	import { generateRwpExercise } from '$lib/rwp/RwpGenerator.js';
+	import { generateRwpExercise } from '$lib/rwp/rwpGenerator.js';
 
 	import Loader from '$lib/components/UI/Loader.svelte';
 
