@@ -129,7 +129,7 @@
 		</div>
 		<div class="profile-reminder">
 			<h3>Make Your Practice More Relevant</h3>
-			<div>Make sure to edit your <em>Learning Profile <em> for better RWP quizzes</em></em></div>p>
+			<p>Make sure to edit your <em>Learning Profile <em> for better RWP quizzes</p>
 		</div>
 	</section>
 
