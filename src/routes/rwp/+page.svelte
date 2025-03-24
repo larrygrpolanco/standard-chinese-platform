@@ -47,7 +47,7 @@
 
 			<div class="header-buttons">
 				{#if user}
-					<a href="/profile" class="primary-button">
+					<a href="/login/profile" class="primary-button">
 						Update Your Profile
 						<svg class="button-arrow" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 							<path
@@ -161,7 +161,10 @@
 		<div class="content-section">
 			<h2 class="section-title">Try out RWP</h2>
 			<div class="section-content">
-				<p>Try this demo based on the most important langauge learning topic - Module 3, Unit 2 (Food Shopping)</p>
+				<p>
+					Try this demo based on the most important langauge learning topic - Module 3, Unit 2 (Food
+					Shopping)
+				</p>
 
 				<div class="cta-container">
 					<button on:click={handleDemoClick} class="primary-button large-button">

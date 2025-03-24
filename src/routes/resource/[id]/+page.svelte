@@ -22,7 +22,7 @@
 			modules: ['Core Module 1'],
 			description: 'Basic Chinese sounds and pinyin system'
 		},
-		'numbers': {
+		numbers: {
 			name: 'Numbers',
 			modules: ['Core Module 1', 'Core Module 3'],
 			description: 'Cardinal and ordinal numbers, quantities and counting'
@@ -41,10 +41,8 @@
 
 	// Hardcoded tape connections to core modules
 	const tapeConnections = {
-		'pronunciation-romanization': [
-			{ tapeNumbers: '1-6', coreModule: 'Core Module 1' }
-		],
-		'numbers': [
+		'pronunciation-romanization': [{ tapeNumbers: '1-6', coreModule: 'Core Module 1' }],
+		numbers: [
 			{ tapeNumbers: '1-4', coreModule: 'Core Module 1' },
 			{ tapeNumbers: '5-6', coreModule: 'Core Module 3' }
 		],
@@ -65,16 +63,18 @@
 	};
 
 	$: connections = tapeConnections[resourceId] || [];
-	
+
 	$: filteredExercises = currentTape
 		? exercises
 				.filter((ex) => ex.tape_id === currentTape.id)
 				.sort((a, b) => a.order_num - b.order_num)
 		: [];
-	
+
 	$: currentExercise = filteredExercises[currentExerciseIndex] || null;
 	$: hasDisplayImage = currentExercise?.display_url && currentExercise.display_url.trim() !== '';
-	$: displayUrls = hasDisplayImage ? currentExercise.display_url.split(',').map(url => url.trim()) : [];
+	$: displayUrls = hasDisplayImage
+		? currentExercise.display_url.split(',').map((url) => url.trim())
+		: [];
 	$: currentImageUrl = displayUrls[currentImageIndex] || '';
 
 	// Reset image index when exercise or tape changes
@@ -154,7 +154,7 @@
 			currentExerciseIndex--;
 			const prevExercise = filteredExercises[currentExerciseIndex];
 			if (prevExercise?.display_url) {
-				const prevUrls = prevExercise.display_url.split(',').map(url => url.trim());
+				const prevUrls = prevExercise.display_url.split(',').map((url) => url.trim());
 				currentImageIndex = prevUrls.length - 1;
 			} else {
 				currentImageIndex = 0;
@@ -193,6 +193,51 @@
 		);
 		formatted = formatted.replace(/\(\s*\)\s/g, '<span class="choice-option">( ) </span>');
 		return formatted;
+	}
+
+	// Add for image resizing
+	let imageWidths = {}; // Store user's preferred widths
+	let isDragging = false;
+	let startX = 0;
+	let startWidth = 0;
+	let defaultImageWidth = '85%'; // Initial readable size
+
+	// Image resize functions
+	function startResize(e) {
+		isDragging = true;
+		startX = e.clientX || e.touches?.[0].clientX;
+
+		// Get current width from stored value or default
+		const imageId = `${currentExerciseIndex}-${currentImageIndex}`;
+		const currentWidth = imageWidths[imageId];
+		startWidth = currentWidth ? parseInt(currentWidth) : 85;
+
+		// Add event listeners
+		window.addEventListener('mousemove', handleMouseMove);
+		window.addEventListener('mouseup', stopResize);
+		window.addEventListener('touchmove', handleMouseMove);
+		window.addEventListener('touchend', stopResize);
+		e.preventDefault();
+	}
+
+	function handleMouseMove(e) {
+		if (!isDragging) return;
+		const clientX = e.clientX || e.touches?.[0].clientX;
+		const delta = clientX - startX;
+
+		// Calculate new width with constraints (50% to 100%)
+		const newWidth = Math.max(50, Math.min(100, startWidth + delta * 0.5));
+		const imageId = `${currentExerciseIndex}-${currentImageIndex}`;
+		imageWidths[imageId] = `${newWidth}%`;
+		imageWidths = { ...imageWidths }; // Trigger reactivity
+	}
+
+	function stopResize() {
+		isDragging = false;
+		window.removeEventListener('mousemove', handleMouseMove);
+		window.removeEventListener('mouseup', stopResize);
+		window.removeEventListener('touchmove', handleMouseMove);
+		window.removeEventListener('touchend', stopResize);
 	}
 
 	onMount(() => {
@@ -258,8 +303,8 @@
 
 				<div class="resource-warning">
 					<p>
-						<strong>Note:</strong> These resource modules are supplementary materials and may be extra boring
-						for absolute beginners. They are best used alongside the core modules.
+						<strong>Note:</strong> These resource modules are supplementary materials and may be extra
+						boring for absolute beginners. They are best used alongside the core modules.
 					</p>
 				</div>
 			</header>
@@ -310,7 +355,8 @@
 									<button
 										class="nav-button"
 										on:click={nextImage}
-										disabled={currentImageIndex === displayUrls.length - 1 && currentExerciseIndex === filteredExercises.length - 1}
+										disabled={currentImageIndex === displayUrls.length - 1 &&
+											currentExerciseIndex === filteredExercises.length - 1}
 										aria-label="Next page"
 									>
 										<span>Next</span>
@@ -338,19 +384,38 @@
 
 									{#if hasDisplayImage}
 										<div class="exercise-display-image">
-											{#if !imageLoaded}
-												<div class="image-loader">
-													<div class="spinner"></div>
-													<span>Loading image...</span>
+											<div
+												class="image-container"
+												style="width: {imageWidths[
+													`${currentExerciseIndex}-${currentImageIndex}`
+												] || defaultImageWidth}; margin: 0 auto;"
+											>
+												{#if !imageLoaded}
+													<div class="image-loader">
+														<div class="spinner"></div>
+														<span>Loading image...</span>
+													</div>
+												{/if}
+
+												<div class="exercise-page">
+													<img
+														src={currentImageUrl}
+														alt={`Exercise page ${currentImageIndex + 1}`}
+														class="exercise-image"
+														style="opacity: {imageLoaded ? 1 : 0}"
+														on:load={() => (imageLoaded = true)}
+													/>
+
+													<!-- Resize handle -->
+													<div
+														class="resize-handle"
+														on:mousedown={startResize}
+														on:touchstart={startResize}
+													>
+														<div class="handle-bar"></div>
+													</div>
 												</div>
-											{/if}
-											<img
-												src={currentImageUrl}
-												alt={`Exercise page ${currentImageIndex + 1}`}
-												class="exercise-image"
-												style="opacity: {imageLoaded ? 1 : 0}"
-												on:load={() => (imageLoaded = true)}
-											/>
+											</div>
 										</div>
 									{:else}
 										<div class="no-image-notice">
@@ -745,7 +810,86 @@
 		margin: 0 0.5rem;
 	}
 
+	/* Image container and resize styling */
+	.image-container {
+		position: relative;
+		transition: width 0.3s ease;
+	}
 
+	.exercise-page {
+		position: relative;
+		display: inline-block;
+		max-width: 100%;
+	}
+
+	/* Resize handle styling */
+	.resize-handle {
+		position: absolute;
+		top: 0;
+		right: -12px;
+		width: 24px; /* Wide touch area */
+		height: 100%;
+		cursor: ew-resize;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		z-index: 10;
+	}
+
+	.handle-bar {
+		height: 80%; /* Taller to be more visible */
+		width: 16px;
+		background-color: #f7f3e3;
+		border-radius: 6px 0 0 6px;
+		opacity: 0.4;
+		transition:
+			opacity 0.2s ease,
+			background-color 0.2s ease;
+		background-image: repeating-linear-gradient(
+			45deg,
+			transparent,
+			transparent 5px,
+			rgba(0, 0, 0, 0.1) 6px,
+			rgba(0, 0, 0, 0.1) 10px
+		);
+        transform: translateX(-50%);
+	}
+
+	.resize-handle:hover .handle-bar {
+		background-color: #c26e5a;
+		width: 20px;
+		box-shadow:
+			0 0 6px rgba(194, 110, 90, 0.4),
+			inset 0 1px 3px rgba(0, 0, 0, 0.3);
+		opacity: 0.8;
+	}
+
+	.resize-handle:active .handle-bar {
+		background-color: #ad6c66;
+	}
+
+	/* Add a tooltip hint on hover */
+	.resize-handle::after {
+		content: 'Drag to resize';
+		position: absolute;
+		top: 10px;
+		right: 20px;
+		background: #33312e;
+		color: #f7f3e3;
+		padding: 4px 8px;
+		border-radius: 4px;
+		font-size: 11px;
+		white-space: nowrap;
+		opacity: 0;
+		transform: translateX(-10px);
+		transition: all 0.3s ease;
+		pointer-events: none;
+	}
+
+	.resize-handle:hover::after {
+		opacity: 0.9;
+		transform: translateX(0);
+	}
 
 	/* Vintage photo frame for images */
 	.exercise-display-image {
@@ -909,6 +1053,22 @@
 			width: 100%;
 			text-align: center;
 			margin-top: 0.5rem;
+		}
+	}
+
+	/* Mobile optimizations */
+	@media (max-width: 768px) {
+		.resize-handle {
+			right: -8px;
+			width: 16px; /* Smaller but still touchable */
+		}
+
+		.resize-handle::after {
+			display: none; /* Hide tooltip on mobile */
+		}
+
+		.handle-bar {
+			width: 14px;
 		}
 	}
 </style>
