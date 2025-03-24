@@ -19,7 +19,7 @@
 		<slot />
 	</main>
 
-	<!-- src/routes/+layout.svelte (Footer section only) -->
+
 	<!-- src/routes/+layout.svelte (Footer section only) -->
 	<footer class="site-footer">
 		<div class="footer-container">
@@ -62,7 +62,7 @@
 						</svg>
 					</div>
 					<p class="vintage-message">ORIGINALLY RECORDED ON CASSETTE TAPES</p>
-					<p class="attribution">Based on materials from the Foreign Service Institute</p>
+					<!-- <p class="attribution">Based on materials from the Foreign Service Institute</p> -->
 				</div>
 
 				<!-- Middle column: Required policies -->
@@ -118,10 +118,9 @@
 	}
 
 	/* Footer Styles */
-	/* Footer Styles */
 	.site-footer {
 		flex-shrink: 0;
-		padding: 2rem 0 1.5rem;
+		padding: 0rem 0 1.5rem;
 		border-top: 1px solid #a0998a;
 		background-color: #e8e5d7;
 		position: relative;
@@ -148,7 +147,7 @@
 		top: 0;
 		left: 0;
 		right: 0;
-		height: 1px;
+		height: 2px;
 		background: linear-gradient(to right, transparent, #33312e, transparent);
 	}
 
@@ -271,7 +270,7 @@
 		.footer-column:first-child {
 			grid-column: span 2;
 			text-align: center;
-			margin-bottom: 1rem;
+			margin-bottom: .25rem;
 		}
 
 		.cassette-illustration {
