@@ -390,14 +390,14 @@
 													`${currentExerciseIndex}-${currentImageIndex}`
 												] || defaultImageWidth}; margin: 0 auto;"
 											>
-												{#if !imageLoaded}
-													<div class="image-loader">
-														<div class="spinner"></div>
-														<span>Loading image...</span>
-													</div>
-												{/if}
-
 												<div class="exercise-page">
+													{#if !imageLoaded}
+														<div class="image-loader">
+															<div class="spinner"></div>
+															<span>Loading image...</span>
+														</div>
+													{/if}
+
 													<img
 														src={currentImageUrl}
 														alt={`Exercise page ${currentImageIndex + 1}`}
@@ -406,14 +406,16 @@
 														on:load={() => (imageLoaded = true)}
 													/>
 
-													<!-- Resize handle -->
-													<div
-														class="resize-handle"
-														on:mousedown={startResize}
-														on:touchstart={startResize}
-													>
-														<div class="handle-bar"></div>
-													</div>
+													<!-- Only show resize handle after image loads -->
+													{#if imageLoaded}
+														<div
+															class="resize-handle"
+															on:mousedown={startResize}
+															on:touchstart={startResize}
+														>
+															<div class="handle-bar"></div>
+														</div>
+													{/if}
 												</div>
 											</div>
 										</div>
@@ -852,7 +854,7 @@
 			rgba(0, 0, 0, 0.1) 6px,
 			rgba(0, 0, 0, 0.1) 10px
 		);
-        transform: translateX(-50%);
+		transform: translateX(-50%);
 	}
 
 	.resize-handle:hover .handle-bar {

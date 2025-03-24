@@ -19,79 +19,80 @@
 		<slot />
 	</main>
 
+	<!-- src/routes/+layout.svelte (Footer section only) -->
+	<!-- src/routes/+layout.svelte (Footer section only) -->
 	<footer class="site-footer">
 		<div class="footer-container">
-			<div class="footer-content">
-				<!-- Top scan line effect -->
-				<div class="scan-line-container">
-					<div class="scan-line"></div>
-					<div class="scan-line-highlight"></div>
+			<!-- Top scanner line effect -->
+			<div class="scan-line-container">
+				<div class="scan-line"></div>
+				<div class="scan-line-highlight"></div>
+			</div>
+
+			<div class="footer-grid">
+				<!-- Left column: About & cassette branding -->
+				<div class="footer-column">
+					<div class="cassette-illustration">
+						<svg
+							class="cassette-svg"
+							width="130"
+							height="80"
+							viewBox="0 0 24 24"
+							fill="none"
+							xmlns="http://www.w3.org/2000/svg"
+						>
+							<rect x="3" y="6" width="18" height="12" rx="1" stroke="#33312E" stroke-width="2" />
+							<circle
+								cx="8"
+								cy="12"
+								r="2"
+								stroke="#33312E"
+								stroke-width="2"
+								class="reel left-reel"
+							/>
+							<circle
+								cx="16"
+								cy="12"
+								r="2"
+								stroke="#33312E"
+								stroke-width="2"
+								class="reel right-reel"
+							/>
+							<line x1="10" y1="12" x2="14" y2="12" stroke="#33312E" stroke-width="2" />
+						</svg>
+					</div>
+					<p class="vintage-message">ORIGINALLY RECORDED ON CASSETTE TAPES</p>
+					<p class="attribution">Based on materials from the Foreign Service Institute</p>
 				</div>
 
-				<!-- Vintage style message -->
-				<div class="vintage-message">ORIGINALLY RECORDED ON CASSETTE TAPES</div>
-
-				<!-- Cassette illustration -->
-				<div class="cassette-illustration">
-					<svg
-						width="100"
-						height="60"
-						viewBox="0 0 100 60"
-						fill="none"
-						xmlns="http://www.w3.org/2000/svg"
-						class="cassette-svg"
-					>
-						<!-- Cassette body -->
-						<rect x="5" y="5" width="90" height="50" rx="4" stroke="#33312E" stroke-width="2" />
-
-						<!-- Left reel -->
-						<circle
-							cx="30"
-							cy="30"
-							r="10"
-							stroke="#33312E"
-							stroke-width="2"
-							class="reel left-reel"
-						/>
-						<circle cx="30" cy="30" r="3" stroke="#33312E" stroke-width="1" />
-
-						<!-- Right reel -->
-						<circle
-							cx="70"
-							cy="30"
-							r="10"
-							stroke="#33312E"
-							stroke-width="2"
-							class="reel right-reel"
-						/>
-						<circle cx="70" cy="30" r="3" stroke="#33312E" stroke-width="1" />
-
-						<!-- Tape connection -->
-						<line x1="40" y1="30" x2="60" y2="30" stroke="#33312E" stroke-width="2" />
-
-						<!-- Label -->
-						<rect x="20" y="10" width="60" height="10" rx="2" stroke="#33312E" stroke-width="1.5" />
-
-						<!-- Scanner line effect -->
-						<rect
-							x="10"
-							y="29"
-							width="80"
-							height="2"
-							fill="#DDB967"
-							opacity="0.3"
-							class="scanner-line"
-						/>
-					</svg>
+				<!-- Middle column: Required policies -->
+				<div class="footer-column">
+					<h3 class="footer-heading">Legal</h3>
+					<nav class="footer-nav">
+						<a href="/policies#terms" class="footer-link">Terms of Service</a>
+						<a href="/policies#privacy" class="footer-link">Privacy Policy</a>
+						<a href="/policies#refunds" class="footer-link">Refund Policy</a>
+						<a href="/policies#cancellation" class="footer-link">Cancellation Policy</a>
+					</nav>
 				</div>
 
-				<!-- Footer text -->
-				<p class="copyright">
-					© {new Date().getFullYear()} Taped Chinese
-				</p>
-				<p class="attribution">Based on materials from the Foreign Service Institute</p>
+				<!-- Right column: Contact & More Info -->
+				<div class="footer-column">
+					<h3 class="footer-heading">Contact</h3>
+					<a href="/policies#contact" class="footer-link">Contact Us</a>
+					<a href="/about" class="footer-link">About This Project</a>
+
+					<h3 class="footer-heading subscription-heading">Subscription</h3>
+					<a href="/premium" class="footer-link">Premium Features</a>
+					<a href="/faq" class="footer-link">FAQ</a>
+				</div>
+			</div>
+
+			<div class="footer-bottom">
+				<p class="copyright">© {new Date().getFullYear()} Taped Chinese</p>
 				<p class="footer-note">
-					Modernized and digitized to preserve and share this open source resource
+					This resource is an independent, educational project not affiliated with the U.S.
+					Government or Foreign Service Institute.
 				</p>
 			</div>
 		</div>
@@ -117,9 +118,10 @@
 	}
 
 	/* Footer Styles */
+	/* Footer Styles */
 	.site-footer {
 		flex-shrink: 0;
-		padding: 2rem 0;
+		padding: 2rem 0 1.5rem;
 		border-top: 1px solid #a0998a;
 		background-color: #e8e5d7;
 		position: relative;
@@ -130,17 +132,10 @@
 		width: 100%;
 		max-width: 1200px;
 		margin: 0 auto;
-		padding: 0 1rem;
+		padding: 0 1.5rem;
 	}
 
-	.footer-content {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		text-align: center;
-		position: relative;
-	}
-
+	/* Keeping your scan line effect */
 	.scan-line-container {
 		position: relative;
 		width: 100%;
@@ -167,28 +162,90 @@
 		opacity: 0.4;
 	}
 
+	/* New grid layout */
+	.footer-grid {
+		display: grid;
+		grid-template-columns: 1fr 1fr 1fr;
+		gap: 2rem;
+		margin-bottom: 2rem;
+	}
+
+	.footer-column {
+		display: flex;
+		flex-direction: column;
+	}
+
+	.footer-heading {
+		font-size: 1rem;
+		font-weight: 600;
+		margin-bottom: 1rem;
+		color: #33312e;
+	}
+
+	.subscription-heading {
+		margin-top: 1.5rem;
+	}
+
+	.footer-nav {
+		display: flex;
+		flex-direction: column;
+	}
+
+	.footer-link {
+		font-size: 0.875rem;
+		color: #665e4d;
+		text-decoration: none;
+		margin-bottom: 0.5rem;
+		transition: color 0.2s;
+	}
+
+	.footer-link:hover {
+		color: #ddb967;
+		text-decoration: underline;
+	}
+
+	/* Bottom section with copyright */
+	.footer-bottom {
+		padding-top: 1.5rem;
+		border-top: 1px solid rgba(160, 153, 138, 0.3);
+		text-align: center;
+	}
+
+	/* Your existing styles with minor adjustments */
+	.cassette-illustration {
+		margin: 0 0 1rem;
+		opacity: 0.6;
+	}
+
 	.vintage-message {
 		font-family: 'Courier New', monospace;
-		font-size: 0.75rem;
+		font-size: 0.7rem;
 		letter-spacing: 0.1em;
 		color: #33312e;
 		text-transform: uppercase;
 		opacity: 0.7;
-		margin: 1.25rem 0;
+		margin: 0 0 1rem;
 	}
 
-	.cassette-illustration {
-		margin: 1rem 0;
-		opacity: 0.6;
-		position: relative;
+	.attribution {
+		font-size: 0.8rem;
+		color: #665e4d;
 	}
 
-	.cassette-svg {
-		display: block;
+	.copyright {
+		font-size: 0.875rem;
+		color: #33312e;
+		margin-bottom: 0.5rem;
+	}
+
+	.footer-note {
+		font-size: 0.75rem;
+		color: #a0998a;
+		max-width: 36rem;
 		margin: 0 auto;
 	}
 
-	/* Subtle reel animation */
+	/* Cassette animations (keeping yours) */
 	.reel {
 		transform-origin: center;
 	}
@@ -201,29 +258,38 @@
 		animation: rotate 20s linear infinite reverse;
 	}
 
-	@keyframes rotate {
-		from {
-			transform: rotate(0deg);
-		}
-		to {
-			transform: rotate(360deg);
-		}
-	}
-
-	/* Scanner line animation */
 	.scanner-line {
 		animation: scan 4s ease-in-out infinite;
 	}
 
-	@keyframes scan {
-		0%,
-		100% {
-			transform: translateY(0);
-			opacity: 0.3;
+	/* Responsive adjustments */
+	@media (max-width: 768px) {
+		.footer-grid {
+			grid-template-columns: 1fr 1fr;
 		}
-		50% {
-			transform: translateY(5px);
-			opacity: 0.5;
+
+		.footer-column:first-child {
+			grid-column: span 2;
+			text-align: center;
+			margin-bottom: 1rem;
+		}
+
+		.cassette-illustration {
+			margin: 0 auto 1rem;
+		}
+	}
+
+	@media (max-width: 480px) {
+		.footer-grid {
+			grid-template-columns: 1fr;
+		}
+
+		.footer-column:first-child {
+			grid-column: span 1;
+		}
+
+		.footer-column {
+			margin-bottom: 1.5rem;
 		}
 	}
 

@@ -182,6 +182,7 @@
 		</div>
 	</section>
 </div>
+
 <style>
 	/* Keep the resource modules container styles */
 	.resource-modules-container {
