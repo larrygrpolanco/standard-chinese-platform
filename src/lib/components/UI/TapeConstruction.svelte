@@ -1,3 +1,4 @@
+<!-- TapeConstruction.svelte  -->
 <script>
 	import { onMount, onDestroy } from 'svelte';
 	import FlashcardDeck from '$lib/components/FlashcardDeck.svelte'; // Import the component

@@ -43,6 +43,7 @@
 	/* Tab container */
 	.tab-container {
 		padding: 8px;
+		border-radius: 6px;
 		border-bottom: 1px solid var(--color-warm-gray, #a0998a);
 		background-color: var(--color-cream-paper, #f4f1de);
 	}

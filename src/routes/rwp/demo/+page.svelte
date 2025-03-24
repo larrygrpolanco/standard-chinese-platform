@@ -109,6 +109,8 @@
 			// PHASE 1A: Analyze story requirements
 			generationPhase = 'analysis';
 			console.log('Analyzing story requirements...');
+			const analysisStartTime = Date.now();
+
 			const analysisResponse = await fetch('/api/rwp/analyze-story', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
@@ -119,6 +121,8 @@
 					debug
 				})
 			});
+
+			console.log(`Story analysis took ${(Date.now() - analysisStartTime) / 1000} seconds`);
 
 			if (!analysisResponse.ok) {
 				const errorData = await analysisResponse.json();
@@ -135,6 +139,8 @@
 			// PHASE 1B: Generate the story based on analysis
 			generationPhase = 'story';
 			console.log('Generating story based on analysis...');
+			const storyStartTime = Date.now();
+
 			const storyResponse = await fetch('/api/rwp/generate-story', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
@@ -146,6 +152,8 @@
 					debug
 				})
 			});
+
+			console.log(`Story generation took ${(Date.now() - storyStartTime) / 1000} seconds`);
 
 			if (!storyResponse.ok) {
 				const errorData = await storyResponse.json();
@@ -162,6 +170,8 @@
 			// PHASE 2: Generate questions based on the story and analysis
 			generationPhase = 'questions';
 			console.log('Generating questions...');
+			const questionsStartTime = Date.now();
+
 			const questionsResponse = await fetch('/api/rwp/create-questions', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
@@ -174,6 +184,8 @@
 					debug
 				})
 			});
+
+			console.log(`Question generation took ${(Date.now() - questionsStartTime) / 1000} seconds`);
 
 			if (!questionsResponse.ok) {
 				const errorData = await questionsResponse.json();
@@ -190,6 +202,8 @@
 			// PHASE 3: Format everything into JSON structure
 			generationPhase = 'formatting';
 			console.log('Formatting exercise...');
+			const formatStartTime = Date.now();
+
 			const formatResponse = await fetch('/api/rwp/format-exercise', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
@@ -200,6 +214,8 @@
 					debug
 				})
 			});
+
+			console.log(`Exercise formatting took ${(Date.now() - formatStartTime) / 1000} seconds`);
 
 			if (!formatResponse.ok) {
 				const errorData = await formatResponse.json();

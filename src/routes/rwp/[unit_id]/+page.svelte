@@ -10,11 +10,14 @@
 		getRwpContent,
 		getUnitVocabularyData
 	} from '$lib/supabase/client.js';
-	import { generateRwpExercise } from '$lib/rwp/rwpGenerator.js';
-	import Loader from '$lib/components/UI/Loader.svelte';
-	import ModuleQuestions from '$lib/components/ModuleQuestions.svelte';
 	import { authStore } from '$lib/stores/authStore';
+
+	import { generateRwpExercise } from '$lib/rwp/RwpGenerator.js';
+
+	import Loader from '$lib/components/UI/Loader.svelte';
+
 	import Toast from '$lib/components/UI/Toast.svelte';
+	import ModuleQuestions from '$lib/components/ModuleQuestions.svelte';
 	import ComprehensionExercise from '$lib/components/rwp/ComprehensionExercise.svelte';
 	import TapeConstruction from '$lib/components/UI/TapeConstruction.svelte';
 

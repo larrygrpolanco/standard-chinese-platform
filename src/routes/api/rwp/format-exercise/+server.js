@@ -38,6 +38,7 @@ export async function POST({ request }) {
 		];
 
 		const { response, data } = await apiClient.fetchCompletion(messages, {
+            response_format: { type: "json_object" },
 			temperature: 0.3, // Lower temperature for more precise formatting
 			model: 'gpt-4o-mini-2024-07-18'
 		});
@@ -105,7 +106,7 @@ function createFormatPrompt(story, questions, unitData) {
 	const moduleTitle = unitData?.module?.title || '';
 
 	return `
-Transform the following Chinese story and questions into a well-structured JSON object with full translations and annotations.
+Transform the following Chinese story and questions into a well-structured JSON object with full translations.
 
 # STORY
 ${story}
