@@ -11,7 +11,23 @@ const storedPrefs =
 const defaultPreferences = {
 	displayMode: storedPrefs.displayMode || 'simplified', // 'simplified', 'traditional', or 'pinyin'
 	showPinyin: storedPrefs.showPinyin !== undefined ? storedPrefs.showPinyin : true,
-    showEnglish: storedPrefs.showEnglish !== undefined ? storedPrefs.showEnglish : true 
+	showEnglish: storedPrefs.showEnglish !== undefined ? storedPrefs.showEnglish : true
 };
 
 // Create the store
+const fontPrefsStore = writable(defaultPreferences);
+
+// Export with extra methods
+export const fontPreferences = {
+	...fontPrefsStore,
+	update: (updater) => {
+		fontPrefsStore.update((prefs) => {
+			const newPrefs = updater(prefs);
+			// Save to localStorage when updated
+			if (typeof localStorage !== 'undefined') {
+				localStorage.setItem('fontPreferences', JSON.stringify(newPrefs));
+			}
+			return newPrefs;
+		});
+	}
+};
