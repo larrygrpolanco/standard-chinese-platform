@@ -1,329 +1,415 @@
-<!-- src/routes/legal/+page.svelte -->
+<!-- src/routes/policies/+page.svelte -->
 <script>
 	import { onMount } from 'svelte';
 
-	// For smooth scrolling to anchors
-	onMount(() => {
-		// Check if there's a hash in the URL
-		if (window.location.hash) {
-			const id = window.location.hash.substring(1);
-			const element = document.getElementById(id);
-			if (element) {
-				element.scrollIntoView({ behavior: 'smooth' });
-			}
+	// For contact form
+	let name = '';
+	let email = '';
+	let message = '';
+	let submitting = false;
+	let submitted = false;
+	let error = '';
+
+	// Function to handle form submission
+	async function handleSubmit() {
+		if (!name || !email || !message) {
+			error = 'Please fill out all fields';
+			return;
 		}
 
-		// Add smooth scrolling for all anchor links
-		document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
-			anchor.addEventListener('click', function (e) {
-				e.preventDefault();
-				const id = this.getAttribute('href').substring(1);
-				const element = document.getElementById(id);
-				if (element) {
+		submitting = true;
+		error = '';
+
+		try {
+			// This would be replaced with your actual email service
+			// For example, using EmailJS, FormSubmit, or a serverless function
+			await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulating API call
+
+			// Clear form and show success message
+			name = '';
+			email = '';
+			message = '';
+			submitted = true;
+		} catch (err) {
+			error = 'Failed to send message. Please try again.';
+			console.error('Contact form error:', err);
+		} finally {
+			submitting = false;
+		}
+	}
+
+	// Scroll to section if hash is present in URL
+	onMount(() => {
+		const hash = window.location.hash;
+		if (hash) {
+			const element = document.querySelector(hash);
+			if (element) {
+				setTimeout(() => {
 					element.scrollIntoView({ behavior: 'smooth' });
-					// Update URL without page reload
-					history.pushState(null, null, `#${id}`);
-				}
-			});
-		});
+				}, 100);
+			}
+		}
 	});
 </script>
 
 <svelte:head>
-	<title>Legal Policies | Taped Chinese</title>
+	<title>Policies & Terms | Taped Chinese</title>
 	<meta
 		name="description"
-		content="Terms of Service, Privacy, Refund and Cancellation policies for Taped Chinese."
+		content="Terms of service, privacy policy, refund policy, and contact information for Taped Chinese."
 	/>
 </svelte:head>
 
 <div class="page-background">
-	<div class="container mx-auto max-w-4xl px-4 py-8">
-		<header class="mb-8">
-			<h1 class="page-title">Legal Policies</h1>
-			<div class="title-underline-gold"></div>
-			<p class="page-description">
-				The following policies govern your use of Taped Chinese. These policies are designed to be
-				clear and straightforward.
-			</p>
-		</header>
-
-		<!-- Table of Contents -->
-		<div class="policy-toc">
-			<h2>Quick Navigation</h2>
-			<ul>
+	<div class="policies-container">
+		<!-- Navigation sidebar -->
+		<div class="policies-nav">
+			<h2 class="nav-title">Policies</h2>
+			<ul class="nav-links">
 				<li><a href="#terms">Terms of Service</a></li>
 				<li><a href="#privacy">Privacy Policy</a></li>
-				<li><a href="#subscription">Subscription Policy</a></li>
-				<li><a href="#refund">Refund Policy</a></li>
+				<li><a href="#premium">Premium Features</a></li>
+				<li><a href="#refunds">Refund Policy</a></li>
 				<li><a href="#cancellation">Cancellation Policy</a></li>
+				<li><a href="#contact">Contact Us</a></li>
 			</ul>
+
+			<div class="nav-decoration">
+				<div class="tape-corner top-left"></div>
+				<div class="tape-corner top-right"></div>
+				<div class="tape-corner bottom-left"></div>
+				<div class="tape-corner bottom-right"></div>
+			</div>
 		</div>
 
-		<!-- Terms of Service -->
-		<section id="terms" class="policy-section">
-			<h2>Terms of Service</h2>
-            <div class="title-underline-gold"></div>
+		<!-- Main content -->
+		<div class="policies-content">
+			<h1 class="page-title">Policies & Terms</h1>
+			<div class="title-underline"></div>
 
-			<div class="policy-content">
-				<h3>1. Introduction</h3>
-				<div class="title-underline"></div>
-				<p>
-					Taped Chinese is a hobby project created to digitize and modernize the Foreign Service
-					Institute's "Standard Chinese: A Modular Approach" course materials. By using this
-					website, you agree to these Terms of Service.
-				</p>
+			<!-- Terms of Service -->
+			<section id="terms" class="policy-section">
+				<h2 class="section-title">Terms of Service</h2>
 
-				<h3>2. Account Terms</h3>
-				<div class="title-underline"></div>
-				<p>
-					When you create an account, you are responsible for maintaining the security of your
-					account and the activities that occur under your account. You must provide accurate
-					information when creating an account.
-				</p>
+				<div class="section-content">
+					<p>
+						Welcome to Taped Chinese. By using our website, you agree to these Terms of Service.
+					</p>
 
-				<h3>3. Core Service</h3>
-				<div class="title-underline"></div>
-				<p>
-					The core FSI materials on this website will always remain free and accessible to all
-					users. These materials are in the public domain.
-				</p>
+					<h3>1. About Our Service</h3>
+					<p>
+						Taped Chinese is an educational platform that digitizes the Foreign Service Institute's
+						"Standard Chinese: A Modular Approach" course materials. We offer both free and premium
+						subscription services.
+					</p>
 
-				<h3>4. Premium Features</h3>
-				<div class="title-underline"></div>
-				<p>
-					Premium features, including expanded access to Relevant World Practice (RWP) exercises,
-					are available through a paid subscription. Premium features have reasonable usage limits
-					to prevent system abuse.
-				</p>
+					<h3>2. Account Responsibilities</h3>
+					<p>
+						You are responsible for maintaining the confidentiality of your account information and
+						for all activities that occur under your account. You must immediately notify us of any
+						unauthorized use of your account.
+					</p>
 
-				<h3>5. Acceptable Use</h3>
-				<div class="title-underline"></div>
-				<p>You agree not to:</p>
-				<ul>
-					<li>Use the service for any illegal purpose</li>
-					<li>Attempt to circumvent any access restrictions</li>
-					<li>Scrape or download materials in bulk</li>
-					<li>Share your account credentials with others</li>
-					<li>Interfere with the proper functioning of the website</li>
-				</ul>
+					<h3>3. Acceptable Use</h3>
+					<p>You agree not to:</p>
+					<ul>
+						<li>Use the service for any illegal purpose or in violation of any laws</li>
+						<li>Attempt to gain unauthorized access to any part of the service</li>
+						<li>Interfere with or disrupt the service or servers</li>
+						<li>Scrape or collect data from the service without permission</li>
+						<li>Share your account or subscription benefits with others</li>
+					</ul>
 
-				<h3>6. Intellectual Property</h3>
-				<div class="title-underline"></div>
-				<p>
-					The FSI materials are in the public domain. The website design, layout, and any
-					enhancements to the original materials (including RWP functionality) are intellectual
-					property of Taped Chinese.
-				</p>
+					<h3>4. Content and Intellectual Property</h3>
+					<p>
+						The core FSI materials are in the public domain. Our digitized interface, design, and
+						additional features (such as RWP exercises) are protected by intellectual property laws.
+						You may not reproduce, distribute, modify, or create derivative works based on these
+						elements without permission.
+					</p>
 
-				<h3>7. Limitation of Liability</h3>
-				<div class="title-underline"></div>
-				<p>
-					Taped Chinese is provided "as is" without warranty of any kind. In no event shall the
-					creator be liable for any damages arising from the use or inability to use this service.
-				</p>
+					<h3>5. User-Generated Content</h3>
+					<p>
+						By submitting feedback or other content to our site, you grant us a non-exclusive,
+						royalty-free license to use, reproduce, and display such content in connection with
+						providing and promoting the service.
+					</p>
 
-				<h3>8. Modifications to Service</h3>
-				<div class="title-underline"></div>
-				<p>
-					We reserve the right to modify or discontinue the service temporarily or permanently with
-					or without notice. We will strive to communicate any significant changes in advance.
-				</p>
+					<h3>6. Subscription Terms</h3>
+					<p>
+						Premium subscriptions are charged on a recurring basis. You can cancel at any time
+						through your account page. For more details, see our Refund and Cancellation policies.
+					</p>
 
-				<h3>9. Governing Law</h3>
-				<div class="title-underline"></div>
-				<p>
-					These Terms shall be governed by and construed in accordance with the laws of the
-					jurisdiction in which the creator resides, without regard to its conflict of law
-					provisions.
-				</p>
-			</div>
-		</section>
+					<h3>7. Disclaimer of Warranties</h3>
+					<p>
+						The service is provided "as is" without warranties of any kind, either express or
+						implied. We do not guarantee that the service will be error-free or uninterrupted.
+					</p>
 
-		<!-- Privacy Policy -->
-		<section id="privacy" class="policy-section">
-			<h2>Privacy Policy</h2>
-			<div class="title-underline-gold"></div>
+					<h3>8. Limitation of Liability</h3>
+					<p>
+						To the maximum extent permitted by law, Taped Chinese shall not be liable for any
+						indirect, incidental, special, consequential, or punitive damages resulting from your
+						use or inability to use the service.
+					</p>
 
-			<div class="policy-content">
-				<h3>1. Data Collection</h3>
-				<div class="title-underline"></div>
-				<p>We collect only the information you actively provide:</p>
-				<ul>
-					<li>Email address and password for account registration</li>
-					<li>Learning preferences you choose to share</li>
-					<li>Context information you provide for personalized exercises</li>
-					<li>Feedback you choose to submit</li>
-				</ul>
+					<h3>9. Changes to Terms</h3>
+					<p>
+						We may modify these terms at any time. Continued use of the service after any changes
+						indicates your acceptance of the modified terms.
+					</p>
+				</div>
+			</section>
 
-				<h3>2. How We Use Your Data</h3>
-                <div class="title-underline"></div>
+			<!-- Privacy Policy -->
+			<section id="privacy" class="policy-section">
+				<h2 class="section-title">Privacy Policy</h2>
 
-				<p>Your data is used exclusively for:</p>
-				<ul>
-					<li>Authenticating your account access</li>
-					<li>Personalizing your learning experience</li>
-					<li>Creating relevant RWP exercises based on your context</li>
-					<li>Processing subscription payments (if applicable)</li>
-					<li>Improving the learning platform</li>
-				</ul>
+				<div class="section-content">
+					<p>
+						Your privacy is important to us. This policy explains how we collect, use, and protect
+						your information.
+					</p>
 
-				<h3>3. Data Storage</h3>
-                <div class="title-underline"></div>
-				<p>
-					User data is stored on Supabase, a secure database platform. We implement appropriate
-					security measures to protect your data.
-				</p>
+					<h3>1. Information We Collect</h3>
+					<p>We collect the following information:</p>
+					<ul>
+						<li>Account information (email, password)</li>
+						<li>User preferences (traditional/simplified character settings)</li>
+						<li>Learning progress data</li>
+						<li>Optional user context for personalized exercises</li>
+						<li>Feedback and communications you provide</li>
+					</ul>
 
-				<h3>4. Data Sharing</h3>
-                <div class="title-underline"></div>
-				<p>We do not sell or share your personal information with third parties except:</p>
-				<ul>
-					<li>With Stripe for payment processing (if you subscribe)</li>
-					<li>When required by law</li>
-				</ul>
+					<h3>2. How We Use Your Information</h3>
+					<p>We use your information to:</p>
+					<ul>
+						<li>Provide and maintain the service</li>
+						<li>Personalize your learning experience</li>
+						<li>Process subscriptions and payments</li>
+						<li>Communicate with you about the service</li>
+						<li>Improve our offerings based on feedback</li>
+					</ul>
 
-				<h3>5. Data Retention and Deletion</h3>
-                <div class="title-underline"></div>
-				<p>
-					When you delete your account, all of your personal data is permanently removed from our
-					systems. You can request data deletion at any time.
-				</p>
+					<h3>3. Cookies and Tracking</h3>
+					<p>
+						Our site uses minimal cookies, primarily to store user preferences such as
+						simplified/traditional Chinese character selection. We do not use analytics tools to
+						track user behavior.
+					</p>
 
-				<h3>6. Cookies and Analytics</h3>
-                <div class="title-underline"></div>
-				<p>
-					We use essential cookies for authentication and site functionality. We may use basic
-					analytics to understand usage patterns, but we minimize data collection.
-				</p>
-			</div>
-		</section>
+					<h3>4. Data Security</h3>
+					<p>
+						We implement appropriate security measures to protect your personal information.
+						However, no method of transmission over the Internet is 100% secure, and we cannot
+						guarantee absolute security.
+					</p>
 
-		<!-- Subscription Policy -->
-		<section id="subscription" class="policy-section">
-			<h2>Subscription Policy</h2>
-            <div class="title-underline-gold"></div>
+					<h3>5. Data Deletion</h3>
+					<p>
+						When you delete your account, we immediately delete all your personal data. We do not
+						maintain a retention period.
+					</p>
 
-			<div class="policy-content">
-				<h3>1. Subscription Service</h3>
-                <div class="title-underline"></div>
-				<p>Taped Chinese offers a premium subscription for $5 per month, which provides:</p>
-				<ul>
-					<li>Increased daily limit of Relevant World Practice (RWP) exercises</li>
-					<li>Support for maintaining and improving the platform</li>
-				</ul>
+					<h3>6. Third-Party Services</h3>
+					<p>
+						We use Stripe for payment processing. Your payment information is handled directly by
+						Stripe according to their privacy policy.
+					</p>
 
-				<h3>2. Free vs. Premium</h3>
-                <div class="title-underline"></div>
-				<p>
-					All core FSI materials will always remain freely accessible. The premium subscription is
-					primarily a way to support the project while gaining additional convenience.
-				</p>
+					<h3>7. International Users</h3>
+					<p>
+						Our services are operated in the United States. If you are located outside of the United
+						States, please be aware that information we collect will be transferred to and processed
+						in the United States.
+					</p>
 
-				<h3>3. Usage Limits</h3>
-                <div class="title-underline"></div>
-				<p>
-					Free users have access to a limited number of RWP exercises. Premium subscribers can
-					generate up to 10 RWP exercises per day, which is designed to be more than sufficient for
-					normal use while preventing system abuse.
-				</p>
+					<h3>8. Changes to Privacy Policy</h3>
+					<p>
+						We may update this privacy policy from time to time. We will notify you of any changes
+						by posting the new policy on this page.
+					</p>
+				</div>
+			</section>
 
-				<h3>4. Billing Cycle</h3>
-                <div class="title-underline"></div>
-				<p>
-					Subscriptions are billed monthly or yearly (depending on your selection) and renew
-					automatically until cancelled.
-				</p>
+			<!-- Premium Features -->
+			<section id="premium" class="policy-section">
+				<h2 class="section-title">Premium Features</h2>
 
-				<h3>5. Payment Processing</h3>
-                <div class="title-underline"></div>
-				<p>
-					Payments are securely processed through Stripe. We do not store your full credit card
-					information on our servers.
-				</p>
-			</div>
-		</section>
+				<div class="section-content">
+					<p>
+						Taped Chinese offers premium subscriptions to support the continued development and
+						maintenance of this educational resource.
+					</p>
 
-		<!-- Refund Policy -->
-		<section id="refund" class="policy-section">
-			<h2>Refund Policy</h2>
-            <div class="title-underline-gold"></div>
+					<h3>Subscription Options</h3>
+					<div class="premium-options">
+						<div class="premium-option">
+							<h4>Monthly Premium</h4>
+							<p class="price">$5 per month</p>
+							<ul class="feature-list">
+								<li>Enhanced access to RWP exercises</li>
+								<li>Text-to-speech capabilities</li>
+								<li>Support the continued development</li>
+							</ul>
+						</div>
 
-			<div class="policy-content">
-				<h3>1. No-Refund Policy</h3>
-                <div class="title-underline"></div>
-				<p>
-					Subscriptions to Taped Chinese are non-refundable. This straightforward policy helps keep
-					subscription costs low and administrative overhead minimal.
-				</p>
+						<div class="premium-option">
+							<h4>Annual Premium</h4>
+							<p class="price">$45 per year</p>
+							<p class="savings">Save $15 compared to monthly plan</p>
+							<ul class="feature-list">
+								<li>All monthly premium features</li>
+								<li>Best value option</li>
+							</ul>
+						</div>
+					</div>
 
-				<h3>2. Subscription Value</h3>
-                <div class="title-underline"></div>
-				<p>
-					The $5 monthly subscription is designed primarily as a way to support this educational
-					resource while receiving additional convenience benefits.
-				</p>
+					<h3>Free vs. Premium</h3>
+					<p>
+						All core FSI course materials will always remain free. Premium subscriptions provide:
+					</p>
+					<ul>
+						<li>
+							Increased daily limit for RWP exercise generation (exact limits being determined)
+						</li>
+						<li>Text-to-speech functionality for learning materials</li>
+						<li>Support for ongoing development and server costs</li>
+					</ul>
 
-				<h3>3. Free Trial</h3>
-                <div class="title-underline"></div>
-				<p>
-					We encourage users to explore the free tier before subscribing to ensure the premium
-					features meet their needs.
-				</p>
+					<p class="premium-note">
+						Note: Premium features are being tested and refined during our initial launch phase.
+						Exact usage limits will be determined based on server costs and user behavior.
+					</p>
+				</div>
+			</section>
 
-				<h3>4. Exceptions</h3>
-                <div class="title-underline"></div>
-				<p>
-					In the case of prolonged service outages or technical issues that substantially prevent
-					access to premium features, please contact us through the contact form to discuss
-					potential adjustments to your billing.
-				</p>
-			</div>
-		</section>
+			<!-- Refund Policy -->
+			<section id="refunds" class="policy-section">
+				<h2 class="section-title">Refund Policy</h2>
 
-		<!-- Cancellation Policy -->
-		<section id="cancellation" class="policy-section">
-			<h2>Cancellation Policy</h2>
-            <div class="title-underline-gold"></div>
+				<div class="section-content">
+					<p>Our refund policy is designed to be clear and straightforward:</p>
 
-			<div class="policy-content">
-				<h3>1. How to Cancel</h3>
-                <div class="title-underline"></div>
-				<p>
-					You can cancel your subscription at any time through your account settings page. The
-					cancellation process is designed to be simple and straightforward with a single-click
-					option.
-				</p>
+					<h3>Subscription Payments</h3>
+					<p>
+						Monthly and yearly subscriptions are non-refundable. When you purchase a subscription,
+						you agree to pay the recurring charges for the subscription period.
+					</p>
 
-				<h3>2. Effect of Cancellation</h3>
-                <div class="title-underline"></div>
-				<p>
-					After cancellation, your premium access will continue until the end of your current
-					billing period. You will not be charged again after cancellation.
-				</p>
+					<h3>Exceptional Circumstances</h3>
+					<p>
+						In exceptional circumstances (such as service unavailability for extended periods),
+						refunds may be considered on a case-by-case basis. Please contact us if you believe such
+						circumstances apply to your situation.
+					</p>
 
-				<h3>3. Account Access After Cancellation</h3>
-                <div class="title-underline"></div>
-				<p>
-					After your premium subscription ends, your account will automatically revert to the free
-					tier. You'll still have full access to all core FSI materials and limited access to RWP
-					exercises.
-				</p>
+					<h3>Trial Periods</h3>
+					<p>
+						If we offer a free trial period for premium features, you will not be charged during the
+						trial. You can cancel anytime before the trial ends to avoid being charged for the
+						subsequent subscription period.
+					</p>
 
-				<h3>4. Data Retention</h3>
-                <div class="title-underline"></div>
-				<p>
-					Cancelling your subscription does not delete your account or learning data. If you wish to
-					completely delete your data, you can do so through the account settings page.
-				</p>
-			</div>
-		</section>
+					<h3>Errors in Billing</h3>
+					<p>
+						If you believe you've been charged in error, please contact us immediately. We will
+						review your case and make appropriate adjustments if warranted.
+					</p>
+				</div>
+			</section>
 
-		<div class="policy-footer">
-			<p>Last updated: {new Date().toLocaleDateString()}</p>
-			<p>
-				If you have any questions about these policies, please <a href="/contact">contact us</a>.
-			</p>
+			<!-- Cancellation Policy -->
+			<section id="cancellation" class="policy-section">
+				<h2 class="section-title">Cancellation Policy</h2>
+
+				<div class="section-content">
+					<p>You can cancel your subscription at any time through your account page:</p>
+
+					<h3>How to Cancel</h3>
+					<ol>
+						<li>Log in to your account</li>
+						<li>Go to your Profile page</li>
+						<li>Navigate to the Account tab</li>
+						<li>Click "Manage Subscription"</li>
+						<li>Select "Cancel Subscription"</li>
+					</ol>
+
+					<h3>Effect of Cancellation</h3>
+					<p>When you cancel your subscription:</p>
+					<ul>
+						<li>Your premium access will continue until the end of your current billing period</li>
+						<li>You will not be charged for future billing periods</li>
+						<li>
+							Your account will automatically revert to free status when the current period ends
+						</li>
+						<li>You will retain access to all core learning materials</li>
+					</ul>
+
+					<h3>Reactivation</h3>
+					<p>
+						You can reactivate your subscription at any time. If you reactivate during the same
+						billing period in which you cancelled, your premium access will simply continue without
+						interruption.
+					</p>
+				</div>
+			</section>
+
+			<!-- Contact Form -->
+			<section id="contact" class="policy-section">
+				<h2 class="section-title">Contact Us</h2>
+
+				<div class="section-content">
+					<p>
+						If you have any questions about these policies or need assistance with the service,
+						please use the contact form below:
+					</p>
+
+					{#if !submitted}
+						<form class="contact-form" on:submit|preventDefault={handleSubmit}>
+							<div class="form-group">
+								<label for="name">Name</label>
+								<input type="text" id="name" bind:value={name} required />
+							</div>
+
+							<div class="form-group">
+								<label for="email">Email</label>
+								<input type="email" id="email" bind:value={email} required />
+							</div>
+
+							<div class="form-group">
+								<label for="message">Message</label>
+								<textarea id="message" bind:value={message} rows="5" required></textarea>
+							</div>
+
+							{#if error}
+								<div class="error-message">{error}</div>
+							{/if}
+
+							<button type="submit" class="submit-button" disabled={submitting}>
+								{submitting ? 'Sending...' : 'Send Message'}
+							</button>
+						</form>
+					{:else}
+						<div class="success-message">
+							<div class="success-icon">✓</div>
+							<h3>Thank You!</h3>
+							<p>Your message has been sent. We'll respond as soon as possible.</p>
+							<button class="reset-button" on:click={() => (submitted = false)}
+								>Send Another Message</button
+							>
+						</div>
+					{/if}
+
+					<div class="response-note">
+						<p>
+							We strive to respond to all inquiries within 48 hours during normal business days.
+						</p>
+					</div>
+				</div>
+			</section>
+			<p class="last-updated">Last updated: {new Date().toLocaleDateString()}</p>
 		</div>
 	</div>
 </div>
@@ -331,77 +417,384 @@
 <style>
 	.page-background {
 		background-color: #f4f1de;
+		background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23a09a8a' fill-opacity='0.05' fill-rule='evenodd'/%3E%3C/svg%3E");
 		min-height: 100vh;
 		padding: 2rem 0;
 	}
 
+	.policies-container {
+		display: grid;
+		grid-template-columns: 250px 1fr;
+		gap: 2rem;
+		max-width: 1200px;
+		margin: 0 auto;
+		padding: 0 1rem;
+	}
+
+	/* Sticky sidebar navigation */
+	.policies-nav {
+		position: sticky;
+		top: 2rem;
+		height: fit-content;
+		background-color: #e8e5d7;
+		border: 1px solid #d3cfc4;
+		border-radius: 8px;
+		padding: 1.5rem;
+		box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.1);
+		margin-bottom: 2rem;
+		z-index: 10;
+		position: relative;
+	}
+
+	.nav-title {
+		font-family: 'Courier Prime', monospace;
+		font-size: 1.25rem;
+		font-weight: 700;
+		color: #33312e;
+		margin-bottom: 1rem;
+		padding-bottom: 0.5rem;
+		border-bottom: 2px solid #ddb967;
+	}
+
+	.nav-links {
+		list-style-type: none;
+		padding: 0;
+		margin: 0;
+	}
+
+	.nav-links li {
+		margin-bottom: 0.75rem;
+	}
+
+	.nav-links a {
+		color: #33312e;
+		text-decoration: none;
+		font-weight: 500;
+		transition: color 0.2s;
+		display: block;
+		padding: 0.5rem;
+		border-radius: 4px;
+	}
+
+	.nav-links a:hover {
+		background-color: rgba(221, 185, 103, 0.2);
+		color: #33312e;
+	}
+
+	/* Taped corners decoration */
+	.nav-decoration {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		pointer-events: none;
+	}
+
+	.tape-corner {
+		position: absolute;
+		width: 30px;
+		height: 30px;
+		background-color: rgba(221, 185, 103, 0.5);
+		transform: rotate(45deg);
+	}
+
+	.top-left {
+		top: -8px;
+		left: -8px;
+	}
+
+	.top-right {
+		top: -8px;
+		right: -8px;
+	}
+
+	.bottom-left {
+		bottom: -8px;
+		left: -8px;
+	}
+
+	.bottom-right {
+		bottom: -8px;
+		right: -8px;
+	}
+
+	/* Main content styles */
+	.policies-content {
+		background-color: #ffffff;
+		border: 1px solid #d3cfc4;
+		border-radius: 8px;
+		padding: 2rem;
+		box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.1);
+	}
+
 	.page-title {
 		font-family: 'Courier Prime', monospace;
-		font-size: 2.5rem;
+		font-size: 2.25rem;
 		font-weight: 700;
 		color: #33312e;
 		margin-bottom: 0.5rem;
 	}
 
-	.title-underline-gold {
-		bottom: -0.5rem;
-		left: 0;
-		height: 0.375rem;
-		width: 100%;
-		background-color: #ddb967;
-	}
-
 	.title-underline {
 		height: 3px;
 		width: 100px;
-		background-color: #34667f;
-		margin-bottom: 1.5rem;
+		background-color: #c17c74;
+		margin-bottom: 1rem;
 	}
 
-	.page-description {
-		font-size: 1.25rem;
-		color: #4b4945;
-		max-width: 700px;
-		line-height: 1.6;
+	.last-updated {
+		font-size: 0.875rem;
+		color: #665e4d;
 		margin-bottom: 2rem;
+		font-style: italic;
 	}
 
-	.policy-toc {
-		background-color: rgba(255, 255, 255, 0.5);
-		border: 1px solid #e5e2dd;
-		border-radius: 8px;
-		padding: 1.5rem;
-		margin-bottom: 2.5rem;
-		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+	.policy-section {
+		margin-bottom: 3rem;
+		padding-top: 1rem;
 	}
 
-	.policy-toc h2 {
+	.section-title {
+		font-family: 'Courier Prime', monospace;
+		font-size: 1.75rem;
+		font-weight: 700;
+		color: #33312e;
+		margin-bottom: 1.25rem;
+		padding-bottom: 0.5rem;
+		border-bottom: 2px solid #e5e2dd;
+	}
+
+	.section-content {
+		font-size: 1rem;
+		line-height: 1.6;
+		color: #4b4945;
+	}
+
+	.section-content p {
+		margin-bottom: 1.25rem;
+	}
+
+	.section-content h3 {
 		font-size: 1.25rem;
 		font-weight: 600;
-		margin-bottom: 1rem;
 		color: #33312e;
+		margin: 1.5rem 0 0.75rem;
 	}
 
-	.policy-toc ul {
-		list-style-type: none;
-		padding: 0;
+	.section-content ul,
+	.section-content ol {
+		margin-bottom: 1.5rem;
+		padding-left: 1.5rem;
 	}
 
-	.policy-toc li {
+	.section-content li {
 		margin-bottom: 0.5rem;
 	}
 
-	.policy-toc a {
-		color: #34667f;
-		text-decoration: none;
-		font-weight: 500;
-		transition: color 0.2s;
-		display: inline-block;
-		padding: 0.25rem 0;
+	/* Premium options styling */
+	.premium-options {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+		gap: 1.5rem;
+		margin: 1.5rem 0;
 	}
 
-	.policy-toc a:hover {
+	.premium-option {
+		background-color: #f4f1de;
+		border: 1px solid #d3cfc4;
+		border-radius: 8px;
+		padding: 1.5rem;
+		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+	}
+
+	.premium-option h4 {
+		font-size: 1.25rem;
+		font-weight: 600;
+		color: #33312e;
+		margin-bottom: 0.5rem;
+	}
+
+	.price {
+		font-size: 1.5rem;
+		font-weight: 700;
+		color: #7d8c5c;
+		margin-bottom: 0.5rem;
+	}
+
+	.savings {
+		font-size: 0.875rem;
 		color: #c17c74;
-		text-decoration: underline;
+		font-weight: 600;
+		margin-bottom: 1rem;
+	}
+
+	.feature-list {
+		list-style-type: none;
+		padding-left: 0;
+	}
+
+	.feature-list li {
+		position: relative;
+		padding-left: 1.5rem;
+		margin-bottom: 0.5rem;
+	}
+
+	.feature-list li:before {
+		content: '✓';
+		position: absolute;
+		left: 0;
+		color: #7d8c5c;
+		font-weight: bold;
+	}
+
+	.premium-note {
+		font-size: 0.875rem;
+		font-style: italic;
+		color: #665e4d;
+		padding: 1rem;
+		background-color: rgba(221, 185, 103, 0.1);
+		border-radius: 4px;
+	}
+
+	/* Contact form styling */
+	.contact-form {
+		background-color: #f4f1de;
+		border: 1px solid #d3cfc4;
+		border-radius: 8px;
+		padding: 1.5rem;
+		margin-bottom: 1.5rem;
+	}
+
+	.form-group {
+		margin-bottom: 1.25rem;
+	}
+
+	.form-group label {
+		display: block;
+		font-weight: 600;
+		margin-bottom: 0.5rem;
+		color: #33312e;
+	}
+
+	.form-group input,
+	.form-group textarea {
+		width: 100%;
+		padding: 0.75rem;
+		border: 1px solid #d3cfc4;
+		border-radius: 4px;
+		background-color: #ffffff;
+		font-family: inherit;
+		font-size: 1rem;
+	}
+
+	.form-group input:focus,
+	.form-group textarea:focus {
+		outline: none;
+		border-color: #ddb967;
+		box-shadow: 0 0 0 2px rgba(221, 185, 103, 0.2);
+	}
+
+	.error-message {
+		color: #c17c74;
+		font-size: 0.875rem;
+		margin-bottom: 1rem;
+	}
+
+	.submit-button {
+		background-color: #7d8c5c;
+		color: white;
+		font-weight: 600;
+		border: none;
+		padding: 0.75rem 1.5rem;
+		border-radius: 4px;
+		cursor: pointer;
+		transition: background-color 0.2s;
+	}
+
+	.submit-button:hover {
+		background-color: #6a774e;
+	}
+
+	.submit-button:disabled {
+		background-color: #a0a99a;
+		cursor: not-allowed;
+	}
+
+	/* Success message styling */
+	.success-message {
+		background-color: #f4f1de;
+		border: 1px solid #d3cfc4;
+		border-radius: 8px;
+		padding: 2rem;
+		text-align: center;
+		margin-bottom: 1.5rem;
+	}
+
+	.success-icon {
+		background-color: #7d8c5c;
+		color: white;
+		width: 50px;
+		height: 50px;
+		border-radius: 50%;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		font-size: 1.5rem;
+		margin: 0 auto 1rem;
+	}
+
+	.success-message h3 {
+		color: #33312e;
+		margin-bottom: 0.75rem;
+	}
+
+	.reset-button {
+		background-color: transparent;
+		border: 1px solid #7d8c5c;
+		color: #7d8c5c;
+		font-weight: 600;
+		padding: 0.5rem 1rem;
+		border-radius: 4px;
+		cursor: pointer;
+		margin-top: 1rem;
+		transition: all 0.2s;
+	}
+
+	.reset-button:hover {
+		background-color: #7d8c5c;
+		color: white;
+	}
+
+	.response-note {
+		font-size: 0.875rem;
+		color: #665e4d;
+		font-style: italic;
+	}
+
+	/* Responsive adjustments */
+	@media (max-width: 900px) {
+		.policies-container {
+			grid-template-columns: 1fr;
+		}
+
+		.policies-nav {
+			position: static;
+			margin-bottom: 2rem;
+		}
+
+		.nav-links {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 0.5rem;
+		}
+
+		.nav-links li {
+			margin-bottom: 0;
+		}
+
+		.premium-options {
+			grid-template-columns: 1fr;
+		}
 	}
 </style>
