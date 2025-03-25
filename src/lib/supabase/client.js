@@ -6,6 +6,16 @@ const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
+// Add this to src/lib/supabase/client.js
+export async function resetPassword(email) {
+	const { error } = await supabase.auth.resetPasswordForEmail(email, {
+		redirectTo: `${window.location.origin}/reset-password`
+	});
+
+	if (error) throw error;
+	return true;
+}
+
 // Fetch all modules (ordered by order_num)
 export async function getModules() {
 	const { data, error } = await supabase
