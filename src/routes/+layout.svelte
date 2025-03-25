@@ -19,7 +19,6 @@
 		<slot />
 	</main>
 
-
 	<!-- src/routes/+layout.svelte (Footer section only) -->
 	<footer class="site-footer">
 		<div class="footer-container">
@@ -30,7 +29,7 @@
 			</div>
 
 			<div class="footer-grid">
-				<!-- Left column: About & cassette branding -->
+				<!-- Left column: Cassette branding -->
 				<div class="footer-column">
 					<div class="cassette-illustration">
 						<svg
@@ -62,29 +61,23 @@
 						</svg>
 					</div>
 					<p class="vintage-message">ORIGINALLY RECORDED ON CASSETTE TAPES</p>
-					<!-- <p class="attribution">Based on materials from the Foreign Service Institute</p> -->
 				</div>
 
-				<!-- Middle column: Required policies -->
+				<!-- Middle column: Legal link -->
 				<div class="footer-column">
-					<h3 class="footer-heading">Legal</h3>
+					<h3 class="footer-heading">Information</h3>
 					<nav class="footer-nav">
-						<a href="/policies#terms" class="footer-link">Terms of Service</a>
-						<a href="/policies#privacy" class="footer-link">Privacy Policy</a>
-						<a href="/policies#refunds" class="footer-link">Refund Policy</a>
-						<a href="/policies#cancellation" class="footer-link">Cancellation Policy</a>
+						<a href="/policies" class="footer-link">Terms & Policies</a>
 					</nav>
 				</div>
 
-				<!-- Right column: Contact & More Info -->
+				<!-- Right column: Contact & Subscription links -->
 				<div class="footer-column">
 					<h3 class="footer-heading">Contact</h3>
 					<a href="/policies#contact" class="footer-link">Contact Us</a>
-					<a href="/about" class="footer-link">About This Project</a>
 
 					<h3 class="footer-heading subscription-heading">Subscription</h3>
-					<a href="/premium" class="footer-link">Premium Features</a>
-					<a href="/faq" class="footer-link">FAQ</a>
+					<a href="/policies#premium" class="footer-link">Subscription Features</a>
 				</div>
 			</div>
 
@@ -270,7 +263,7 @@
 		.footer-column:first-child {
 			grid-column: span 2;
 			text-align: center;
-			margin-bottom: .25rem;
+			margin-bottom: 0.25rem;
 		}
 
 		.cassette-illustration {

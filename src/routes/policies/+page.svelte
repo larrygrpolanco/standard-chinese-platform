@@ -11,6 +11,7 @@
 	let error = '';
 
 	// Function to handle form submission
+	// Function to handle form submission
 	async function handleSubmit() {
 		if (!name || !email || !message) {
 			error = 'Please fill out all fields';
@@ -21,15 +22,38 @@
 		error = '';
 
 		try {
-			// This would be replaced with your actual email service
-			// For example, using EmailJS, FormSubmit, or a serverless function
-			await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulating API call
+			// Create payload for Web3Forms
+			const formData = {
+				access_key: '2943f377-7b08-410e-84c2-2aca5ee79791', // Your access key
+				name,
+				email,
+				message,
+				subject: 'New Contact Form Submission - Taped Chinese', // Optional
+				botcheck: '' // Honeypot field should remain empty
+			};
 
-			// Clear form and show success message
-			name = '';
-			email = '';
-			message = '';
-			submitted = true;
+			const response = await fetch('https://api.web3forms.com/submit', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					Accept: 'application/json'
+				},
+				body: JSON.stringify(formData)
+			});
+
+			const result = await response.json();
+
+			if (response.status === 200) {
+				// Success - clear form and show success message
+				name = '';
+				email = '';
+				message = '';
+				submitted = true;
+			} else {
+				// Handle error from Web3Forms
+				error = result.message || 'Something went wrong. Please try again.';
+				console.error('Contact form error:', result);
+			}
 		} catch (err) {
 			error = 'Failed to send message. Please try again.';
 			console.error('Contact form error:', err);
@@ -368,6 +392,7 @@
 
 					{#if !submitted}
 						<form class="contact-form" on:submit|preventDefault={handleSubmit}>
+							<input type="checkbox" name="botcheck" style="display: none;" />
 							<div class="form-group">
 								<label for="name">Name</label>
 								<input type="text" id="name" bind:value={name} required />

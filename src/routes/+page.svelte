@@ -245,7 +245,7 @@
 	<section class="about-section">
 		<div class="about-container">
 			<!-- Content side -->
-			<div class="about-content">
+			<div id="about" class="about-content">
 				<h2 class="about-title">
 					About This Project
 					<span class="title-underline"></span>
