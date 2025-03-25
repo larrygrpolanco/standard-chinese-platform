@@ -14,9 +14,8 @@ export const STRIPE_CONFIG = {
 	PRODUCTS: {
 		MONTHLY_SUBSCRIPTION: {
 			name: 'Monthly Premium',
-			price: '$5/month'
-			// You'll add your Stripe price ID here once set up
-			// price_id: 'price_YOUR_ID_HERE'
+			price: '$5/month',
+			price_id: 'prod_S0XFPF6SkyZaKo'
 		}
 	}
 };

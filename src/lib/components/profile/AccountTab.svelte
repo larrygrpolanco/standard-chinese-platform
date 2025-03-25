@@ -4,9 +4,14 @@
 	import { authStore } from '$lib/stores/authStore';
 	import { supabase } from '$lib/supabase/client';
 	import ConfirmationModal from '$lib/components/UI/ConfirmationModal.svelte';
+	import { getUserUsageStats } from '$lib/usage/usageTracking.js';
+	import { STRIPE_CONFIG } from '$lib/stripe/config.js';
+	import { onMount } from 'svelte';
 
 	export let user;
 	export let userPreferences;
+	let usageStats = null;
+	let loadingStats = true;
 
 	const dispatch = createEventDispatcher();
 
@@ -20,15 +25,6 @@
 	let deleteAccountVisible = false;
 	let deleteConfirmText = '';
 	let deleting = false;
-
-	// Subscription info - this would be retrieved from your actual subscription service
-	// For now, we'll simulate it based on fake data
-	let subscriptionInfo = {
-		status: 'yearly', // 'free', 'monthly', 'yearly'
-		nextBillingDate: null,
-		// This would come from your Stripe integration
-		managementUrl: null
-	};
 
 	// Toast helper function
 	function showToast(message, type = 'success') {
@@ -110,6 +106,81 @@
 		passwordError = '';
 		changePasswordVisible = false;
 	}
+
+	onMount(async () => {
+		try {
+			// Fetch usage statistics
+			const response = await fetch('/api/user/usage-stats');
+			if (!response.ok) {
+				throw new Error('Failed to load usage statistics');
+			}
+			usageStats = await response.json();
+		} catch (error) {
+			console.error('Error loading usage stats:', error);
+		} finally {
+			loadingStats = false;
+		}
+	});
+
+	async function handleSubscribe() {
+		isLoading = true;
+		error = null;
+
+		try {
+			const response = await fetch('/api/stripe/create-checkout', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify({
+					user: user
+				})
+			});
+
+			if (!response.ok) {
+				const data = await response.json();
+				throw new Error(data.error || 'Failed to create checkout session');
+			}
+
+			const { url } = await response.json();
+			window.location.href = url;
+		} catch (err) {
+			console.error('Subscribe error:', err);
+			error = err.message;
+		} finally {
+			isLoading = false;
+		}
+	}
+
+	async function handleManageSubscription() {
+		isLoading = true;
+		error = null;
+
+		try {
+			const response = await fetch('/api/stripe/create-portal', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify({
+					user: user
+				})
+			});
+
+			if (!response.ok) {
+				const data = await response.json();
+				throw new Error(data.error || 'Failed to create customer portal session');
+			}
+
+			const { url } = await response.json();
+			window.location.href = url;
+		} catch (err) {
+			console.error('Manage subscription error:', err);
+			error = err.message;
+		} finally {
+			isLoading = false;
+		}
+	}
 </script>
 
 <div class="account-tab">
@@ -129,68 +200,131 @@
 		</div>
 		<div class="profile-reminder">
 			<h3>Make Your Practice More Relevant</h3>
-			<p>Make sure to edit your <em>Learning Profile <em> for better RWP quizzes</p>
+			<p>Make sure to edit your <em>Learning Profile <em> for better RWP quizzes</em></em></p>
 		</div>
 	</section>
 
 	<section class="account-section">
 		<h2 class="section-title">Subscription</h2>
-		<div class="subscription-message">
-			RWP features completely free during this prototyping phase
-		</div>
-		<div class="subscription-card">
-			<div class="sub-status">
-				<span class="sub-status-label">Current Plan:</span>
-				<span class="sub-status-value {subscriptionInfo.status}">
-					{subscriptionInfo.status === 'free'
-						? 'Free Tier'
-						: subscriptionInfo.status === 'monthly'
-							? 'Monthly Premium'
-							: 'Yearly Premium'}
-				</span>
+		<div class="subscription-message">Subscription features still in testing</div>
+		{#if loadingStats}
+			<div class="loading-box">Loading subscription information...</div>
+		{:else if usageStats}
+			<div class="subscription-card">
+				<div class="sub-status">
+					<span class="sub-status-label">Current Plan:</span>
+					<span
+						class="sub-status-value {usageStats.subscription.status === 'active'
+							? 'premium'
+							: 'free'}"
+					>
+						{usageStats.subscription.status === 'active' ? 'Premium' : 'Free Tier'}
+					</span>
+				</div>
+
+				{#if usageStats.subscription.status === 'active' && usageStats.subscription.renewalDate}
+					<div class="sub-details">
+						<span class="sub-label">Next billing date:</span>
+						<span class="sub-value"
+							>{new Date(usageStats.subscription.renewalDate).toLocaleDateString()}</span
+						>
+					</div>
+				{/if}
+
+				<div class="usage-stats">
+					<h3 class="usage-title">Your Usage</h3>
+
+					<div class="usage-item">
+						<div class="usage-header">
+							<span class="usage-label">RWP Exercises</span>
+							<span class="usage-period"
+								>{usageStats.rwp.periodType === 'daily' ? 'Daily' : 'Weekly'}</span
+							>
+						</div>
+
+						<div class="usage-meter">
+							<div
+								class="usage-fill"
+								style="width: {Math.min(100, (usageStats.rwp.count / usageStats.rwp.limit) * 100)}%"
+							></div>
+						</div>
+
+						<div class="usage-text">
+							<span
+								>{usageStats.rwp.count} used / {usageStats.rwp.limit}
+								{usageStats.rwp.periodType} limit</span
+							>
+
+							{#if usageStats.rwp.resetAt && usageStats.subscription.status !== 'active'}
+								<span class="reset-date"
+									>Resets on {new Date(usageStats.rwp.resetAt).toLocaleDateString()}</span
+								>
+							{/if}
+						</div>
+					</div>
+
+					<div class="usage-item">
+						<div class="usage-header">
+							<span class="usage-label">TTS Audio</span>
+						</div>
+
+						{#if usageStats.tts.available}
+							<div class="feature-available">
+								<span class="check-icon">✓</span>
+								<span>Available with your Premium subscription</span>
+							</div>
+						{:else}
+							<div class="feature-unavailable">
+								<span class="lock-icon">🔒</span>
+								<span>Available with Premium subscription</span>
+							</div>
+						{/if}
+					</div>
+				</div>
+
+				<div class="sub-features">
+					<h3 class="sub-features-title">Plan Features:</h3>
+					<ul class="features-list">
+						{#if usageStats.subscription.status === 'active'}
+							<li class="feature">Access to all FSI course materials</li>
+							<li class="feature">
+								Up to {STRIPE_CONFIG.PREMIUM_TIER_LIMITS.rwp_per_day} RWP exercises per day
+							</li>
+							<li class="feature">TTS audio for listening practice</li>
+							<li class="feature">Priority support</li>
+						{:else}
+							<li class="feature">Access to all FSI course materials</li>
+							<li class="feature">
+								Limited to {STRIPE_CONFIG.FREE_TIER_LIMITS.rwp_per_week} RWP exercises per week
+							</li>
+							<li class="feature-upgrade">
+								Upgrade to Premium for {STRIPE_CONFIG.PREMIUM_TIER_LIMITS.rwp_per_day} daily exercises
+								and TTS audio
+							</li>
+						{/if}
+					</ul>
+				</div>
+
+				<div class="sub-actions">
+					{#if usageStats.subscription.status === 'active'}
+						<button class="tape-button manage" on:click={handleManageSubscription}>
+							Manage Subscription
+						</button>
+					{:else}
+						<button class="tape-button upgrade" on:click={handleSubscribe}>
+							Upgrade to Premium
+						</button>
+					{/if}
+				</div>
 			</div>
 
-			{#if subscriptionInfo.status !== 'free' && subscriptionInfo.nextBillingDate}
-				<div class="sub-details">
-					<span class="sub-label">Next billing date:</span>
-					<span class="sub-value"
-						>{new Date(subscriptionInfo.nextBillingDate).toLocaleDateString()}</span
-					>
+			{#if usageStats.subscription.status !== 'active'}
+				<div class="subscription-message">
+					Your subscription helps support the continued development of this site and keeps all the
+					core material free for everyone. The subscription fee mainly covers the AI costs for
+					generating personalized practice content.
 				</div>
 			{/if}
-
-			<div class="sub-features">
-				<h3 class="sub-features-title">Plan Features:</h3>
-				<ul class="features-list">
-					{#if subscriptionInfo.status === 'free'}
-						<li class="feature">Access to all FSI course materials</li>
-						<li class="feature">Limited to 1 RWP exercise generation per day</li>
-						<li class="feature-upgrade">
-							Upgrade to Premium for unlimited RWP exercises and to support this site
-						</li>
-					{:else}
-						<li class="feature">Access to all FSI course materials</li>
-						<li class="feature">Unlimited RWP exercise generation</li>
-						<li class="feature">Priority support</li>
-						<li class="feature">Early access to new features</li>
-					{/if}
-				</ul>
-			</div>
-
-			<div class="sub-actions">
-				{#if subscriptionInfo.status === 'free'}
-					<button class="tape-button upgrade">Upgrade to Premium</button>
-				{:else}
-					<button class="tape-button manage">Manage Subscription</button>
-				{/if}
-			</div>
-		</div>
-
-		{#if subscriptionInfo.status === 'free'}
-			<div class="subscription-message">
-				Your subscription helps support the continued development of this site and keeps all the
-				core material free for everyone.
-			</div>
 		{/if}
 	</section>
 
