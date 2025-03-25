@@ -4,6 +4,7 @@ import Stripe from 'stripe';
 import { STRIPE_SECRET_KEY } from '$env/static/private';
 import { createOrUpdateStripeCustomer, getCurrentUser } from '$lib/supabase/client.js';
 import { STRIPE_CONFIG } from '$lib/stripe/config.js';
+import { supabase } from '$lib/supabase/client';
 
 const stripe = new Stripe(STRIPE_SECRET_KEY);
 

@@ -1,4 +1,4 @@
-// rwpGenerator.js OLD server-side generator
+// rwpGenerator.js
 import {
 	getCurrentUser,
 	getCompleteUnit,
