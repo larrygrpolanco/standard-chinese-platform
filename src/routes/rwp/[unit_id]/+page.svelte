@@ -21,6 +21,10 @@
 	import ComprehensionExercise from '$lib/components/rwp/ComprehensionExercise.svelte';
 	import TapeConstruction from '$lib/components/UI/TapeConstruction.svelte';
 
+	import { checkRWPAvailability } from '$lib/supabase/client';
+
+	let rwpStatus;
+
 	// State variables
 	let loading = true;
 	let generating = false;
@@ -53,6 +57,7 @@
 
 	onMount(async () => {
 		loading = true;
+		rwpStatus = await checkRWPAvailability();
 
 		try {
 			// Load unit data
@@ -280,6 +285,14 @@
 												<span class="checkbox-label">Debug Mode</span>
 											</label>
 										</div> -->
+
+										{#if rwpStatus}
+											<div class="mt-2 text-sm text-gray-600">
+												{rwpStatus.remaining}
+												{rwpStatus.tier === 'premium' ? 'daily' : 'weekly'}
+												generations remaining
+											</div>
+										{/if}
 
 										<!-- Generate Button -->
 										<button

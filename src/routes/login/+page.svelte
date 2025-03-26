@@ -9,7 +9,7 @@
     onMount(() => {
         const unsubscribe = authStore.subscribe(user => {
             if (user) {
-                goto('/login/profile'); // Redirect to profile if already logged in
+                goto('/profile'); // Redirect to profile if already logged in
             }
         });
 

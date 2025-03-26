@@ -399,3 +399,247 @@ export async function getUserPreferences() {
 	if (error) throw error;
 	return data;
 }
+
+// Stripe
+// Get user's subscription status
+export async function getUserSubscription() {
+	const user = await getCurrentUser();
+	if (!user) return { tier: 'free' };
+
+	const { data, error } = await supabase
+		.from('user_subscriptions')
+		.select('subscription_status, current_period_end, stripe_customer_id, subscription_id')
+		.eq('user_id', user.id)
+		.maybeSingle();
+
+	if (error) {
+		console.error('Error fetching subscription:', error);
+		return { tier: 'free' };
+	}
+
+	if (!data) {
+		return { tier: 'free' };
+	}
+
+	return {
+		tier: data.subscription_status || 'free',
+		expiresAt: data.current_period_end,
+		customerId: data.stripe_customer_id,
+		subscriptionId: data.subscription_id
+	};
+}
+
+// Check if RWP is available for current user
+export async function checkRWPAvailability() {
+	const user = await getCurrentUser();
+	if (!user) return { allowed: false, reason: 'Not authenticated' };
+
+	// First get the subscription status
+	const subscription = await getUserSubscription();
+
+	// Get the usage information
+	const { data: usage, error } = await supabase
+		.from('user_usage')
+		.select('rwp_week_count, rwp_week_reset, rwp_day_count, rwp_day_reset')
+		.eq('user_id', user.id)
+		.maybeSingle();
+
+	if (error) {
+		console.error('Error fetching usage:', error);
+		return { allowed: false, reason: 'Error checking limits' };
+	}
+
+	// Initialize usage if not exists
+	if (!usage) {
+		// Create a new usage record
+		const now = new Date().toISOString();
+		const nextWeek = new Date();
+		nextWeek.setDate(nextWeek.getDate() + 7);
+
+		const tomorrow = new Date();
+		tomorrow.setDate(tomorrow.getDate() + 1);
+		tomorrow.setHours(0, 0, 0, 0);
+
+		await supabase.from('user_usage').insert({
+			user_id: user.id,
+			rwp_week_count: 0,
+			rwp_week_reset: nextWeek.toISOString(),
+			rwp_day_count: 0,
+			rwp_day_reset: tomorrow.toISOString(),
+			last_updated: now
+		});
+
+		return {
+			allowed: true,
+			remaining: subscription.tier === 'premium' ? 20 : 3,
+			tier: subscription.tier
+		};
+	}
+
+	// Check if we need to reset counters
+	const now = new Date();
+	let weekCount = usage.rwp_week_count;
+	let dayCount = usage.rwp_day_count;
+
+	// Check if week needs reset
+	if (new Date(usage.rwp_week_reset) <= now) {
+		weekCount = 0;
+		const nextWeek = new Date();
+		nextWeek.setDate(nextWeek.getDate() + 7);
+
+		await supabase
+			.from('user_usage')
+			.update({
+				rwp_week_count: 0,
+				rwp_week_reset: nextWeek.toISOString(),
+				last_updated: now.toISOString()
+			})
+			.eq('user_id', user.id);
+	}
+
+	// Check if day needs reset (for premium tier)
+	if (subscription.tier === 'premium' && new Date(usage.rwp_day_reset) <= now) {
+		dayCount = 0;
+		const tomorrow = new Date();
+		tomorrow.setDate(tomorrow.getDate() + 1);
+		tomorrow.setHours(0, 0, 0, 0);
+
+		await supabase
+			.from('user_usage')
+			.update({
+				rwp_day_count: 0,
+				rwp_day_reset: tomorrow.toISOString(),
+				last_updated: now.toISOString()
+			})
+			.eq('user_id', user.id);
+	}
+
+	// Check limits based on tier
+	if (subscription.tier === 'premium') {
+		// Premium: 20 per day limit
+		if (dayCount >= 20) {
+			const resetTime = new Date(usage.rwp_day_reset);
+			return {
+				allowed: false,
+				reason: 'Daily limit reached',
+				resetTime,
+				tier: 'premium',
+				remaining: 0
+			};
+		}
+
+		return {
+			allowed: true,
+			tier: 'premium',
+			remaining: 20 - dayCount
+		};
+	} else {
+		// Free tier: 3 per week limit
+		if (weekCount >= 3) {
+			const resetTime = new Date(usage.rwp_week_reset);
+			return {
+				allowed: false,
+				reason: 'Weekly limit reached',
+				resetTime,
+				tier: 'free',
+				remaining: 0
+			};
+		}
+
+		return {
+			allowed: true,
+			tier: 'free',
+			remaining: 3 - weekCount
+		};
+	}
+}
+
+// Increment RWP usage counter
+export async function incrementRWPUsage() {
+	const user = await getCurrentUser();
+	if (!user) return false;
+
+	const { data: usage } = await supabase
+		.from('user_usage')
+		.select('rwp_week_count, rwp_day_count')
+		.eq('user_id', user.id)
+		.maybeSingle();
+
+	if (!usage) {
+		// Handle first-time usage
+		await checkRWPAvailability(); // This creates the usage record
+		return true;
+	}
+
+	// Update both counters
+	const { error: updateError } = await supabase
+		.from('user_usage')
+		.update({
+			rwp_week_count: usage.rwp_week_count + 1,
+			rwp_day_count: usage.rwp_day_count + 1,
+			last_updated: new Date().toISOString()
+		})
+		.eq('user_id', user.id);
+
+	if (updateError) {
+		console.error('Error updating usage count:', updateError);
+		return false;
+	}
+
+	return true;
+}
+
+// Create a checkout session
+export async function createCheckoutSession() {
+	// Get the current session token
+	const { data: sessionData } = await supabase.auth.getSession();
+	const token = sessionData?.session?.access_token;
+
+	if (!token) {
+		throw new Error('Not authenticated. Please log in.');
+	}
+
+	const response = await fetch('/api/stripe/create-checkout', {
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/json',
+			Authorization: `Bearer ${token}`
+		}
+	});
+
+	if (!response.ok) {
+		const errorData = await response.json();
+		throw new Error(errorData.message || 'Failed to create checkout session');
+	}
+
+	const data = await response.json();
+	return data.url;
+}
+
+// Create a customer portal session for managing subscription
+// In src/lib/supabase/client.js
+export async function createCustomerPortalSession() {
+	// Get the current session token
+	const { data: sessionData } = await supabase.auth.getSession();
+	const token = sessionData?.session?.access_token;
+
+	if (!token) {
+		throw new Error('Not authenticated. Please log in.');
+	}
+
+	const response = await fetch('/api/stripe/portal', {
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/json',
+			Authorization: `Bearer ${token}`
+		}
+	});
+
+	if (!response.ok) {
+		const errorData = await response.json();
+		throw new Error(errorData.message || 'Failed to create portal session');
+	}
+
+	const data = await response.json();
+	return data.url;
+}

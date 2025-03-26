@@ -13,6 +13,7 @@
 	import ContextModulesTab from '$lib/components/profile/ContextModulesTab.svelte';
 	import FeedbackTab from '$lib/components/profile/FeedbackTab.svelte';
 	import Loader from '$lib/components/UI/Loader.svelte';
+    import SubscriptionTab from '$lib/components/profile/SubscriptionTab.svelte';
 
 	let user = null;
 	let userPreferences = null;
@@ -83,7 +84,7 @@
 
 <div class="profile-container">
 	<h1 class="page-title">Your Profile</h1>
-
+<SubscriptionTab/>
 	{#if loading}
 		<Loader />
 	{:else if user}

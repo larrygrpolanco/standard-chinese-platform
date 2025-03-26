@@ -6,6 +6,10 @@
 	import NavigationItem from './NavigationItem.svelte';
 	import MobileMenu from './MobileMenu.svelte';
 
+	import { getUserSubscription } from '$lib/supabase/client';
+
+	let subscription = { tier: 'free' };
+
 	// Core modules data
 	const coreModules = [
 		{ id: 1, title: 'ORN', fullTitle: 'Orientation' },
@@ -39,7 +43,8 @@
 	$: if ($page) mobileMenuOpen = false;
 
 	// Add click handler to document
-	onMount(() => {
+	onMount(async () => {
+		subscription = await getUserSubscription();
 		document.addEventListener('click', handleClickOutside);
 		return () => document.removeEventListener('click', handleClickOutside);
 	});
@@ -93,6 +98,12 @@
 				<div class="logo-underline"></div>
 			</div>
 		</a>
+
+		{#if subscription.tier === 'premium'}
+			<span class="ml-2 rounded-full bg-amber-500 px-2 py-0.5 text-xs font-medium text-white">
+				Premium
+			</span>
+		{/if}
 
 		<!-- Desktop Navigation -->
 		<nav class="desktop-nav">

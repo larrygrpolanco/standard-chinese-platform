@@ -3,6 +3,8 @@
 	import Loader from '$lib/components/UI/Loader.svelte';
 	import { createEventDispatcher, onMount } from 'svelte';
 
+    
+
 	const dispatch = createEventDispatcher();
 
 	// Props

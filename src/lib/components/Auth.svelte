@@ -58,7 +58,7 @@
                 }
                 
                 await signIn(email, password);
-                goto('/login/profile'); // Redirect to profile after login
+                goto('/profile'); // Redirect to profile after login
             }
         } catch (e) {
             console.error('Auth error:', e);
