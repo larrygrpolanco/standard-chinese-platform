@@ -123,9 +123,9 @@
 				on:click={toggleModuleDropdown}
 			/>
 
-			<!-- Conditional login/profile button -->
+			<!-- Conditional /profile button -->
 			{#if $authStore}
-				<a href="/login/profile" class="login-button">
+				<a href="/profile" class="login-button">
 					<span>Profile</span>
 					<div class="login-button-highlight"></div>
 				</a>

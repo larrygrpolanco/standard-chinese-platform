@@ -47,6 +47,59 @@ export async function POST({ request }) {
 }
 
 // Helper function to handle subscription deletions
+async function handleSubscriptionUpdated(subscription, supabaseAdmin) {
+	try {
+		const customerId = subscription.customer;
+		const subscriptionId = subscription.id;
+		const status = subscription.status;
+
+		// Look up the user by customer ID
+		const { data: userData, error: userError } = await supabaseAdmin
+			.from('user_subscriptions')
+			.select('user_id')
+			.eq('stripe_customer_id', customerId)
+			.maybeSingle();
+
+		if (userError) {
+			console.error('Error looking up user:', userError);
+			return;
+		}
+
+		if (!userData) {
+			console.error('User not found for customer:', customerId);
+			return;
+		}
+
+		const userId = userData.user_id;
+		const subscriptionStatus = status === 'active' || status === 'trialing' ? 'premium' : 'free';
+
+		// Now these logs are AFTER variables are defined
+		console.log('Updating subscription for user:', userId);
+		console.log('New status:', subscriptionStatus);
+
+		// Calculate the period end (when the subscription will expire)
+		// Add some buffer time (1 hour) to avoid timezone issues
+		const periodEnd = new Date(subscription.current_period_end * 1000);
+		periodEnd.setHours(periodEnd.getHours() + 1);
+
+		// Update the user's subscription details
+		const { error: updateError } = await supabaseAdmin
+			.from('user_subscriptions')
+			.update({
+				subscription_status: subscriptionStatus,
+				subscription_id: subscriptionId,
+				current_period_end: periodEnd.toISOString()
+			})
+			.eq('user_id', userId);
+
+		if (updateError) {
+			console.error('Error updating subscription in database:', updateError);
+		}
+	} catch (error) {
+		console.error('Error handling subscription update:', error);
+	}
+}
+
 async function handleSubscriptionDeleted(subscription, supabaseAdmin) {
 	const customerId = subscription.customer;
 
@@ -70,53 +123,6 @@ async function handleSubscriptionDeleted(subscription, supabaseAdmin) {
 			subscription_status: 'free',
 			subscription_id: null,
 			current_period_end: null
-		})
-		.eq('user_id', userId);
-}
-
-async function handleSubscriptionUpdated(subscription, supabaseAdmin) {
-    try {
-        const customerId = subscription.customer;
-        const subscriptionId = subscription.id;
-        const status = subscription.status;
-
-        // Look up the user by customer ID
-        const { data: userData, error: userError } = await supabaseAdmin
-            .from('user_subscriptions')
-            .select('user_id')
-            .eq('stripe_customer_id', customerId)
-            .maybeSingle();
-
-        if (userError) {
-            console.error('Error looking up user:', userError);
-            return;
-        }
-
-        if (!userData) {
-            console.error('User not found for customer:', customerId);
-            return;
-        }
-
-        const userId = userData.user_id;
-        const subscriptionStatus = status === 'active' || status === 'trialing' ? 'premium' : 'free';
-
-        // Now these logs are AFTER variables are defined
-        console.log('Updating subscription for user:', userId);
-        console.log('New status:', subscriptionStatus);
-
-
-	// Calculate the period end (when the subscription will expire)
-	// Add some buffer time (1 hour) to avoid timezone issues
-	const periodEnd = new Date(subscription.current_period_end * 1000);
-	periodEnd.setHours(periodEnd.getHours() + 1);
-
-	// Update the user's subscription details
-	await supabaseAdmin
-		.from('user_subscriptions')
-		.update({
-			subscription_status: subscriptionStatus,
-			subscription_id: subscriptionId,
-			current_period_end: periodEnd.toISOString()
 		})
 		.eq('user_id', userId);
 }

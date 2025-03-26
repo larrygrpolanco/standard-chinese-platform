@@ -97,7 +97,7 @@
 				<!-- Login button (future implementation) -->
 				<div class="login-section">
 					{#if isLoggedIn}
-						<a href="/login/profile" class="mobile-login-button">
+						<a href="/profile" class="mobile-login-button">
 							<span>Profile</span>
 							<div class="login-button-highlight"></div>
 						</a>
