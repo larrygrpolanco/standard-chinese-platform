@@ -18,59 +18,59 @@
 	}
 
 	// Component method updates (SubscriptionModal.svelte)
-	async function handleSubscribe() {
-		isLoading = true;
-		error = null;
+async function handleSubscribe() {
+  isLoading = true;
+  error = null;
 
-		try {
-			// No need to pass tokens - server uses session cookie
-			const response = await fetch('/api/stripe/create-checkout', {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json'
-				}
-			});
+  try {
+    // No need to pass tokens - server uses session cookie
+    const response = await fetch('/api/stripe/create-checkout', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
 
-			if (!response.ok) {
-				const data = await response.json();
-				throw new Error(data.error || 'Failed to create checkout session');
-			}
+    if (!response.ok) {
+      const data = await response.json();
+      throw new Error(data.error || 'Failed to create checkout session');
+    }
 
-			const { url } = await response.json();
-			window.location.href = url;
-		} catch (err) {
-			console.error('Subscription error:', err);
-			error = err.message;
-			showToast(error, 'error');
-		} finally {
-			isLoading = false;
-		}
-	}
+    const { url } = await response.json();
+    window.location.href = url;
+  } catch (err) {
+    console.error('Subscription error:', err);
+    error = err.message;
+    showToast(error, 'error');
+  } finally {
+    isLoading = false;
+  }
+}
 
-	async function handleManageSubscription() {
-		isLoading = true;
-		error = null;
+async function handleManageSubscription() {
+  isLoading = true;
+  error = null;
 
-		try {
-			// No need to pass user data - server uses session
-			const response = await fetch('/api/stripe/create-portal', {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json'
-				}
-			});
+  try {
+    // No need to pass user data - server uses session
+    const response = await fetch('/api/stripe/create-portal', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
 
-			if (!response.ok) {
-				const data = await response.json();
-				throw new Error(data.error || 'Failed to create customer portal session');
-			}
+    if (!response.ok) {
+      const data = await response.json();
+      throw new Error(data.error || 'Failed to create customer portal session');
+    }
 
-			const { url } = await response.json();
-			window.location.href = url;
-		} finally {
-			isLoading = false;
-		}
-	}
+    const { url } = await response.json();
+    window.location.href = url;
+  } finally {
+    isLoading = false;
+  }
+}
 </script>
 
 {#if showModal}
