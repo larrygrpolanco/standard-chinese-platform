@@ -10,6 +10,9 @@ import { createClient } from '@supabase/supabase-js';
 
 export async function POST({ request }) {
 	const signature = request.headers.get('stripe-signature');
+	console.log('Webhook received at:', new Date().toISOString());
+	console.log('URL:', request.url);
+	console.log('Headers:', Object.fromEntries(request.headers.entries()));
 
 	if (!signature) {
 		return new Response('Missing signature', { status: 400 });
