@@ -2,10 +2,7 @@
 	import AudioPlayer from '$lib/components/AudioPlayer.svelte';
 	import Loader from '$lib/components/UI/Loader.svelte';
 	import { createEventDispatcher, onMount } from 'svelte';
-	import { canUseFeature, incrementUsage } from '$lib/supabase/client';
-	import { authStore } from '$lib/stores/authStore';
-	import SubscriptionModal from '$lib/components/Subscription/SubscriptionModal.svelte';
-    
+
 	const dispatch = createEventDispatcher();
 
 	// Props
@@ -13,8 +10,6 @@
 	export let storyTitle = ''; // For reference
 	export let language = 'zh'; // Default language (Chinese)
 	export let instructions = ''; // Optional instructions for speech style
-	let subscriptionModalVisible = false;
-	let userUsageStats = null;
 
 	// Cache settings
 	const MAX_CACHE_SIZE = 5 * 1024 * 1024; // 5MB max cache size
@@ -102,27 +97,6 @@
 		error = null;
 
 		try {
-			// First, check if the user is authenticated
-			if (!$authStore) {
-				throw new Error('Please sign in to use the TTS feature');
-			}
-
-			// Check if the user can use TTS
-			const permission = await canUseFeature('tts');
-			if (!permission.allowed) {
-				if (permission.reason === 'premium_required') {
-					// Get usage stats for the subscription modal
-					const response = await fetch('/api/user/usage-stats');
-					userUsageStats = await response.json();
-
-					// Show subscription modal instead of error
-					subscriptionModalVisible = true;
-					throw new Error('TTS is a premium feature. Please upgrade to access it.');
-				} else {
-					throw new Error('You do not have permission to use this feature.');
-				}
-			}
-
 			// Check if we already have this audio cached in sessionStorage
 			const cachedAudio = sessionStorage.getItem(cacheKey);
 			if (cachedAudio) {
@@ -155,9 +129,6 @@
 				const errorMessage = errorData?.error || 'Failed to generate speech';
 				throw new Error(errorMessage);
 			}
-
-			// After successful generation, increment the usage count
-			await incrementUsage('tts');
 
 			const data = await response.json();
 			audioUrl = data.audioUrl;
@@ -312,13 +283,6 @@
 		</div>
 	</div>
 </section>
-
-<SubscriptionModal
-	bind:showModal={subscriptionModalVisible}
-	usageStats={userUsageStats}
-	trigger="tts"
-	on:close={() => (subscriptionModalVisible = false)}
-/>
 
 <style>
 	.audio-player-wrapper {

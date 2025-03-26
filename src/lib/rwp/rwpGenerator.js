@@ -1,12 +1,10 @@
-// rwpGenerator.js
+// rwpGenerator.js OLD server-side generator
 import {
 	getCurrentUser,
 	getCompleteUnit,
 	getUserPreferences,
 	saveRwpContent
 } from '$lib/supabase/client.js';
-
-import { canUseFeature, incrementUsage } from '$lib/supabase/client';
 
 /**
  * Generates a comprehensive practice exercise for a specific unit
@@ -37,20 +35,6 @@ export async function generateRwpExercise(
 		const user = await getCurrentUser();
 		if (!user) throw new Error('User not authenticated');
 
-		// Check if user can use the RWP feature
-		const permission = await canUseFeature('rwp');
-		if (!permission.allowed) {
-			if (permission.reason === 'weekly_limit_reached') {
-				throw new Error(
-					`Weekly limit reached. Resets on ${new Date(permission.resetAt).toLocaleDateString()}.`
-				);
-			} else if (permission.reason === 'daily_limit_reached') {
-				throw new Error('You have reached your daily RWP generation limit.');
-			} else {
-				throw new Error('Sorry, you do not have access to this feature.');
-			}
-		}
-
 		const userPreferences = await getUserPreferences();
 
 		// 2. Get unit data
@@ -69,7 +53,7 @@ export async function generateRwpExercise(
 		// 4. PHASE 1A: Analyze story requirements
 		updateProgress('analysis'); // Update to analysis phase
 		console.log('Analyzing story requirements...');
-		const analysisStartTime = Date.now();
+        const analysisStartTime = Date.now();
 
 		const analysisResponse = await fetch('/api/rwp/analyze-story', {
 			method: 'POST',
@@ -82,7 +66,7 @@ export async function generateRwpExercise(
 			})
 		});
 
-		console.log(`Story analysis took ${(Date.now() - analysisStartTime) / 1000} seconds`);
+        console.log(`Story analysis took ${(Date.now() - analysisStartTime) / 1000} seconds`);
 
 		if (!analysisResponse.ok) {
 			const errorData = await analysisResponse.json();
@@ -100,7 +84,7 @@ export async function generateRwpExercise(
 		// 5. PHASE 1B: Generate the story based on analysis
 		updateProgress('story'); // Update to story generation phase
 		console.log('Generating story based on analysis...');
-		const storyStartTime = Date.now();
+        const storyStartTime = Date.now();
 
 		const storyResponse = await fetch('/api/rwp/generate-story', {
 			method: 'POST',
@@ -114,7 +98,7 @@ export async function generateRwpExercise(
 			})
 		});
 
-		console.log(`Story generation took ${(Date.now() - storyStartTime) / 1000} seconds`);
+        console.log(`Story generation took ${(Date.now() - storyStartTime) / 1000} seconds`);
 
 		if (!storyResponse.ok) {
 			const errorData = await storyResponse.json();
@@ -132,7 +116,7 @@ export async function generateRwpExercise(
 		// 6. PHASE 2: Generate questions based on the story and analysis
 		updateProgress('questions');
 		console.log('Generating questions...');
-		const questionsStartTime = Date.now();
+        const questionsStartTime = Date.now();
 
 		const questionsResponse = await fetch('/api/rwp/create-questions', {
 			method: 'POST',
@@ -147,7 +131,7 @@ export async function generateRwpExercise(
 			})
 		});
 
-		console.log(`Question generation took ${(Date.now() - questionsStartTime) / 1000} seconds`);
+        console.log(`Question generation took ${(Date.now() - questionsStartTime) / 1000} seconds`);
 
 		// Continue with the rest of the function as before
 		if (!questionsResponse.ok) {
@@ -166,7 +150,7 @@ export async function generateRwpExercise(
 		// 7. PHASE 3: Format everything into JSON structure
 		updateProgress('formatting');
 		console.log('Formatting exercise...');
-		const formatStartTime = Date.now();
+        const formatStartTime = Date.now();
 
 		const formatResponse = await fetch('/api/rwp/format-exercise', {
 			method: 'POST',
@@ -179,7 +163,7 @@ export async function generateRwpExercise(
 			})
 		});
 
-		console.log(`Exercise formatting took ${(Date.now() - formatStartTime) / 1000} seconds`);
+        console.log(`Exercise formatting took ${(Date.now() - formatStartTime) / 1000} seconds`);
 
 		if (!formatResponse.ok) {
 			const errorData = await formatResponse.json();
@@ -197,9 +181,6 @@ export async function generateRwpExercise(
 
 		// Save to database
 		await saveRwpContent(unitId, contentToSave);
-
-		// After successful generation, increment the usage count
-		await incrementUsage('rwp');
 
 		// Return the content
 		return contentToSave;

@@ -2,17 +2,11 @@
 <script>
 	import { createEventDispatcher } from 'svelte';
 	import { authStore } from '$lib/stores/authStore';
-	import { supabase, getUserUsageStats } from '$lib/supabase/client';
+	import { supabase } from '$lib/supabase/client';
 	import ConfirmationModal from '$lib/components/UI/ConfirmationModal.svelte';
-	import { STRIPE_CONFIG } from '$lib/stripe/config.js';
-	import { onMount } from 'svelte';
 
 	export let user;
 	export let userPreferences;
-	let usageStats = null;
-	let loadingStats = true;
-	let isLoading = false; // Added missing variable
-	let error = null; // Added missing variable
 
 	const dispatch = createEventDispatcher();
 
@@ -27,17 +21,21 @@
 	let deleteConfirmText = '';
 	let deleting = false;
 
+	// Subscription info - this would be retrieved from your actual subscription service
+	// For now, we'll simulate it based on fake data
+	let subscriptionInfo = {
+		status: 'yearly', // 'free', 'monthly', 'yearly'
+		nextBillingDate: null,
+		// This would come from your Stripe integration
+		managementUrl: null
+	};
+
 	// Toast helper function
 	function showToast(message, type = 'success') {
 		dispatch('toast', { message, type });
 	}
 
 	async function handleChangePassword() {
-		if (!oldPassword) {
-			passwordError = 'Current password is required';
-			return;
-		}
-
 		if (newPassword !== confirmPassword) {
 			passwordError = 'Passwords do not match';
 			return;
@@ -52,17 +50,7 @@
 		passwordError = '';
 
 		try {
-			// First verify the current password by attempting a login
-			const { error: verificationError } = await supabase.auth.signInWithPassword({
-				email: user.email,
-				password: oldPassword
-			});
-
-			if (verificationError) {
-				throw new Error('Current password is incorrect');
-			}
-
-			// If verification succeeded, update the password
+			// Supabase requires current password for security
 			const { error } = await supabase.auth.updateUser({
 				password: newPassword
 			});
@@ -78,6 +66,7 @@
 		} catch (error) {
 			console.error('Error changing password:', error);
 			passwordError = error.message || 'Failed to change password';
+			showToast('Failed to change password', 'error');
 		} finally {
 			changing = false;
 		}
@@ -92,38 +81,23 @@
 		deleting = true;
 
 		try {
-			// First delete user data from all tables
-			const tables = [
-				'feature_usage',
-				'user_subscriptions',
-				'user_preferences',
-				'user_progress',
-				'rwp_content'
-				// Add any other tables that store user data
-			];
+			// First we should delete all user data from the database
+			// This could be a call to a server function that handles all deletion
+			// For simplicity, I'm showing just the auth deletion here
 
-			// Execute deletes for each table
-			for (const table of tables) {
-				const { error } = await supabase.from(table).delete().eq('user_id', user.id);
+			// Delete the user account
+			const { error } = await supabase.auth.admin.deleteUser(user.id);
+			if (error) throw error;
 
-				if (error && error.code !== 'PGRST116') {
-					// Ignore not found errors
-					console.error(`Error deleting from ${table}:`, error);
-				}
-			}
-
-			// Now delete the user account itself
-			await supabase.auth.signOut();
+			// Sign out
+			await authStore.signOut();
 			showToast('Your account has been deleted', 'success');
 
-			// Redirect to home page after a short delay
-			setTimeout(() => {
-				window.location.href = '/';
-			}, 1500);
+			// Redirect to home page
+			window.location.href = '/';
 		} catch (error) {
 			console.error('Error deleting account:', error);
 			showToast('Failed to delete account: ' + error.message, 'error');
-		} finally {
 			deleting = false;
 		}
 	}
@@ -136,56 +110,10 @@
 		passwordError = '';
 		changePasswordVisible = false;
 	}
-
-	// Load subscription data on component mount
-	onMount(async () => {
-		loadUsageStats();
-	});
-
-	async function loadUsageStats() {
-		try {
-			loadingStats = true;
-			usageStats = await getUserUsageStats();
-			console.log('Loaded usage stats:', usageStats);
-		} catch (error) {
-			console.error('Error loading usage stats:', error);
-			error = error.message;
-		} finally {
-			loadingStats = false;
-		}
-	}
-
-	async function handleSubscribe() {
-		isLoading = true;
-		error = null;
-
-		try {
-			const response = await fetch('/api/stripe/create-checkout', {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json'
-				}
-			});
-
-			if (!response.ok) {
-				const data = await response.json();
-				throw new Error(data.error || 'Failed to create checkout session');
-			}
-
-			const { url } = await response.json();
-			window.location.href = url;
-		} catch (err) {
-			console.error('Subscription error:', err);
-			error = err.message;
-			showToast(error, 'error');
-		} finally {
-			isLoading = false;
-		}
-	}
 </script>
 
 <div class="account-tab">
-	<!-- Account Information Section -->
+	<!-- I don't think it is doing much now I may edit this later -->
 	<section class="account-section">
 		<h2 class="section-title">Account Information</h2>
 		<div class="info-grid">
@@ -201,150 +129,73 @@
 		</div>
 		<div class="profile-reminder">
 			<h3>Make Your Practice More Relevant</h3>
-			<p>Make sure to edit your <em>Learning Profile</em> for better RWP quizzes</p>
+			<p>Make sure to edit your <em>Learning Profile <em> for better RWP quizzes</p>
 		</div>
 	</section>
 
-	<!-- Subscription Section -->
 	<section class="account-section">
 		<h2 class="section-title">Subscription</h2>
-		{#if loadingStats}
-			<div class="loading-box">Loading subscription information...</div>
-		{:else if usageStats}
-			<div class="subscription-card">
-				<div class="sub-status">
-					<span class="sub-status-label">Current Plan:</span>
-					<span
-						class="sub-status-value {usageStats.subscription.status === 'active'
-							? 'premium'
-							: 'free'}"
-					>
-						{usageStats.subscription.status === 'active' ? 'Premium' : 'Free Tier'}
-					</span>
-				</div>
-
-				{#if usageStats.subscription.status === 'active' && usageStats.subscription.renewalDate}
-					<div class="sub-details">
-						<span class="sub-label">Next billing date:</span>
-						<span class="sub-value"
-							>{new Date(usageStats.subscription.renewalDate).toLocaleDateString()}</span
-						>
-					</div>
-				{/if}
-
-				<div class="usage-stats">
-					<h3 class="usage-title">Your Usage</h3>
-
-					<div class="usage-item">
-						<div class="usage-header">
-							<span class="usage-label">RWP Exercises</span>
-							<span class="usage-period"
-								>{usageStats.rwp.periodType === 'daily' ? 'Daily' : 'Weekly'}</span
-							>
-						</div>
-
-						<div class="usage-meter">
-							<div
-								class="usage-fill"
-								style="width: {Math.min(100, (usageStats.rwp.count / usageStats.rwp.limit) * 100)}%"
-							></div>
-						</div>
-
-						<div class="usage-text">
-							<span
-								>{usageStats.rwp.count} used / {usageStats.rwp.limit}
-								{usageStats.rwp.periodType} limit</span
-							>
-
-							{#if usageStats.rwp.resetAt && usageStats.subscription.status !== 'active'}
-								<span class="reset-date"
-									>Resets on {new Date(usageStats.rwp.resetAt).toLocaleDateString()}</span
-								>
-							{/if}
-						</div>
-					</div>
-
-					<div class="usage-item">
-						<div class="usage-header">
-							<span class="usage-label">TTS Audio</span>
-						</div>
-
-						{#if usageStats.tts.available}
-							<div class="feature-available">
-								<span class="check-icon">✓</span>
-								<span>Available with your Premium subscription</span>
-							</div>
-						{:else}
-							<div class="feature-unavailable">
-								<span class="lock-icon">🔒</span>
-								<span>Available with Premium subscription</span>
-							</div>
-						{/if}
-					</div>
-				</div>
-
-				<div class="sub-features">
-					<h3 class="sub-features-title">Plan Features:</h3>
-					<ul class="features-list">
-						{#if usageStats.subscription.status === 'active'}
-							<li class="feature">Access to all FSI course materials</li>
-							<li class="feature">
-								Up to {STRIPE_CONFIG.PREMIUM_TIER_LIMITS.rwp_per_day} RWP exercises per day
-							</li>
-							<li class="feature">TTS audio for listening practice</li>
-							<li class="feature">Priority support</li>
-						{:else}
-							<li class="feature">Access to all FSI course materials</li>
-							<li class="feature">
-								Limited to {STRIPE_CONFIG.FREE_TIER_LIMITS.rwp_per_week} RWP exercises per week
-							</li>
-							<li class="feature-upgrade">
-								Upgrade to Premium for {STRIPE_CONFIG.PREMIUM_TIER_LIMITS.rwp_per_day} daily exercises
-								and TTS audio
-							</li>
-						{/if}
-					</ul>
-				</div>
-
-				<div class="sub-actions">
-					{#if usageStats.subscription.status === 'active'}
-						<button
-							class="tape-button manage"
-							on:click={handleManageSubscription}
-							disabled={isLoading}
-						>
-							{isLoading ? 'Loading...' : 'Manage Subscription'}
-						</button>
-					{:else}
-						<button class="tape-button upgrade" on:click={handleSubscribe} disabled={isLoading}>
-							{isLoading ? 'Loading...' : 'Upgrade to Premium'}
-						</button>
-					{/if}
-				</div>
+		<div class="subscription-message">
+			RWP features completely free during this prototyping phase
+		</div>
+		<div class="subscription-card">
+			<div class="sub-status">
+				<span class="sub-status-label">Current Plan:</span>
+				<span class="sub-status-value {subscriptionInfo.status}">
+					{subscriptionInfo.status === 'free'
+						? 'Free Tier'
+						: subscriptionInfo.status === 'monthly'
+							? 'Monthly Premium'
+							: 'Yearly Premium'}
+				</span>
 			</div>
 
-			{#if usageStats.subscription.status !== 'active'}
-				<div class="subscription-message">
-					Your subscription helps support the continued development of this site and keeps all the
-					core material free for everyone. The subscription fee mainly covers the AI costs for
-					generating personalized practice content.
+			{#if subscriptionInfo.status !== 'free' && subscriptionInfo.nextBillingDate}
+				<div class="sub-details">
+					<span class="sub-label">Next billing date:</span>
+					<span class="sub-value"
+						>{new Date(subscriptionInfo.nextBillingDate).toLocaleDateString()}</span
+					>
 				</div>
 			{/if}
-		{:else}
-			<div class="error-message">
-				Failed to load subscription information. <button on:click={loadUsageStats}>Try again</button
-				>
-			</div>
-		{/if}
 
-		{#if error}
-			<div class="error-message">{error}</div>
+			<div class="sub-features">
+				<h3 class="sub-features-title">Plan Features:</h3>
+				<ul class="features-list">
+					{#if subscriptionInfo.status === 'free'}
+						<li class="feature">Access to all FSI course materials</li>
+						<li class="feature">Limited to 1 RWP exercise generation per day</li>
+						<li class="feature-upgrade">
+							Upgrade to Premium for unlimited RWP exercises and to support this site
+						</li>
+					{:else}
+						<li class="feature">Access to all FSI course materials</li>
+						<li class="feature">Unlimited RWP exercise generation</li>
+						<li class="feature">Priority support</li>
+						<li class="feature">Early access to new features</li>
+					{/if}
+				</ul>
+			</div>
+
+			<div class="sub-actions">
+				{#if subscriptionInfo.status === 'free'}
+					<button class="tape-button upgrade">Upgrade to Premium</button>
+				{:else}
+					<button class="tape-button manage">Manage Subscription</button>
+				{/if}
+			</div>
+		</div>
+
+		{#if subscriptionInfo.status === 'free'}
+			<div class="subscription-message">
+				Your subscription helps support the continued development of this site and keeps all the
+				core material free for everyone.
+			</div>
 		{/if}
 	</section>
 
-	<!-- Account Management Section -->
 	<section class="account-section">
-		<h2 class="section-title">Account Management</h2>
+		<h2 class="section-title">Account Managment</h2>
 		<div class="flex-box my-2 gap-2">
 			{#if !changePasswordVisible}
 				<button class="tape-button secondary" on:click={() => (changePasswordVisible = true)}>
@@ -352,17 +203,6 @@
 				</button>
 			{:else}
 				<div class="password-form">
-					<div class="form-group">
-						<label for="oldPassword">Current Password</label>
-						<input
-							type="password"
-							id="oldPassword"
-							class="form-input"
-							bind:value={oldPassword}
-							placeholder="Enter current password"
-						/>
-					</div>
-
 					<div class="form-group">
 						<label for="newPassword">New Password</label>
 						<input
@@ -400,7 +240,7 @@
 						<button
 							class="tape-button"
 							on:click={handleChangePassword}
-							disabled={changing || !oldPassword || !newPassword || !confirmPassword}
+							disabled={changing || !newPassword || !confirmPassword}
 						>
 							{changing ? 'Changing...' : 'Save New Password'}
 						</button>
@@ -415,7 +255,6 @@
 		</div>
 	</section>
 
-	<!-- Delete Account Section -->
 	<section class="account-section danger-section">
 		<h2 class="section-title">Delete Account</h2>
 		<p class="danger-text">

@@ -257,8 +257,36 @@ CREATE POLICY "Users can insert their own progress"
   USING (auth.uid() = user_id);
 
 
+
 -- ===============================
--- TTS
+-- Subscription
+-- ===============================
+
+  -- User subscriptions table
+CREATE TABLE user_subscriptions (
+  id UUID REFERENCES auth.users(id) PRIMARY KEY,
+  stripe_customer_id TEXT,
+  stripe_subscription_id TEXT,
+  subscription_status TEXT NOT NULL DEFAULT 'free',  -- 'free', 'active', 'past_due', 'canceled'
+  current_period_start TIMESTAMP,
+  current_period_end TIMESTAMP,
+  cancel_at_period_end BOOLEAN DEFAULT FALSE,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Feature usage table
+CREATE TABLE feature_usage (
+  id UUID REFERENCES auth.users(id) PRIMARY KEY,
+  rwp_count INT DEFAULT 0,
+  tts_count INT DEFAULT 0,
+  rwp_reset_at TIMESTAMP,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- ===============================
+-- TTS (NOT BEING USED)
 -- ===============================
 
 -- Create the TTS audio storage table
@@ -307,3 +335,4 @@ CREATE POLICY "Users can upload their own audio files"
     bucket_id = 'tts_audio' AND 
     auth.uid()::text = (storage.foldername(name))[1]
   );
+
