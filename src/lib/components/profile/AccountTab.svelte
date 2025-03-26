@@ -4,7 +4,7 @@
 	import { authStore } from '$lib/stores/authStore';
 	import { supabase } from '$lib/supabase/client';
 	import ConfirmationModal from '$lib/components/UI/ConfirmationModal.svelte';
-	import { getUserUsageStats } from '$lib/usage/usageTracking.js';
+	import { getUserUsageStats } from '$lib/supabase/client';
 	import { STRIPE_CONFIG } from '$lib/stripe/config.js';
 	import { onMount } from 'svelte';
 
