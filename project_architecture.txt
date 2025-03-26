@@ -11,6 +11,7 @@ A web-based language learning platform that modernizes the Foreign Service Insti
 - **API**: SvelteKit endpoints (serverless functions)
 - **Email**: EmailJS
 - **Deployment**: Vercel
+- **Payments**: Stripe
 
 ## Project Structure
 
@@ -21,6 +22,9 @@ A web-based language learning platform that modernizes the Foreign Service Insti
 - `/svelte.config.js` - SvelteKit configuration
 - `/vite.config.js` - Vite bundler configuration
 - `/jsconfig.json` - JavaScript configuration for editor support
+- `/project_architecture.txt` - This file
+- `/README.md` - Project overview and setup instructions
+- `/CLAUDE.md` - Development guide for Claude AI assistant
 
 ### Source Code (/src)
 1. **/lib** - Library code and components
@@ -34,8 +38,12 @@ A web-based language learning platform that modernizes the Foreign Service Insti
      - `/ModuleQuestions.svelte` - Questions for module assessment
      - `/ResourceModuleCard.svelte` - Card UI for resource modules
      - `/ReviewTab.svelte` - Review functionality
+     - `/Test.svelte` - Testing component
      - `/UnitContent.svelte` - Content display for learning units
      - `/VocabularyTab.svelte` - Vocabulary learning interface
+     
+     - **/Subscription** - Subscription-related components
+       - `/SubscriptionModal.svelte` - Subscription modal dialog
      
      - **/UI** - Low-level UI components
        - `/Breadcrumb.svelte` - Navigation breadcrumb
@@ -71,6 +79,9 @@ A web-based language learning platform that modernizes the Foreign Service Insti
      - `/fontPreferences.js` - Chinese character display preferences
      - `/quizStore.js` - Quiz state management
    
+   - **/stripe** - Stripe payment integration
+     - `/config.js` - Stripe configuration
+   
    - **/supabase** - Database integration
      - `/client.js` - Supabase client initialization
    
@@ -90,8 +101,14 @@ A web-based language learning platform that modernizes the Foreign Service Insti
        - `/create-questions/+server.js` - Question generation endpoint
        - `/format-exercise/+server.js` - Exercise formatting endpoint
        - `/generate-story/+server.js` - Story generation endpoint
+     - **/stripe** - Stripe payment API
+       - `/create-checkout/+server.js` - Create checkout session
+       - `/create-portal/+server.js` - Create customer portal
+       - `/webhook/+server.js` - Stripe webhook handler
      - **/tts** - Text-to-speech API
        - `/+server.js` - TTS endpoint
+     - **/user** - User-related API endpoints
+       - `/usage-stats/+server.js` - User usage statistics
    
    - **/login** - Authentication routes
      - `/+page.svelte` - Login page
@@ -126,6 +143,13 @@ A web-based language learning platform that modernizes the Foreign Service Insti
 
 ### Static Assets (/static)
 - Favicons and app icons
+  - `android-chrome-192x192.png`
+  - `android-chrome-512x512.png`
+  - `apple-touch-icon.png`
+  - `favicon-16x16.png`
+  - `favicon-32x32.png`
+  - `favicon.ico`
+  - `site.webmanifest`
 - **/images** - Site images
   - `chinese-calligraphy.jpg`
   - `vintage-cassette.png`
@@ -137,6 +161,14 @@ A web-based language learning platform that modernizes the Foreign Service Insti
 ### Database (/supabase)
 - `/schema.sql` - Database schema definition
 
+### Notes and Documentation
+- `/Note_Auth.txt` - Authentication implementation notes
+- `/Note_Description.txt` - Project description notes
+- `/Note_StyleGuide.txt` - Style guide documentation
+- `/Notes_Automation.txt` - Automation process notes
+- `/Notes_DatabaseEx.txt` - Database extension notes
+- `/stripe_implementation.txt` - Stripe implementation documentation
+
 ## Key Features
 1. Toggle between simplified/traditional Chinese characters
 2. Integrated audio playback for dialogues and exercises
@@ -144,6 +176,8 @@ A web-based language learning platform that modernizes the Foreign Service Insti
 4. User accounts with progress tracking
 5. Vintage cassette tape aesthetic UI
 6. Mobile-responsive design
+7. Subscription-based premium features using Stripe
+8. Usage tracking and statistics
 
 ## Developer Workflow
 - Development: `npm run dev`

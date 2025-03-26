@@ -4,7 +4,6 @@
 	import { authStore } from '$lib/stores/authStore';
 	import { supabase } from '$lib/supabase/client';
 	import ConfirmationModal from '$lib/components/UI/ConfirmationModal.svelte';
-	import { getUserUsageStats } from '$lib/supabase/client';
 	import { STRIPE_CONFIG } from '$lib/stripe/config.js';
 	import { onMount } from 'svelte';
 
@@ -12,6 +11,8 @@
 	export let userPreferences;
 	let usageStats = null;
 	let loadingStats = true;
+	let isLoading = false; // Added missing variable
+	let error = null; // Added missing variable
 
 	const dispatch = createEventDispatcher();
 
@@ -32,6 +33,11 @@
 	}
 
 	async function handleChangePassword() {
+		if (!oldPassword) {
+			passwordError = 'Current password is required';
+			return;
+		}
+
 		if (newPassword !== confirmPassword) {
 			passwordError = 'Passwords do not match';
 			return;
@@ -46,7 +52,17 @@
 		passwordError = '';
 
 		try {
-			// Supabase requires current password for security
+			// First verify the current password by attempting a login
+			const { error: verificationError } = await supabase.auth.signInWithPassword({
+				email: user.email,
+				password: oldPassword
+			});
+
+			if (verificationError) {
+				throw new Error('Current password is incorrect');
+			}
+
+			// If verification succeeded, update the password
 			const { error } = await supabase.auth.updateUser({
 				password: newPassword
 			});
@@ -62,7 +78,6 @@
 		} catch (error) {
 			console.error('Error changing password:', error);
 			passwordError = error.message || 'Failed to change password';
-			showToast('Failed to change password', 'error');
 		} finally {
 			changing = false;
 		}
@@ -77,23 +92,38 @@
 		deleting = true;
 
 		try {
-			// First we should delete all user data from the database
-			// This could be a call to a server function that handles all deletion
-			// For simplicity, I'm showing just the auth deletion here
+			// First delete user data from all tables
+			const tables = [
+				'feature_usage',
+				'user_subscriptions',
+				'user_preferences',
+				'user_progress',
+				'rwp_content'
+				// Add any other tables that store user data
+			];
 
-			// Delete the user account
-			const { error } = await supabase.auth.admin.deleteUser(user.id);
-			if (error) throw error;
+			// Execute deletes for each table
+			for (const table of tables) {
+				const { error } = await supabase.from(table).delete().eq('user_id', user.id);
 
-			// Sign out
-			await authStore.signOut();
+				if (error && error.code !== 'PGRST116') {
+					// Ignore not found errors
+					console.error(`Error deleting from ${table}:`, error);
+				}
+			}
+
+			// Now delete the user account itself
+			await supabase.auth.signOut();
 			showToast('Your account has been deleted', 'success');
 
-			// Redirect to home page
-			window.location.href = '/';
+			// Redirect to home page after a short delay
+			setTimeout(() => {
+				window.location.href = '/';
+			}, 1500);
 		} catch (error) {
 			console.error('Error deleting account:', error);
 			showToast('Failed to delete account: ' + error.message, 'error');
+		} finally {
 			deleting = false;
 		}
 	}
@@ -107,20 +137,33 @@
 		changePasswordVisible = false;
 	}
 
+	// Load subscription data on component mount
 	onMount(async () => {
+		loadUsageStats();
+	});
+
+	async function loadUsageStats() {
 		try {
-			// Fetch usage statistics
-			const response = await fetch('/api/user/usage-stats');
+			loadingStats = true;
+
+			// Make sure cookies are sent with the request
+			const response = await fetch('/api/user/usage-stats', {
+				credentials: 'include'
+			});
+
 			if (!response.ok) {
 				throw new Error('Failed to load usage statistics');
 			}
+
 			usageStats = await response.json();
+			console.log('Loaded usage stats:', usageStats);
 		} catch (error) {
 			console.error('Error loading usage stats:', error);
+			error = error.message;
 		} finally {
 			loadingStats = false;
 		}
-	});
+	}
 
 	async function handleSubscribe() {
 		isLoading = true;
@@ -147,6 +190,7 @@
 		} catch (err) {
 			console.error('Subscribe error:', err);
 			error = err.message;
+			showToast(error, 'error');
 		} finally {
 			isLoading = false;
 		}
@@ -177,6 +221,7 @@
 		} catch (err) {
 			console.error('Manage subscription error:', err);
 			error = err.message;
+			showToast(error, 'error');
 		} finally {
 			isLoading = false;
 		}
@@ -184,7 +229,7 @@
 </script>
 
 <div class="account-tab">
-	<!-- I don't think it is doing much now I may edit this later -->
+	<!-- Account Information Section -->
 	<section class="account-section">
 		<h2 class="section-title">Account Information</h2>
 		<div class="info-grid">
@@ -200,13 +245,13 @@
 		</div>
 		<div class="profile-reminder">
 			<h3>Make Your Practice More Relevant</h3>
-			<p>Make sure to edit your <em>Learning Profile <em> for better RWP quizzes</em></em></p>
+			<p>Make sure to edit your <em>Learning Profile</em> for better RWP quizzes</p>
 		</div>
 	</section>
 
+	<!-- Subscription Section -->
 	<section class="account-section">
 		<h2 class="section-title">Subscription</h2>
-		<div class="subscription-message">Subscription features still in testing</div>
 		{#if loadingStats}
 			<div class="loading-box">Loading subscription information...</div>
 		{:else if usageStats}
@@ -307,12 +352,16 @@
 
 				<div class="sub-actions">
 					{#if usageStats.subscription.status === 'active'}
-						<button class="tape-button manage" on:click={handleManageSubscription}>
-							Manage Subscription
+						<button
+							class="tape-button manage"
+							on:click={handleManageSubscription}
+							disabled={isLoading}
+						>
+							{isLoading ? 'Loading...' : 'Manage Subscription'}
 						</button>
 					{:else}
-						<button class="tape-button upgrade" on:click={handleSubscribe}>
-							Upgrade to Premium
+						<button class="tape-button upgrade" on:click={handleSubscribe} disabled={isLoading}>
+							{isLoading ? 'Loading...' : 'Upgrade to Premium'}
 						</button>
 					{/if}
 				</div>
@@ -325,11 +374,21 @@
 					generating personalized practice content.
 				</div>
 			{/if}
+		{:else}
+			<div class="error-message">
+				Failed to load subscription information. <button on:click={loadUsageStats}>Try again</button
+				>
+			</div>
+		{/if}
+
+		{#if error}
+			<div class="error-message">{error}</div>
 		{/if}
 	</section>
 
+	<!-- Account Management Section -->
 	<section class="account-section">
-		<h2 class="section-title">Account Managment</h2>
+		<h2 class="section-title">Account Management</h2>
 		<div class="flex-box my-2 gap-2">
 			{#if !changePasswordVisible}
 				<button class="tape-button secondary" on:click={() => (changePasswordVisible = true)}>
@@ -337,6 +396,17 @@
 				</button>
 			{:else}
 				<div class="password-form">
+					<div class="form-group">
+						<label for="oldPassword">Current Password</label>
+						<input
+							type="password"
+							id="oldPassword"
+							class="form-input"
+							bind:value={oldPassword}
+							placeholder="Enter current password"
+						/>
+					</div>
+
 					<div class="form-group">
 						<label for="newPassword">New Password</label>
 						<input
@@ -374,7 +444,7 @@
 						<button
 							class="tape-button"
 							on:click={handleChangePassword}
-							disabled={changing || !newPassword || !confirmPassword}
+							disabled={changing || !oldPassword || !newPassword || !confirmPassword}
 						>
 							{changing ? 'Changing...' : 'Save New Password'}
 						</button>
@@ -389,6 +459,7 @@
 		</div>
 	</section>
 
+	<!-- Delete Account Section -->
 	<section class="account-section danger-section">
 		<h2 class="section-title">Delete Account</h2>
 		<p class="danger-text">
