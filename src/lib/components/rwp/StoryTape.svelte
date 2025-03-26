@@ -2,11 +2,10 @@
 	import AudioPlayer from '$lib/components/AudioPlayer.svelte';
 	import Loader from '$lib/components/UI/Loader.svelte';
 	import { createEventDispatcher, onMount } from 'svelte';
-	import { canUseFeature, incrementUsage } from '$lib/usage/usageTracking.js';
+	import { canUseFeature, incrementUsage } from '$lib/supabase/client';
 	import { authStore } from '$lib/stores/authStore';
 	import SubscriptionModal from '$lib/components/Subscription/SubscriptionModal.svelte';
     
-
 	const dispatch = createEventDispatcher();
 
 	// Props
@@ -109,7 +108,7 @@
 			}
 
 			// Check if the user can use TTS
-			const permission = await canUseFeature($authStore.id, 'tts');
+			const permission = await canUseFeature('tts');
 			if (!permission.allowed) {
 				if (permission.reason === 'premium_required') {
 					// Get usage stats for the subscription modal
@@ -158,7 +157,7 @@
 			}
 
 			// After successful generation, increment the usage count
-			await incrementUsage($authStore.id, 'tts');
+			await incrementUsage('tts');
 
 			const data = await response.json();
 			audioUrl = data.audioUrl;

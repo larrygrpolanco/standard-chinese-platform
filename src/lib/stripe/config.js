@@ -15,7 +15,7 @@ export const STRIPE_CONFIG = {
 		MONTHLY_SUBSCRIPTION: {
 			name: 'Monthly Premium',
 			price: '$5/month',
-			price_id: 'prod_S0XFPF6SkyZaKo'
+			price_id: 'price_1R6WB8A4kfkUd2x1S7lXsvOH'
 		}
 	}
 };

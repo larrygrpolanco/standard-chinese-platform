@@ -6,7 +6,7 @@ import {
 	saveRwpContent
 } from '$lib/supabase/client.js';
 
-import { canUseFeature, incrementUsage } from '$lib/usage/usageTracking.js';
+import { canUseFeature, incrementUsage } from '$lib/supabase/client';
 
 /**
  * Generates a comprehensive practice exercise for a specific unit
@@ -38,7 +38,7 @@ export async function generateRwpExercise(
 		if (!user) throw new Error('User not authenticated');
 
 		// Check if user can use the RWP feature
-		const permission = await canUseFeature(user.id, 'rwp');
+		const permission = await canUseFeature('rwp');
 		if (!permission.allowed) {
 			if (permission.reason === 'weekly_limit_reached') {
 				throw new Error(
@@ -199,7 +199,7 @@ export async function generateRwpExercise(
 		await saveRwpContent(unitId, contentToSave);
 
 		// After successful generation, increment the usage count
-		await incrementUsage(user.id, 'rwp');
+		await incrementUsage('rwp');
 
 		// Return the content
 		return contentToSave;

@@ -41,7 +41,7 @@ async function handleSubscriptionChange(subscription) {
 
 	// Update subscription data
 	await supabase.from('user_subscriptions').upsert({
-		id: userId,
+		user_id: userId,
 		stripe_subscription_id: subscription.id,
 		subscription_status: subscription.status,
 		current_period_start: new Date(subscription.current_period_start * 1000),
@@ -63,5 +63,5 @@ async function handleSubscriptionCanceled(subscription) {
 			subscription_status: 'canceled',
 			updated_at: new Date()
 		})
-		.eq('id', userId);
+		.eq('user_id', userId);
 }
