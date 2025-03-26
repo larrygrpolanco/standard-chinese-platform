@@ -1,7 +1,8 @@
 // src/lib/stores/authStore.js
 import { writable } from 'svelte/store';
 import { browser } from '$app/environment';
-import { supabase, getCurrentUser } from '$lib/supabase/client';
+import { page } from '$app/stores';
+import { supabase } from '$lib/supabase/client';
 
 function createAuthStore() {
 	const { subscribe, set } = writable(null);
@@ -9,11 +10,17 @@ function createAuthStore() {
 	async function initialize() {
 		if (!browser) return;
 
-		// Set initial state
-		const user = await getCurrentUser();
-		set(user);
+		// Try to get user from session first (for SSR support)
+		const pageData = get(page);
+		if (pageData.data?.session?.user) {
+			set(pageData.data.session.user);
+		} else {
+			// Fall back to client method
+			const user = await getCurrentUser();
+			set(user);
+		}
 
-		// Listen for auth changes
+		// Continue listening for auth changes
 		supabase.auth.onAuthStateChange((event, session) => {
 			if (event === 'SIGNED_IN') {
 				set(session?.user || null);
@@ -32,7 +39,7 @@ function createAuthStore() {
 	return {
 		subscribe,
 		initialize,
-		signOut 
+		signOut
 	};
 }
 

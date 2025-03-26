@@ -17,24 +17,18 @@
 		dispatch('close');
 	}
 
+	// Component method updates (SubscriptionModal.svelte)
 	async function handleSubscribe() {
-		if (!$authStore) {
-			window.location.href = '/login?redirect=' + window.location.pathname;
-			return;
-		}
-
 		isLoading = true;
 		error = null;
 
 		try {
+			// No need to pass tokens - server uses session cookie
 			const response = await fetch('/api/stripe/create-checkout', {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json'
-				},
-				body: JSON.stringify({
-					user: $authStore
-				})
+				}
 			});
 
 			if (!response.ok) {
@@ -45,28 +39,25 @@
 			const { url } = await response.json();
 			window.location.href = url;
 		} catch (err) {
-			console.error('Subscribe error:', err);
+			console.error('Subscription error:', err);
 			error = err.message;
+			showToast(error, 'error');
 		} finally {
 			isLoading = false;
 		}
 	}
 
 	async function handleManageSubscription() {
-		if (!$authStore) return;
-
 		isLoading = true;
 		error = null;
 
 		try {
+			// No need to pass user data - server uses session
 			const response = await fetch('/api/stripe/create-portal', {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json'
-				},
-				body: JSON.stringify({
-					user: $authStore
-				})
+				}
 			});
 
 			if (!response.ok) {
@@ -76,9 +67,6 @@
 
 			const { url } = await response.json();
 			window.location.href = url;
-		} catch (err) {
-			console.error('Manage subscription error:', err);
-			error = err.message;
 		} finally {
 			isLoading = false;
 		}

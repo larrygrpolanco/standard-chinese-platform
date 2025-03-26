@@ -5,9 +5,22 @@
 	import { authStore } from '$lib/stores/authStore';
 	import Header from '$lib/components/UI/Header.svelte';
 	import Breadcrumb from '$lib/components/UI/Breadcrumb.svelte';
+	import { invalidate } from '$app/navigation';
+
+	export let data;
 
 	onMount(() => {
+		const { supabase } = data;
+
 		authStore.initialize();
+
+		const { data: authListener } = supabase.auth.onAuthStateChange(() => {
+			invalidate('supabase:auth');
+		});
+
+		return () => {
+			authListener.subscription.unsubscribe();
+		};
 	});
 </script>
 

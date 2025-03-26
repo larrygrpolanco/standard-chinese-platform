@@ -2,37 +2,40 @@
 import { json } from '@sveltejs/kit';
 import Stripe from 'stripe';
 import { STRIPE_SECRET_KEY } from '$env/static/private';
-import { supabase } from '$lib/supabase/client';
 
 const stripe = new Stripe(STRIPE_SECRET_KEY);
 
-export async function POST({ request, url }) {
+export async function POST({ locals, url }) {
 	try {
-		const { user } = await request.json();
-		if (!user) {
-			return json({ error: 'User not authenticated' }, { status: 401 });
+		// Get the authenticated user from the server-side session
+		const session = locals.session;
+
+		if (!session) {
+			return json({ error: 'Not authenticated' }, { status: 401 });
 		}
 
-		// Get customer ID
-		const { data: subscription } = await supabase
+		const user = session.user;
+
+		// Get customer ID from Supabase
+		const { data: subscription, error } = await locals.supabase
 			.from('user_subscriptions')
 			.select('stripe_customer_id')
 			.eq('user_id', user.id)
 			.single();
 
-		if (!subscription?.stripe_customer_id) {
-			return json({ error: 'No subscription found' }, { status: 404 });
+		if (error || !subscription?.stripe_customer_id) {
+			return json({ error: 'No subscription found for this user' }, { status: 404 });
 		}
 
 		// Create portal session
-		const session = await stripe.billingPortal.sessions.create({
+		const portalSession = await stripe.billingPortal.sessions.create({
 			customer: subscription.stripe_customer_id,
-			return_url: `${url.origin}/account`
+			return_url: `${url.origin}/login/profile`
 		});
 
-		return json({ url: session.url });
+		return json({ url: portalSession.url });
 	} catch (error) {
-		console.error('Stripe portal error:', error);
+		console.error('Create portal error:', error);
 		return json({ error: error.message }, { status: 500 });
 	}
 }

@@ -2,7 +2,7 @@
 <script>
 	import { createEventDispatcher } from 'svelte';
 	import { authStore } from '$lib/stores/authStore';
-	import { supabase } from '$lib/supabase/client';
+	import { supabase, getUserUsageStats } from '$lib/supabase/client';
 	import ConfirmationModal from '$lib/components/UI/ConfirmationModal.svelte';
 	import { STRIPE_CONFIG } from '$lib/stripe/config.js';
 	import { onMount } from 'svelte';
@@ -145,17 +145,7 @@
 	async function loadUsageStats() {
 		try {
 			loadingStats = true;
-
-			// Make sure cookies are sent with the request
-			const response = await fetch('/api/user/usage-stats', {
-				credentials: 'include'
-			});
-
-			if (!response.ok) {
-				throw new Error('Failed to load usage statistics');
-			}
-
-			usageStats = await response.json();
+			usageStats = await getUserUsageStats();
 			console.log('Loaded usage stats:', usageStats);
 		} catch (error) {
 			console.error('Error loading usage stats:', error);
@@ -174,10 +164,7 @@
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json'
-				},
-				body: JSON.stringify({
-					user: user
-				})
+				}
 			});
 
 			if (!response.ok) {
@@ -188,38 +175,7 @@
 			const { url } = await response.json();
 			window.location.href = url;
 		} catch (err) {
-			console.error('Subscribe error:', err);
-			error = err.message;
-			showToast(error, 'error');
-		} finally {
-			isLoading = false;
-		}
-	}
-
-	async function handleManageSubscription() {
-		isLoading = true;
-		error = null;
-
-		try {
-			const response = await fetch('/api/stripe/create-portal', {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json'
-				},
-				body: JSON.stringify({
-					user: user
-				})
-			});
-
-			if (!response.ok) {
-				const data = await response.json();
-				throw new Error(data.error || 'Failed to create customer portal session');
-			}
-
-			const { url } = await response.json();
-			window.location.href = url;
-		} catch (err) {
-			console.error('Manage subscription error:', err);
+			console.error('Subscription error:', err);
 			error = err.message;
 			showToast(error, 'error');
 		} finally {
