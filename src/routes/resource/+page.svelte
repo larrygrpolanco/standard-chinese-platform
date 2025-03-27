@@ -345,7 +345,7 @@
 
 	/* Resource modules warning */
 	.resource-module-warning {
-		padding: .5rem 1rem;
+		padding: 0.5rem 1rem;
 		margin: 0.5rem;
 		background-color: rgba(193, 124, 116, 0.1);
 		border-left: 4px solid #c17c74;
