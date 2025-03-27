@@ -325,7 +325,7 @@ export async function getRwpContent(unitId) {
 		.select('*')
 		.eq('user_id', user.id)
 		.eq('unit_id', unitId)
-		.single();
+		.maybeSingle();
 
 	if (error && error.code !== 'PGRST116') throw error;
 
@@ -365,6 +365,7 @@ export async function saveRwpContent(unitId, content) {
 	if (error) throw error;
 	return data;
 }
+
 // Save or update user preferences
 export async function saveUserPreferences(preferences) {
 	const user = await getCurrentUser();

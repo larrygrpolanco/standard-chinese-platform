@@ -52,10 +52,10 @@
 </script>
 
 <!-- Core Module -->
-<div class="relative mx-auto mb-8 w-full max-w-xl" in:fade={{ duration: 400, delay: 400 }}>
+<div class="module-container" in:fade={{ duration: 400, delay: 400 }}>
 	<!-- Module card styled as vintage cassette case -->
 	<div
-		class="group relative flex h-full cursor-pointer flex-col overflow-hidden rounded-lg border-2 border-[#33312E] bg-[#E8E5D7] transition-all hover:-translate-y-1 hover:shadow-[4px_4px_0_#826D5B]"
+		class="module-card"
 		style="box-shadow: inset 0 1px 20px rgba(255, 255, 255, 0.5), 2px 2px 0 #826D5B;"
 		role="button"
 		tabindex="0"
@@ -64,22 +64,18 @@
 		on:keydown={handleKeydown}
 	>
 		<!-- Top colored binding - using a green color -->
-		<div class="h-3 w-full border-b-2 border-[#33312E] bg-[#DDB967]"></div>
+		<div class="binding-top"></div>
 
 		<!-- Card content -->
-		<div class="flex flex-grow flex-col">
+		<div class="card-content">
 			<!-- Header section with title -->
-			<div class="p-6">
-				<div class="relative mb-3 flex gap-4">
+			<div class="header-section">
+				<div class="title-container">
 					<!-- Title -->
-					<h2
-						class="flex-1 self-center font-['Arvo',serif] text-xl font-semibold text-[#33312E] transition-colors group-hover:text-[#C17C74]"
-					>
-						Core Modules
-					</h2>
+					<h2 class="card-title">Core Modules</h2>
 
 					<!-- Small tape icon - positioned relative to the top-right -->
-					<div class="absolute top-0 right-0 opacity-70" aria-hidden="true">
+					<div class="tape-icon" aria-hidden="true">
 						<svg
 							width="24"
 							height="24"
@@ -96,37 +92,32 @@
 				</div>
 
 				<!-- Progress meter styled as tape counter -->
-				<div class="mt-4">
-					<div class="flex items-center">
-						<div class="mr-2 font-['Courier_New',monospace] text-xs tracking-tight opacity-80">
-							PROGRESS:
-						</div>
+				<div class="progress-container">
+					<div class="progress-meter">
+						<div class="progress-label">PROGRESS:</div>
 						<div
-							class="relative h-4 flex-grow overflow-hidden rounded-sm border border-[#33312E] bg-[#F4F1DE]"
+							class="progress-bar-container"
 							style="box-shadow: inset 0 1px 3px rgba(0,0,0,0.2);"
 						>
 							<!-- Progress bar -->
 							<div
-								class="h-full"
-								style="width: {getProgressWidth()}%; transition: width 0.3s ease-out; background-color: #C17C74; opacity: 0.8;"
+								class="progress-bar"
+								style="width: {getProgressWidth()}%; background-color: #C17C74; opacity: 0.8;"
 								role="progressbar"
 								aria-valuenow={getProgressWidth()}
 								aria-valuemin="0"
 								aria-valuemax="100"
 							></div>
 							<!-- Tick marks -->
-							<div
-								class="pointer-events-none absolute top-0 left-0 flex h-full w-[80%] justify-between px-1"
-								aria-hidden="true"
-							>
-								<span class="mt-1 h-1 w-px bg-[#33312E] opacity-40"></span>
-								<span class="mt-1 h-1 w-px bg-[#33312E] opacity-40"></span>
-								<span class="mt-1 h-1 w-px bg-[#33312E] opacity-40"></span>
-								<span class="mt-1 h-1 w-px bg-[#33312E] opacity-40"></span>
+							<div class="tick-marks" aria-hidden="true">
+								<span class="tick"></span>
+								<span class="tick"></span>
+								<span class="tick"></span>
+								<span class="tick"></span>
 							</div>
 						</div>
 					</div>
-					<p class="mt-1 font-['Courier_New',monospace] text-xs text-[#33312E] opacity-70">
+					<p class="progress-status">
 						{#if $authStore}
 							{getProgressStatusText()} - {completedCount}/63 UNITS
 						{:else}
@@ -137,32 +128,33 @@
 			</div>
 
 			<!-- Divider with perforated line -->
-			<div class="flex items-center px-4" aria-hidden="true">
-				<div class="flex-grow border-t border-dashed border-[#A0998A]"></div>
+			<div class="divider" aria-hidden="true">
+				<div class="divider-line"></div>
 			</div>
 
 			<!-- Module description -->
-			<div class="bg-opacity-50 flex-grow bg-[#F4F1DE] p-4">
-				<p class="font-['Work_Sans',sans-serif] text-sm leading-relaxed text-[#33312E]">
-					The FSI Standard Chinese course is divided into 9 core comprehensive modules.
+			<div class="description-section">
+				<p class="description-text">
+					The FSI Standard Chinese course is divided into 9 core modules each with a different
+					focus. Start with the module you feel is at your leve or with the topic you need most.
 				</p>
 			</div>
 
 			<!-- Call to action styled as a mechanical button -->
 			<div
-				class="border-t-2 border-[#33312E] p-3 text-right"
+				class="cta-section"
 				style="background: repeating-linear-gradient(45deg, #7D8C5C10, #7D8C5C10 10px, transparent 10px, transparent 20px);"
 			>
 				{#if $authStore && latestUnit}
 					<button
 						type="button"
-						class="inline-flex items-center rounded-full border border-[#33312E] bg-[#F4F1DE] px-4 py-1.5 text-sm font-medium text-[#33312E] transition-all group-hover:-translate-y-0.5 group-hover:shadow-[2px_2px_0_#826D5B] active:translate-y-0.5 active:shadow-none"
-						style="box-shadow: 1px 1px 0 #826D5B; transition: all 0.15s ease-out;"
+						class="cta-button continue-button"
+						style="box-shadow: 1px 1px 0 #826D5B;"
 						on:click|stopPropagation={() => navigateToLatestUnit()}
 					>
-						Continue learning
+						Continue Unit {latestUnit.unit_id}
 						<svg
-							class="ml-1.5 h-4 w-4 transition-transform group-hover:translate-x-1"
+							class="button-icon"
 							fill="none"
 							viewBox="0 0 24 24"
 							stroke="currentColor"
@@ -179,13 +171,13 @@
 				{:else}
 					<button
 						type="button"
-						class="inline-flex items-center rounded-full border border-[#33312E] bg-[#F4F1DE] px-4 py-1.5 text-sm font-medium text-[#33312E] transition-all group-hover:-translate-y-0.5 group-hover:shadow-[2px_2px_0_#826D5B] active:translate-y-0.5 active:shadow-none"
-						style="box-shadow: 1px 1px 0 #826D5B; transition: all 0.15s ease-out;"
+						class="cta-button browse-button"
+						style="box-shadow: 1px 1px 0 #826D5B;"
 						on:click|stopPropagation={() => navigateToModules()}
 					>
 						Browse modules
 						<svg
-							class="ml-1.5 h-4 w-4 transition-transform group-hover:translate-x-1"
+							class="button-icon"
 							fill="none"
 							viewBox="0 0 24 24"
 							stroke="currentColor"
@@ -204,3 +196,227 @@
 		</div>
 	</div>
 </div>
+
+<style>
+	/* Container */
+	.module-container {
+		position: relative;
+		margin-left: auto;
+		margin-right: auto;
+		margin-bottom: 2rem;
+		width: 100%;
+		max-width: 36rem;
+	}
+
+	/* Module card */
+	.module-card {
+		position: relative;
+		display: flex;
+		height: 100%;
+		cursor: pointer;
+		flex-direction: column;
+		overflow: hidden;
+		border-radius: 0.5rem;
+		border: 2px solid #33312e;
+		background-color: #e8e5d7;
+		transition: all 0.3s;
+	}
+
+	.module-card:hover {
+		transform: translateY(-0.25rem);
+		box-shadow: 4px 4px 0 #826d5b !important;
+	}
+
+	/* Top colored binding */
+	.binding-top {
+		height: 0.75rem;
+		width: 100%;
+		border-bottom: 2px solid #33312e;
+		background-color: #ddb967;
+	}
+
+	/* Card content */
+	.card-content {
+		display: flex;
+		flex-grow: 1;
+		flex-direction: column;
+	}
+
+	/* Header section */
+	.header-section {
+		padding: 1.5rem;
+	}
+
+	.title-container {
+		position: relative;
+		margin-bottom: 0.75rem;
+		display: flex;
+		gap: 1rem;
+	}
+
+	/* Title */
+	.card-title {
+		flex: 1;
+		align-self: center;
+		font-family: 'Arvo', serif;
+		font-size: 1.25rem;
+		font-weight: 600;
+		color: #33312e;
+		transition: color 0.3s;
+	}
+
+	.module-card:hover .card-title {
+		color: #c17c74;
+	}
+
+	/* Tape icon */
+	.tape-icon {
+		position: absolute;
+		top: 0;
+		right: 0;
+		opacity: 0.7;
+	}
+
+	/* Progress section */
+	.progress-container {
+		margin-top: 1rem;
+	}
+
+	.progress-meter {
+		display: flex;
+		align-items: center;
+	}
+
+	.progress-label {
+		margin-right: 0.5rem;
+		font-family: 'Courier New', monospace;
+		font-size: 0.75rem;
+		letter-spacing: -0.025em;
+		opacity: 0.8;
+	}
+
+	.progress-bar-container {
+		position: relative;
+		height: 1rem;
+		flex-grow: 1;
+		overflow: hidden;
+		border-radius: 0.125rem;
+		border: 1px solid #33312e;
+		background-color: #f4f1de;
+	}
+
+	.progress-bar {
+		height: 100%;
+		transition: width 0.3s ease-out;
+	}
+
+	.tick-marks {
+		pointer-events: none;
+		position: absolute;
+		top: 0;
+		left: 0;
+		display: flex;
+		height: 100%;
+		width: 80%;
+		justify-content: space-between;
+		padding-left: 0.25rem;
+		padding-right: 0.25rem;
+	}
+
+	.tick {
+		margin-top: 0.25rem;
+		height: 0.25rem;
+		width: 1px;
+		background-color: #33312e;
+		opacity: 0.4;
+	}
+
+	.progress-status {
+		margin-top: 0.25rem;
+		font-family: 'Courier New', monospace;
+		font-size: 0.75rem;
+		color: #33312e;
+		opacity: 0.7;
+	}
+
+	/* Divider */
+	.divider {
+		display: flex;
+		align-items: center;
+		padding-left: 1rem;
+		padding-right: 1rem;
+	}
+
+	.divider-line {
+		flex-grow: 1;
+		border-top: 1px dashed #a0998a;
+	}
+
+	/* Description section */
+	.description-section {
+		flex-grow: 1;
+		background-color: #f4f1de;
+		opacity: 0.5;
+		padding: 1rem;
+	}
+
+	.description-text {
+		font-family: 'Work Sans', sans-serif;
+		font-size: 0.875rem;
+		line-height: 1.625;
+		color: #33312e;
+	}
+
+	/* Call to action section */
+	.cta-section {
+		border-top: 2px solid #33312e;
+		padding: 0.75rem;
+		text-align: right;
+	}
+
+	/* Button */
+	.cta-button {
+		display: inline-flex;
+		align-items: center;
+		border-radius: 9999px;
+		border: 1px solid #33312e;
+		background-color: #f4f1de;
+		padding-left: 1rem;
+		padding-right: 1rem;
+		padding-top: 0.375rem;
+		padding-bottom: 0.375rem;
+		font-size: 0.875rem;
+		font-weight: 500;
+		transition: all 0.15s ease-out;
+	}
+
+	.continue-button {
+		color: #34667f;
+	}
+
+	.browse-button {
+		color: #33312e;
+	}
+
+	.module-card:hover .cta-button {
+		transform: translateY(-0.125rem);
+		box-shadow: 2px 2px 0 #826d5b !important;
+	}
+
+	.cta-button:active {
+		transform: translateY(0.125rem);
+		box-shadow: none !important;
+	}
+
+	/* Button icon */
+	.button-icon {
+		margin-left: 0.375rem;
+		height: 1rem;
+		width: 1rem;
+		transition: transform 0.3s;
+	}
+
+	.module-card:hover .button-icon {
+		transform: translateX(0.25rem);
+	}
+</style>

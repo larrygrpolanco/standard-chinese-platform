@@ -77,7 +77,7 @@
 
 	// Fetch exercises data directly from Supabase
 	async function fetchExercisesData(unitId) {
-		console.log('Directly fetching exercises data for unit:', unitId);
+		// console.log('Directly fetching exercises data for unit:', unitId);
 		isLoadingExercisesData = true;
 
 		try {
@@ -87,8 +87,8 @@
 			directExercises = exercises;
 			hasFetchedExercisesData = true;
 
-			console.log('Directly fetched workbook tapes:', directWorkbookTapes.length);
-			console.log('Directly fetched exercises:', directExercises.length);
+			// console.log('Directly fetched workbook tapes:', directWorkbookTapes.length);
+			// console.log('Directly fetched exercises:', directExercises.length);
 		} catch (error) {
 			console.error('Error directly fetching exercises data:', error);
 		} finally {
@@ -98,7 +98,7 @@
 
 	// Fetch vocabulary data directly from Supabase
 	async function fetchVocabularyDirectly(unitId) {
-		console.log('Directly fetching vocabulary for unit:', unitId);
+		// console.log('Directly fetching vocabulary for unit:', unitId);
 		isLoadingVocabulary = true;
 
 		try {
@@ -113,7 +113,7 @@
 			} else {
 				directVocabulary = data || [];
 				hasFetchedVocabulary = true;
-				console.log('Directly fetched vocabulary:', directVocabulary.length);
+				// console.log('Directly fetched vocabulary:', directVocabulary.length);
 			}
 		} catch (error) {
 			console.error('Error directly fetching vocabulary data:', error);

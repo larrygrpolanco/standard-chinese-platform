@@ -103,7 +103,8 @@
 	<!-- Profile Reminder -->
 	<div class="profile-reminder">
 		<h3>Make Your Practice More Relevant</h3>
-		<p>Make sure to edit your <b>Learning Profile</b> for better RWP quizzes</p>
+		<p>Make sure to edit your <b>Learning Profile</b> for better RWP quizzes.</p>
+		<p><em>Also try creating a fictional character instead to learn chinese through!</em></p>
 	</div>
 
 	<!-- Account Information Section -->

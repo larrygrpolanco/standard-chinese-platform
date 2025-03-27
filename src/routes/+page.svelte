@@ -10,6 +10,36 @@
 	let completedCount = 0;
 
 	onMount(async () => {
+		// Parallax action for Svelte elements
+		function parallax(node, params = { speed: 0.02, direction: 1 }) {
+			let { speed, direction } = params;
+
+			function updatePosition() {
+				const scrollPosition = window.scrollY;
+				const rect = node.getBoundingClientRect();
+
+				if (rect.top < window.innerHeight && rect.bottom > 0) {
+					node.style.transform = `translateY(${scrollPosition * speed * direction}px)`;
+				}
+			}
+
+			window.addEventListener('scroll', updatePosition);
+
+			// Initial update
+			updatePosition();
+
+			// Clean up when component is destroyed
+			return {
+				destroy() {
+					window.removeEventListener('scroll', updatePosition);
+				},
+				update(newParams) {
+					speed = newParams.speed;
+					direction = newParams.direction;
+				}
+			};
+		}
+
 		// Wait for auth initialization to complete
 		await authStore.initialize();
 
@@ -52,7 +82,9 @@
 				<div class="title-underline"></div>
 			</div>
 
-			<p class="subtitle">Diplomat-grade language training, now digitized and improved</p>
+			<p class="subtitle">
+				Foriegn Service Institute diplomat language training, now digitized and improved
+			</p>
 
 			<!-- Core Module Card -->
 			<ModuleCard {authStore} {latestUnit} {completedCount} />
@@ -105,10 +137,9 @@
 		</div>
 	</section>
 
-	<!-- RWP Section -->
 	<section class="rwp-section">
 		<div class="rwp-container">
-			<!-- Decorative elements -->
+			<!-- Decorative corners (matching page style) -->
 			<div class="tape-corner top-left"></div>
 			<div class="tape-corner top-right"></div>
 			<div class="tape-corner bottom-left"></div>
@@ -116,33 +147,69 @@
 
 			<!-- Content container -->
 			<div class="rwp-content">
-				<h2 class="section-title">Real World Practice (RWP)</h2>
+				<h2 class="section-title">Relevant World Practice (RWP)</h2>
 
-				<p class="rwp-description">
-					RWPs are exercises added to each unit which let you apply what you learn in each unit to
-					real-life (or imagined) situations based on your interests, career, or goals. Instead of
-					just repeating textbook phrases, you'll practice using Chinese in situations that matter
-					to you.
-					<br /> <br />
-					While the classic FSI course excels at teaching structural patterns, it was designed for rapid
-					memorization rather than creative language use. We hope that the RWPs added to each unit bridges
-					this gap!
-				</p>
+				<div class="rwp-explanation">
+					<div use:parallax={{ speed: 0.02, direction: 1 }} class="explanation-highlight">
+						<p class="highlight-text">
+							Chinese learning that adapts to <em>your</em> life, not the other way around
+						</p>
+					</div>
 
-				<a href="/rwp" class="rwp-button">
-					<span class="button-text">Try it out</span>
-					<svg class="arrow-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-						<path
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							stroke-width="2"
-							d="M14 5l7 7m0 0l-7 7m7-7H3"
-						/>
-					</svg>
-				</a>
+					<div class="explanation-grid">
+						<div use:parallax={{ speed: 0.01, direction: -1 }} class="explanation-item">
+							<div class="item-number">1</div>
+							<div class="item-content">
+								<h3 class="item-title">Personalized Stories</h3>
+								<p class="item-description">
+									AI-generated stories and dialogs that use each unit's vocabulary in contexts
+									relevant to your life, interests, and goals
+								</p>
+							</div>
+						</div>
 
-				<!-- Tape visual element -->
-				<div class="tape-circle border-opacity-10"></div>
+						<div use:parallax={{ speed: 0.03, direction: 1 }} class="explanation-item">
+							<div class="item-number">2</div>
+							<div class="item-content">
+								<h3 class="item-title">Custom Audio</h3>
+								<p class="item-description">
+									Listen to your personalized content with natural-sounding AI voices for authentic
+									listening practice
+								</p>
+							</div>
+						</div>
+
+						<div use:parallax={{ speed: 0.01, direction: -1 }} class="explanation-item">
+							<div class="item-number">3</div>
+							<div class="item-content">
+								<h3 class="item-title">Targeted Practice</h3>
+								<p class="item-description">
+									Multiple-choice, short-answer, and reflection questions that test your
+									comprehension in meaningful contexts
+								</p>
+							</div>
+						</div>
+					</div>
+
+					<div use:parallax={{ speed: 0.02, direction: 1 }} class="rwp-footer">
+						<p class="rwp-tagline">
+							While the classic FSI course excels at teaching structural patterns, RWP bridges the
+							gap between memorization and creative, personally relevant language use.
+						</p>
+
+						<a href="/rwp" class="rwp-button">
+							<span class="button-text">See How It Works</span>
+							<svg class="arrow-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M14 5l7 7m0 0l-7 7m7-7H3"
+								/>
+							</svg>
+						</a>
+					</div>
+				</div>
 			</div>
 		</div>
 	</section>
@@ -499,6 +566,7 @@
 	.rwp-container {
 		position: relative;
 		max-width: 1200px;
+		width: 100%;
 		padding: 2rem;
 		border: 2px solid var(--color-text);
 		border-radius: 0.5rem;
@@ -510,6 +578,11 @@
 		background-image:
 			radial-gradient(circle at 15% 50%, rgba(193, 124, 116, 0.08) 0%, transparent 45%),
 			radial-gradient(circle at 85% 30%, rgba(52, 102, 127, 0.08) 0%, transparent 45%);
+	}
+
+	.rwp-content {
+		position: relative;
+		z-index: 1;
 	}
 
 	.rwp-content::before {
@@ -526,54 +599,147 @@
 		pointer-events: none;
 	}
 
-	.tape-corner {
-		position: absolute;
-		height: 1rem;
-		width: 1rem;
-		border: 1px solid var(--color-text);
-		border-radius: 50%;
-		opacity: 0.3;
-	}
-
-	.top-left {
-		top: 0.75rem;
-		left: 0.75rem;
-	}
-
-	.top-right {
-		top: 0.75rem;
-		right: 0.75rem;
-	}
-
-	.bottom-left {
-		bottom: 0.75rem;
-		left: 0.75rem;
-	}
-
-	.bottom-right {
-		bottom: 0.75rem;
-		right: 0.75rem;
-	}
-
-	.rwp-content {
-		position: relative;
-		z-index: 1;
-		text-align: center;
-	}
-
 	.section-title {
 		font-family: var(--font-serif);
 		font-size: 2rem;
 		font-weight: 700;
 		color: var(--color-text);
-		margin-bottom: 1rem;
+		margin-bottom: 1.5rem;
+		text-align: center;
+		position: relative;
+	}
+
+	.section-title::after {
+		content: '';
+		position: absolute;
+		bottom: -0.5rem;
+		left: 50%;
+		transform: translateX(-50%);
+		width: 80px;
+		height: 3px;
+		background-color: var(--color-gold);
+	}
+
+	/* Explanation Section */
+	.rwp-explanation {
+		max-width: 900px;
+		margin: 0 auto;
+	}
+
+	.explanation-highlight {
+		background-color: rgba(221, 185, 103, 0.15);
+		border-left: 3px solid var(--color-gold);
+		padding: 1rem 1.5rem;
+		margin-bottom: 2rem;
+		border-radius: 0 0.25rem 0.25rem 0;
+	}
+
+	.highlight-text {
+		font-family: var(--font-serif);
+		font-size: 1.25rem;
+		color: var(--color-text);
+		text-align: center;
+		margin: 0;
+	}
+
+	.highlight-text em {
+		font-style: normal;
+		color: var(--color-navy);
+		font-weight: 600;
+	}
+
+	.explanation-grid {
+		display: grid;
+		grid-template-columns: 1fr;
+		gap: 1.5rem;
+		margin-bottom: 2rem;
+	}
+
+	@media (min-width: 768px) {
+		.explanation-grid {
+			grid-template-columns: repeat(3, 1fr);
+		}
+	}
+
+	.explanation-item {
+		display: flex;
+		background-color: rgba(255, 255, 255, 0.5);
+		border: 1px solid rgba(51, 49, 46, 0.1);
+		border-radius: 0.5rem;
+		padding: 1rem;
+		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+		transition:
+			transform 0.3s ease,
+			box-shadow 0.3s ease;
+	}
+
+	.explanation-item:hover {
+		transform: translateY(-3px);
+		box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+	}
+
+	.item-number {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		height: 32px;
+		width: 32px;
+		flex-shrink: 0;
+		margin-right: 1rem;
+		border-radius: 50%;
+		background-color: var(--color-avocado);
+		color: white;
+		font-family: var(--font-serif);
+		font-weight: 700;
+	}
+
+	.explanation-item:nth-child(2) .item-number {
+		background-color: var(--color-terracotta);
+	}
+
+	.explanation-item:nth-child(3) .item-number {
+		background-color: var(--color-navy);
+	}
+
+	.item-content {
+		flex: 1;
+	}
+
+	.item-title {
+		font-family: var(--font-serif);
+		font-size: 1.125rem;
+		font-weight: 700;
+		color: var(--color-text);
+		margin: 0 0 0.5rem 0;
+	}
+
+	.item-description {
+		font-family: var(--font-sans);
+		font-size: 0.9375rem;
+		line-height: 1.5;
+		color: var(--color-text-light);
+		margin: 0;
+	}
+
+	.rwp-footer {
+		text-align: center;
+		margin-top: 2rem;
+	}
+
+	.rwp-tagline {
+		font-family: var(--font-sans);
+		font-size: 1rem;
+		color: var(--color-text);
+		max-width: 700px;
+		margin: 0 auto 1.5rem auto;
+		padding: 0 1rem;
+		line-height: 1.6;
 	}
 
 	.rwp-button {
 		display: inline-flex;
 		align-items: center;
 		padding: 0.5rem 1.5rem;
-		margin-bottom: 0.5rem;
 		background-color: var(--color-cream-paper);
 		border: 2px solid var(--color-terracotta);
 		border-radius: 0.5rem;
@@ -592,33 +758,15 @@
 		box-shadow: 1px 1px 0 var(--color-shadow);
 	}
 
-	.button-text {
-		font-family: var(--font-sans);
-		font-weight: 600;
+	.rwp-button:hover .arrow-icon {
+		transform: translateX(0.25rem);
 	}
 
-	.rwp-description {
-		font-family: var(--font-sans);
-		font-size: 1rem;
-		line-height: 1.6;
-		color: var(--color-text);
-		max-width: 48rem;
-		margin: 1.5rem auto;
-		text-align: center;
-	}
-
-	.tape-circle {
-		position: absolute;
-		border: 8px solid var(--color-text);
-		border-opacity: 0.1;
-		height: 6rem;
-		width: 6rem;
-		border-radius: 50%;
-		right: 5rem;
-		top: -1.5rem;
-		transform: rotate(12deg);
-		opacity: 0.1;
-		pointer-events: none;
+	.arrow-icon {
+		height: 1.25rem;
+		width: 1.25rem;
+		margin-left: 0.5rem;
+		transition: transform 0.2s ease;
 	}
 
 	/* Stats Section */

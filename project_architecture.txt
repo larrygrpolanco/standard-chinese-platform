@@ -4,13 +4,14 @@
 A web-based language learning platform that modernizes the Foreign Service Institute's "Standard Chinese: A Modular Approach" course, featuring a cassette tape vintage aesthetic. Built with SvelteKit, Tailwind CSS, and Supabase.
 
 ## Tech Stack
-- **Frontend**: SvelteKit 5.0, Svelte 5.0
-- **Styling**: Tailwind CSS 4.0
+- **Frontend**: SvelteKit 2.16.0, Svelte 5.0.0
+- **Styling**: Tailwind CSS 4.0.0
 - **Database**: Supabase
 - **Authentication**: Supabase Auth
+- **Payments**: Stripe 17.7.0
 - **API**: SvelteKit endpoints (serverless functions)
-- **Email**: EmailJS
-- **Deployment**: Vercel
+- **Email**: EmailJS 4.4.1
+- **Deployment**: Vercel (with Vercel adapter 5.6.3)
 
 ## Project Structure
 
@@ -21,6 +22,7 @@ A web-based language learning platform that modernizes the Foreign Service Insti
 - `/svelte.config.js` - SvelteKit configuration
 - `/vite.config.js` - Vite bundler configuration
 - `/jsconfig.json` - JavaScript configuration for editor support
+- `/vercel.json` - Vercel deployment configuration
 
 ### Source Code (/src)
 1. **/lib** - Library code and components
@@ -34,6 +36,7 @@ A web-based language learning platform that modernizes the Foreign Service Insti
      - `/ModuleQuestions.svelte` - Questions for module assessment
      - `/ResourceModuleCard.svelte` - Card UI for resource modules
      - `/ReviewTab.svelte` - Review functionality
+     - `/Test.svelte` - Test component for development
      - `/UnitContent.svelte` - Content display for learning units
      - `/VocabularyTab.svelte` - Vocabulary learning interface
      
@@ -53,12 +56,14 @@ A web-based language learning platform that modernizes the Foreign Service Insti
        - `/TapeConstruction.svelte` - Cassette tape visual element
        - `/Toast.svelte` - Toast notification component
        - `/UnitProgressButton.svelte` - Progress indicator button
+       - `/UpgradePrompt.svelte` - Premium subscription prompt
      
      - **/profile** - User profile components
        - `/AccountTab.svelte` - Account settings
        - `/ContextModulesTab.svelte` - Contextual learning modules
        - `/FeedbackTab.svelte` - User feedback interface
        - `/LearningProfileTab.svelte` - Learning preferences
+       - `/SubscriptionTab.svelte` - Subscription management
      
      - **/rwp** - "Relevant World Practice" components
        - `/ComprehensionExercise.svelte` - Comprehension practice
@@ -66,38 +71,54 @@ A web-based language learning platform that modernizes the Foreign Service Insti
        - `/QuizTab.svelte` - Quiz interface
        - `/StoryTape.svelte` - Story-based learning component
    
+   - **/middleware** - Server middleware
+     - `/subscriptionCheck.js` - Subscription validation middleware
+   
    - **/stores** - Svelte stores for state management
      - `/authStore.js` - Authentication state
      - `/fontPreferences.js` - Chinese character display preferences
      - `/quizStore.js` - Quiz state management
    
    - **/supabase** - Database integration
-     - `/client.js` - Supabase client initialization
+     - `/client.js` - Supabase client with authentication and data functions
+   
+   - **/stripe** - Payment processing
+     - `/config.js` - Stripe configuration and tier limits
+     - `/server.js` - Server-side Stripe functions
    
    - **/rwp** - Relevant World Practice implementation
      - `/rwpGenerator.js` - Generator for personalized practice
 
    - `/apiClient.js` - Client for API interactions
    - `/index.js` - Library exports
+   - `/hooks.server.js` - SvelteKit server hooks
 
 2. **/routes** - SvelteKit routes (pages and API endpoints)
    - `/+layout.svelte` - Root layout for all pages
    - `/+page.svelte` - Home page
    
    - **/api** - Backend API endpoints
+     - **/account** - Account management
+       - **/delete** - Account deletion endpoint
+         - `/+server.js` - Delete account handler
      - **/rwp** - Relevant World Practice API
        - `/analyze-story/+server.js` - Story analysis endpoint
        - `/create-questions/+server.js` - Question generation endpoint
        - `/format-exercise/+server.js` - Exercise formatting endpoint
        - `/generate-story/+server.js` - Story generation endpoint
+     - **/stripe** - Payment processing
+       - `/create-checkout/+server.js` - Create checkout session
+       - `/portal/+server.js` - Customer portal session
+       - `/webhook/+server.js` - Stripe webhook handler
      - **/tts** - Text-to-speech API
        - `/+server.js` - TTS endpoint
    
    - **/login** - Authentication routes
      - `/+page.svelte` - Login page
-     - **/profile** - User profile pages
-       - `/+page.server.js` - Server-side profile logic
-       - `/+page.svelte` - Profile page
+   
+   - **/profile** - User profile pages
+     - `/+page.server.js` - Server-side profile logic
+     - `/+page.svelte` - Profile page
    
    - **/modules** - Learning modules
      - `/+page.svelte` - Modules listing page
@@ -137,13 +158,38 @@ A web-based language learning platform that modernizes the Foreign Service Insti
 ### Database (/supabase)
 - `/schema.sql` - Database schema definition
 
+## Authentication & User Management
+- Supabase Auth for user authentication
+- Email/password authentication
+- Password reset functionality
+- User profile management
+- Account deletion functionality
+
+## Subscription & Payment
+- Stripe integration for subscription management
+- Two tier system:
+  - Free tier: Limited access to RWP (3 per week), no TTS access
+  - Premium tier: Enhanced RWP access (20 per day), TTS access (20 per day)
+- Customer portal for subscription management
+- Stripe webhook handling for subscription events
+
+## Usage Tracking & Limits
+- Usage tracking system with reset timers:
+  - Daily limits for premium users
+  - Weekly limits for free users
+- Automatic counter resets based on time
+- Upgrade prompts for free users
+
 ## Key Features
 1. Toggle between simplified/traditional Chinese characters
 2. Integrated audio playback for dialogues and exercises
 3. LLM integration for personalized practice (Relevant World Practice)
-4. User accounts with progress tracking
-5. Vintage cassette tape aesthetic UI
-6. Mobile-responsive design
+4. Text-to-Speech (TTS) for premium users
+5. User accounts with progress tracking
+6. Subscription system with free and premium tiers
+7. Usage limits and tracking
+8. Vintage cassette tape aesthetic UI
+9. Mobile-responsive design
 
 ## Developer Workflow
 - Development: `npm run dev`

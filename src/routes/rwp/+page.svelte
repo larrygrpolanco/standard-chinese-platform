@@ -40,25 +40,13 @@
 			</div>
 
 			<p class="page-description">
-				Practice Chinese in contexts that matter to you personally. RWP connects what you're
-				learning to your relevant-world experiences, making language study more relevant, effective,
-				and hopefully fun.
+				Practice Chinese in contexts that matter to you personally. RWP exercises connects what
+				you're learning to your relevant-world experiences, making language study more relevant,
+				effective, and hopefully fun. 
 			</p>
 
 			<div class="header-buttons">
-				{#if user}
-					<a href="/login/profile" class="primary-button">
-						Update Your Profile
-						<svg class="button-arrow" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-							<path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="2"
-								d="M14 5l7 7m0 0l-7 7m7-7H3"
-							/>
-						</svg>
-					</a>
-				{:else}
+				{#if !user}
 					<a href="/login?redirect=/rwp" class="primary-button">
 						Sign In To Get Started
 						<svg class="button-arrow" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -91,17 +79,17 @@
 			<div class="section-content">
 				<p>
 					<strong>Relevant World Practice (RWP)</strong> tries to improve on one of the biggest issues
-					with the FSI course by creating personalized exercises that connect directly to your life and
+					with the FSI course by creating personalized reading and listening exercises that connect directly to your life and
 					interests.
 				</p>
 				<p>
-					Unlike the exercises in the FSI workbook that can feel dated or out of touch, RWPs are
-					reading/listening passages and questions based around <em>your</em> context - your job, hobbies,
+					RWPs are generated first person narrative stories with multiple choice, short answer, and
+					reflection questions based around each unit and <em>your</em> context - your job, hobbies,
 					goals, and experience.
 				</p>
 				<p>
-					The hope is to make learning more engaging by allowing you to use the language your
-					practicing in situations that matter to you.
+					The hope is to make learning more engaging by allowing you to control over how you use and
+					practice the things you learn.
 				</p>
 			</div>
 		</div>
@@ -120,8 +108,8 @@
 					<div class="step-number">2</div>
 					<h3 class="step-title">Makes connections</h3>
 					<p>
-						It finds overlap with what you've shared from your profile and module-specific questions
-						to create scenarios and stories more relevant to your life
+						It finds overlap with what you've written your profile and survey questions to create
+						scenarios and stories more relevant to your life
 					</p>
 				</div>
 
@@ -137,9 +125,10 @@
 				<div class="profile-reminder">
 					<h3>Make Your Practice More Relevant</h3>
 					<p>
-						For the best experience, be sure to complete your profile information and the brief
-						questionnaire for each module. This helps RWP create more personalized content.
+						Make sure to complete your profile information and the surveys for each module. This
+						helps RWP create more personalized content.
 					</p>
+					<p>You can even create a fictional character instead to learn chinese through!</p>
 					{#if user}
 						<a href="/profile" class="info-link">
 							Update your profile information
@@ -162,13 +151,12 @@
 			<h2 class="section-title">Try out RWP</h2>
 			<div class="section-content">
 				<p>
-					Try this demo based on the most important langauge learning topic - Module 3, Unit 2 (Food
-					Shopping)
+					Check it out with this demo based on the most important langauge learning topic, food shoping. See how Dracula might learn how to use chinese to buy food at Taiwanese night markets.
 				</p>
 
 				<div class="cta-container">
-					<button on:click={handleDemoClick} class="primary-button large-button">
-						Try the RWP Demo
+					<button on:click={handleDemoClick} class="primary-button">
+						Demo
 						<svg class="button-arrow" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 							<path
 								stroke-linecap="round"
@@ -196,18 +184,12 @@
 
 				<div class="beta-note">
 					<p>
-						<strong>Note:</strong> RWP is still being improved. While it works well most of the time,
+						<strong>Note:</strong> RWP is still being improved on. While it works well most of the time,
 						you may occasionally need to regenerate an exercise if there are issues. If have any ideas
-						or feedback please leave it from the profile page.
+						or feedback please let me know from the profile page feedback tab.
 					</p>
 				</div>
 
-				<!-- <div class="support-note">
-					<p>
-						RWP is part of our efforts to enhance the learning experience on Taped Chinese. Consider
-						supporting this project to help with continued development.
-					</p>
-				</div> -->
 			</div>
 		</div>
 	</section>
