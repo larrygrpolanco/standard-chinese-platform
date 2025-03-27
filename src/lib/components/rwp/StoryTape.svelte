@@ -272,7 +272,7 @@
 						<AudioPlayer audioSrc={audioUrl} />
 
 						<div class="regenerate-container">
-							<button class="regenerate-button" on:click={clearCache}> Regenerate Audio </button>
+							<button class="regenerate-button" on:click={clearCache}> Record New Tape </button>
 						</div>
 					</div>
 				{:else}

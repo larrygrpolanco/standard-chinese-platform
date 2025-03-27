@@ -126,8 +126,10 @@
 			});
 
 			audio.addEventListener('loadedmetadata', () => {
-				duration = audio.duration;
-				loaded = true;
+				if (audio && !isNaN(audio.duration)) {
+					duration = audio.duration;
+					loaded = true;
+				}
 			});
 
 			audio.addEventListener('ended', () => {
