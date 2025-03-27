@@ -40,7 +40,7 @@
 	let debug = true; // Set to false by default, developers can enable in UI
 
 	// Collapsible panel state - only for context panel
-	let contextPanelOpen = true; // Open by default for first-time users
+	let contextPanelOpen = false; // Open by default for first-time users
 	let generatorPanelOpen = true; // Open by default
 
 	// Toast state
@@ -274,23 +274,14 @@
 												placeholder="Add anything you want to practice or include"
 												class="vintage-input"
 											/>
-											<p class="input-hint">Specific grammar, vocabulary, situations, etc.</p>
+											<!-- <p class="input-hint">Specific grammar, vocabulary, situations, etc.</p> -->
 										</div>
 
-										<!-- Debug toggle (for developers) -->
-										<!-- <div class="form-group checkbox-group">
-											<label class="vintage-checkbox">
-												<input type="checkbox" bind:checked={debug} hidden />
-												<span class="checkbox-custom"></span>
-												<span class="checkbox-label">Debug Mode</span>
-											</label>
-										</div> -->
-
-										{#if rwpStatus}
-											<div class="mt-2 text-sm text-gray-600">
+										{#if rwpStatus && rwpStatus.remaining < 3}
+											<div class="input-hint">
 												{rwpStatus.remaining}
 												{rwpStatus.tier === 'premium' ? 'daily' : 'weekly'}
-												generations remaining
+												RWPs remaining
 											</div>
 										{/if}
 
@@ -356,7 +347,7 @@
 							<div class="loading-container">
 								<TapeConstruction
 									message="Creating Your Practice"
-									submessage="This should take about a minute"
+									submessage="This will take 2-3 minutes"
 									currentPhase={generationPhase}
 									isGenerating={true}
 									vocabulary={unitVocabulary}
@@ -740,45 +731,9 @@
 
 	.input-hint {
 		margin-top: 0.375rem;
+		justify-self: center;
 		font-size: 0.8rem;
 		color: var(--color-warm-gray, #a0998a);
-	}
-
-	/* Checkbox styling */
-	.checkbox-group {
-		margin-bottom: 1.5rem;
-	}
-
-	.vintage-checkbox {
-		display: flex;
-		align-items: center;
-		cursor: pointer;
-	}
-
-	.checkbox-custom {
-		position: relative;
-		width: 18px;
-		height: 18px;
-		border: 1px solid var(--color-warm-gray, #a0998a);
-		border-radius: 3px;
-		background-color: var(--color-cream-paper, #f4f1de);
-		margin-right: 0.5rem;
-	}
-
-	.vintage-checkbox input:checked + .checkbox-custom::after {
-		content: '';
-		position: absolute;
-		top: 3px;
-		left: 3px;
-		width: 10px;
-		height: 10px;
-		background-color: var(--color-navy, #34667f);
-		border-radius: 1px;
-	}
-
-	.checkbox-label {
-		font-size: 0.875rem;
-		color: var(--color-charcoal, #33312e);
 	}
 
 	/* Generate button styling */

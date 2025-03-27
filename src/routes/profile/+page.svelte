@@ -13,7 +13,7 @@
 	import ContextModulesTab from '$lib/components/profile/ContextModulesTab.svelte';
 	import FeedbackTab from '$lib/components/profile/FeedbackTab.svelte';
 	import Loader from '$lib/components/UI/Loader.svelte';
-    import SubscriptionTab from '$lib/components/profile/SubscriptionTab.svelte';
+	import SubscriptionTab from '$lib/components/profile/SubscriptionTab.svelte';
 
 	let user = null;
 	let userPreferences = null;
@@ -27,6 +27,7 @@
 	// Tab navigation
 	const tabs = [
 		{ id: 'account', label: 'Account' },
+		{ id: 'subscription', label: 'Subscription' }, // Added subscription as second tab
 		{ id: 'profile', label: 'Learning Profile' },
 		{ id: 'context', label: 'Context & Modules' },
 		{ id: 'feedback', label: 'Feedback' }
@@ -84,7 +85,7 @@
 
 <div class="profile-container">
 	<h1 class="page-title">Your Profile</h1>
-<SubscriptionTab/>
+
 	{#if loading}
 		<Loader />
 	{:else if user}
@@ -113,6 +114,8 @@
 					}}
 					on:signOut={handleSignOut}
 				/>
+			{:else if activeTab === 'subscription'}
+				<SubscriptionTab />
 			{:else if activeTab === 'profile'}
 				<LearningProfileTab
 					{userPreferences}

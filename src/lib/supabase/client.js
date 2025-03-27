@@ -400,6 +400,31 @@ export async function getUserPreferences() {
 	return data;
 }
 
+// Add this to src/lib/supabase/client.js
+export async function deleteUserAccount() {
+	const { data: sessionData } = await supabase.auth.getSession();
+	const token = sessionData?.session?.access_token;
+
+	if (!token) {
+		throw new Error('Not authenticated. Please log in.');
+	}
+
+	const response = await fetch('/api/account/delete', {
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/json',
+			Authorization: `Bearer ${token}`
+		}
+	});
+
+	if (!response.ok) {
+		const errorData = await response.json();
+		throw new Error(errorData.message || 'Failed to delete account');
+	}
+
+	return true;
+}
+
 // Stripe
 // Get user's subscription status
 export async function getUserSubscription() {
@@ -587,6 +612,172 @@ export async function incrementRWPUsage() {
 	}
 
 	return true;
+}
+
+// Check if TTS is available for current user
+export async function checkTTSAvailability() {
+	const user = await getCurrentUser();
+	if (!user) return { allowed: false, reason: 'Not authenticated' };
+
+	// First get the subscription status
+	const subscription = await getUserSubscription();
+
+	// TTS is premium-only
+	if (subscription.tier !== 'premium') {
+		return {
+			allowed: false,
+			reason: 'TTS requires premium subscription',
+			upgradeAvailable: true
+		};
+	}
+
+	// Get the usage information
+	const { data: usage, error } = await supabase
+		.from('user_usage')
+		.select('tts_day_count, tts_day_reset')
+		.eq('user_id', user.id)
+		.maybeSingle();
+
+	if (error) {
+		console.error('Error fetching usage:', error);
+		return { allowed: false, reason: 'Error checking limits' };
+	}
+
+	// Initialize usage if not exists
+	if (!usage) {
+		// Create a new usage record
+		const now = new Date().toISOString();
+		const tomorrow = new Date();
+		tomorrow.setDate(tomorrow.getDate() + 1);
+		tomorrow.setHours(0, 0, 0, 0);
+
+		await supabase.from('user_usage').upsert({
+			user_id: user.id,
+			tts_day_count: 0,
+			tts_day_reset: tomorrow.toISOString(),
+			last_updated: now
+		});
+
+		return {
+			allowed: true,
+			remaining: 20,
+			tier: 'premium'
+		};
+	}
+
+	// Check if day needs reset
+	const now = new Date();
+	let dayCount = usage.tts_day_count;
+
+	if (new Date(usage.tts_day_reset) <= now) {
+		dayCount = 0;
+		const tomorrow = new Date();
+		tomorrow.setDate(tomorrow.getDate() + 1);
+		tomorrow.setHours(0, 0, 0, 0);
+
+		await supabase
+			.from('user_usage')
+			.update({
+				tts_day_count: 0,
+				tts_day_reset: tomorrow.toISOString(),
+				last_updated: now.toISOString()
+			})
+			.eq('user_id', user.id);
+	}
+
+	// Check if limit reached
+	if (dayCount >= 20) {
+		const resetTime = new Date(usage.tts_day_reset);
+		return {
+			allowed: false,
+			reason: 'Daily TTS limit reached',
+			resetTime,
+			tier: 'premium',
+			remaining: 0
+		};
+	}
+
+	return {
+		allowed: true,
+		tier: 'premium',
+		remaining: 20 - dayCount
+	};
+}
+
+// Increment TTS usage counter
+export async function incrementTTSUsage() {
+	const user = await getCurrentUser();
+	if (!user) return false;
+
+	const { data: usage } = await supabase
+		.from('user_usage')
+		.select('tts_day_count')
+		.eq('user_id', user.id)
+		.maybeSingle();
+
+	if (!usage) {
+		// Handle first-time usage
+		await checkTTSAvailability(); // This creates the usage record
+		return true;
+	}
+
+	// Update counter
+	const { error: updateError } = await supabase
+		.from('user_usage')
+		.update({
+			tts_day_count: usage.tts_day_count + 1,
+			last_updated: new Date().toISOString()
+		})
+		.eq('user_id', user.id);
+
+	if (updateError) {
+		console.error('Error updating TTS usage count:', updateError);
+		return false;
+	}
+
+	return true;
+}
+
+// Helper function to generate TTS audio
+export async function generateTTS(text, voice, language = 'zh', instructions = '') {
+	// Check TTS availability first
+	const availability = await checkTTSAvailability();
+
+	if (!availability.allowed) {
+		throw new Error(
+			`TTS not available: ${availability.reason}. ${
+				availability.resetTime
+					? `Available again: ${new Date(availability.resetTime).toLocaleString()}`
+					: ''
+			}`
+		);
+	}
+
+	// Get current auth session
+	const { data: sessionData } = await supabase.auth.getSession();
+
+	if (!sessionData?.session?.access_token) {
+		throw new Error('Authentication required');
+	}
+
+	const response = await fetch('/api/tts', {
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/json',
+			Authorization: `Bearer ${sessionData.session.access_token}`
+		},
+		body: JSON.stringify({ text, voice, language, instructions })
+	});
+
+	if (!response.ok) {
+		const errorData = await response.json();
+		throw new Error(errorData.error || 'Failed to generate speech');
+	}
+
+	// Increment the usage after successful generation
+	await incrementTTSUsage();
+
+	return await response.json();
 }
 
 // Create a checkout session

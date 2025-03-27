@@ -48,10 +48,10 @@ body {
 }
 
 /* Optional subtle paper texture */
-body {
+/* body {
 	background-image: url('/textures/subtle-paper.png');
 	background-repeat: repeat;
-}
+} */
 
 /* Typography */
 h1,
@@ -245,53 +245,4 @@ a:hover {
 }
 .p-5 {
 	padding: var(--space-5);
-}
-
-/* CRT Effects - Retro screen styling */
-.crt-effect {
-	background: --color-cream-paper;
-	padding: 20px;
-	border-radius: 5px;
-	box-shadow:
-		inset 0 0 10px #0ff,
-		0 0 20px rgba(0, 255, 255, 0.5);
-}
-
-/* Scanlines overlay */
-.crt-effect::after {
-	content: '';
-	position: fixed;
-	top: 0;
-	left: 0;
-	width: 100%;
-	height: 100%;
-	background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%);
-	background-size: 100% 4px;
-	pointer-events: none;
-	z-index: 999;
-}
-
-/* Additional CRT variant for local effects (doesn't overlay entire screen) */
-.crt-effect-local {
-	position: relative;
-	background: --color-cream-paper;
-	padding: 20px;
-	border-radius: 5px;
-	box-shadow:
-		inset 0 0 10px #0ff,
-		0 0 20px rgba(0, 255, 255, 0.5);
-	overflow: hidden;
-}
-
-.crt-effect-local::after {
-	content: '';
-	position: absolute;
-	top: 0;
-	left: 0;
-	width: 100%;
-	height: 100%;
-	background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%);
-	background-size: 100% 4px;
-	pointer-events: none;
-	z-index: 1;
 }

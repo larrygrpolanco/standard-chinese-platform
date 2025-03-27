@@ -3,7 +3,9 @@ import {
 	getCurrentUser,
 	getCompleteUnit,
 	getUserPreferences,
-	saveRwpContent
+	saveRwpContent,
+	checkRWPAvailability,
+    incrementRWPUsage
 } from '$lib/supabase/client.js';
 
 /**
@@ -23,12 +25,28 @@ export async function generateRwpExercise(
 	progressCallback = null
 ) {
 	try {
-		// Add a helper function to report progress
 		const updateProgress = (phase) => {
 			if (typeof progressCallback === 'function') {
 				progressCallback(phase);
 			}
 		};
+
+		// Check RWP availability first
+		updateProgress('checking_limits');
+		const availability = await checkRWPAvailability();
+
+		if (!availability.allowed) {
+			throw new Error(
+				`RWP limit reached: ${availability.reason}. ${
+					availability.resetTime
+						? `Available again: ${new Date(availability.resetTime).toLocaleString()}`
+						: ''
+				}`
+			);
+		}
+
+		// Track usage immediately
+		await incrementRWPUsage();
 
 		// 1. Get user data
 		updateProgress('init'); // Initial phase
@@ -53,7 +71,7 @@ export async function generateRwpExercise(
 		// 4. PHASE 1A: Analyze story requirements
 		updateProgress('analysis'); // Update to analysis phase
 		console.log('Analyzing story requirements...');
-        const analysisStartTime = Date.now();
+		const analysisStartTime = Date.now();
 
 		const analysisResponse = await fetch('/api/rwp/analyze-story', {
 			method: 'POST',
@@ -66,7 +84,7 @@ export async function generateRwpExercise(
 			})
 		});
 
-        console.log(`Story analysis took ${(Date.now() - analysisStartTime) / 1000} seconds`);
+		console.log(`Story analysis took ${(Date.now() - analysisStartTime) / 1000} seconds`);
 
 		if (!analysisResponse.ok) {
 			const errorData = await analysisResponse.json();
@@ -84,7 +102,7 @@ export async function generateRwpExercise(
 		// 5. PHASE 1B: Generate the story based on analysis
 		updateProgress('story'); // Update to story generation phase
 		console.log('Generating story based on analysis...');
-        const storyStartTime = Date.now();
+		const storyStartTime = Date.now();
 
 		const storyResponse = await fetch('/api/rwp/generate-story', {
 			method: 'POST',
@@ -98,7 +116,7 @@ export async function generateRwpExercise(
 			})
 		});
 
-        console.log(`Story generation took ${(Date.now() - storyStartTime) / 1000} seconds`);
+		console.log(`Story generation took ${(Date.now() - storyStartTime) / 1000} seconds`);
 
 		if (!storyResponse.ok) {
 			const errorData = await storyResponse.json();
@@ -116,7 +134,7 @@ export async function generateRwpExercise(
 		// 6. PHASE 2: Generate questions based on the story and analysis
 		updateProgress('questions');
 		console.log('Generating questions...');
-        const questionsStartTime = Date.now();
+		const questionsStartTime = Date.now();
 
 		const questionsResponse = await fetch('/api/rwp/create-questions', {
 			method: 'POST',
@@ -131,7 +149,7 @@ export async function generateRwpExercise(
 			})
 		});
 
-        console.log(`Question generation took ${(Date.now() - questionsStartTime) / 1000} seconds`);
+		console.log(`Question generation took ${(Date.now() - questionsStartTime) / 1000} seconds`);
 
 		// Continue with the rest of the function as before
 		if (!questionsResponse.ok) {
@@ -150,7 +168,7 @@ export async function generateRwpExercise(
 		// 7. PHASE 3: Format everything into JSON structure
 		updateProgress('formatting');
 		console.log('Formatting exercise...');
-        const formatStartTime = Date.now();
+		const formatStartTime = Date.now();
 
 		const formatResponse = await fetch('/api/rwp/format-exercise', {
 			method: 'POST',
@@ -163,7 +181,7 @@ export async function generateRwpExercise(
 			})
 		});
 
-        console.log(`Exercise formatting took ${(Date.now() - formatStartTime) / 1000} seconds`);
+		console.log(`Exercise formatting took ${(Date.now() - formatStartTime) / 1000} seconds`);
 
 		if (!formatResponse.ok) {
 			const errorData = await formatResponse.json();

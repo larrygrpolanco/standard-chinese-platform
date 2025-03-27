@@ -2,10 +2,11 @@
 <script>
 	import { createEventDispatcher } from 'svelte';
 
-	export let message = 'Are you sure?';
+	export let title = 'Confirmation'; // Changed from message to title
 	export let confirmButtonText = 'Yes';
 	export let cancelButtonText = 'No';
 	export let isDanger = false;
+	export let loading = false; // Add loading state
 
 	const dispatch = createEventDispatcher();
 
@@ -19,7 +20,7 @@
 
 	// Close on escape key
 	function handleKeydown(event) {
-		if (event.key === 'Escape') {
+		if (event.key === 'Escape' && !loading) {
 			cancel();
 		}
 	}
@@ -27,18 +28,26 @@
 
 <svelte:window on:keydown={handleKeydown} />
 
-<div class="modal-backdrop" on:click={cancel} role="presentation">
+<div class="modal-backdrop" on:click={!loading && cancel} role="presentation">
 	<div class="modal-container" on:click|stopPropagation role="dialog">
 		<div class="modal-content">
-			<p class="message">{message}</p>
+			<h2 class="modal-title">{title}</h2>
+
+			<div class="modal-body">
+				<slot />
+			</div>
 
 			<div class="buttons">
-				<button class="tape-button secondary" on:click={cancel}>
+				<button class="tape-button secondary" on:click={cancel} disabled={loading}>
 					{cancelButtonText}
 				</button>
 
-				<button class="tape-button {isDanger ? 'danger' : ''}" on:click={confirm}>
-					{confirmButtonText}
+				<button
+					class="tape-button {isDanger ? 'danger' : ''}"
+					on:click={confirm}
+					disabled={loading}
+				>
+					{loading ? 'Processing...' : confirmButtonText}
 				</button>
 			</div>
 		</div>
@@ -72,11 +81,16 @@
 		text-align: center;
 	}
 
-	.message {
-		margin: 0 0 1.5rem;
-		font-family: 'Work Sans', sans-serif;
-		font-size: 1.125rem;
+	.modal-title {
+		margin: 0 0 1rem;
+		font-family: 'Arvo', serif;
+		font-size: 1.25rem;
 		color: #33312e;
+	}
+
+	.modal-body {
+		margin-bottom: 1.5rem;
+		font-family: 'Work Sans', sans-serif;
 	}
 
 	.buttons {

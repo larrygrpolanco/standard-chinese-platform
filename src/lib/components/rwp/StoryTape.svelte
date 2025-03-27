@@ -1,9 +1,9 @@
+<!-- StoryTape.svelte -->
 <script>
+	import { checkTTSAvailability, incrementTTSUsage } from '$lib/supabase/client';
 	import AudioPlayer from '$lib/components/AudioPlayer.svelte';
 	import Loader from '$lib/components/UI/Loader.svelte';
 	import { createEventDispatcher, onMount } from 'svelte';
-
-    
 
 	const dispatch = createEventDispatcher();
 
@@ -99,6 +99,18 @@
 		error = null;
 
 		try {
+			// Check if the user is allowed to use TTS
+			const availability = await checkTTSAvailability();
+			if (!availability.allowed) {
+				throw new Error(
+					`${availability.reason}. ${
+						availability.resetTime
+							? `Available again: ${new Date(availability.resetTime).toLocaleString()}`
+							: ''
+					}`
+				);
+			}
+
 			// Check if we already have this audio cached in sessionStorage
 			const cachedAudio = sessionStorage.getItem(cacheKey);
 			if (cachedAudio) {
@@ -112,7 +124,7 @@
 				return;
 			}
 
-			// Call our API endpoint to generate the speech
+			// Call our API endpoint to generate the speech (keep your existing API call)
 			const response = await fetch('/api/tts', {
 				method: 'POST',
 				headers: {
@@ -122,7 +134,7 @@
 					text: storyText,
 					voice: selectedVoice,
 					language: language,
-					instructions: customInstructions // Added instructions
+					instructions: customInstructions
 				})
 			});
 
@@ -134,6 +146,9 @@
 
 			const data = await response.json();
 			audioUrl = data.audioUrl;
+
+			// Increment usage counter after successful generation
+			await incrementTTSUsage();
 
 			// Prune cache before adding new item
 			pruneCache();

@@ -1,6 +1,5 @@
 // src/lib/stripe/config.js
 export const STRIPE_CONFIG = {
-	// Centralized place to adjust limits
 	FREE_TIER_LIMITS: {
 		rwp_per_week: 3,
 		tts_access: false
@@ -8,6 +7,7 @@ export const STRIPE_CONFIG = {
 
 	PREMIUM_TIER_LIMITS: {
 		rwp_per_day: 20,
+		tts_per_day: 20, // Add this line
 		tts_access: true
 	},
 

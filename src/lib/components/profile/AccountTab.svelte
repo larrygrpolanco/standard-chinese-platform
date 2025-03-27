@@ -2,7 +2,7 @@
 <script>
 	import { createEventDispatcher } from 'svelte';
 	import { authStore } from '$lib/stores/authStore';
-	import { supabase } from '$lib/supabase/client';
+	import { supabase, deleteUserAccount } from '$lib/supabase/client';
 	import ConfirmationModal from '$lib/components/UI/ConfirmationModal.svelte';
 
 	export let user;
@@ -20,15 +20,6 @@
 	let deleteAccountVisible = false;
 	let deleteConfirmText = '';
 	let deleting = false;
-
-	// Subscription info - this would be retrieved from your actual subscription service
-	// For now, we'll simulate it based on fake data
-	let subscriptionInfo = {
-		status: 'yearly', // 'free', 'monthly', 'yearly'
-		nextBillingDate: null,
-		// This would come from your Stripe integration
-		managementUrl: null
-	};
 
 	// Toast helper function
 	function showToast(message, type = 'success') {
@@ -73,24 +64,19 @@
 	}
 
 	async function handleDeleteAccount() {
-		if (deleteConfirmText !== 'DELETE') {
-			showToast('Please type DELETE to confirm account deletion', 'error');
+		if (deleteConfirmText !== 'delete') {
+			showToast('Please type delete to confirm account deletion', 'error');
 			return;
 		}
 
 		deleting = true;
 
 		try {
-			// First we should delete all user data from the database
-			// This could be a call to a server function that handles all deletion
-			// For simplicity, I'm showing just the auth deletion here
-
-			// Delete the user account
-			const { error } = await supabase.auth.admin.deleteUser(user.id);
-			if (error) throw error;
-
 			// Sign out
 			await authStore.signOut();
+			// Delete user account using our helper function
+			await deleteUserAccount();
+
 			showToast('Your account has been deleted', 'success');
 
 			// Redirect to home page
@@ -98,6 +84,7 @@
 		} catch (error) {
 			console.error('Error deleting account:', error);
 			showToast('Failed to delete account: ' + error.message, 'error');
+		} finally {
 			deleting = false;
 		}
 	}
@@ -113,7 +100,13 @@
 </script>
 
 <div class="account-tab">
-	<!-- I don't think it is doing much now I may edit this later -->
+	<!-- Profile Reminder -->
+	<div class="profile-reminder">
+		<h3>Make Your Practice More Relevant</h3>
+		<p>Make sure to edit your <b>Learning Profile</b> for better RWP quizzes</p>
+	</div>
+
+	<!-- Account Information Section -->
 	<section class="account-section">
 		<h2 class="section-title">Account Information</h2>
 		<div class="info-grid">
@@ -124,79 +117,18 @@
 
 			<div class="info-item">
 				<span class="info-label">Account Created</span>
-				<span class="info-value">{new Date(user.created_at).toLocaleString()}</span>
+				<span class="info-value">{new Date(user.created_at).toLocaleDateString()}</span>
 			</div>
-		</div>
-		<div class="profile-reminder">
-			<h3>Make Your Practice More Relevant</h3>
-			<p>Make sure to edit your <em>Learning Profile <em> for better RWP quizzes</p>
 		</div>
 	</section>
 
+	<!-- Account Actions Section -->
 	<section class="account-section">
-		<h2 class="section-title">Subscription</h2>
-		<div class="subscription-message">
-			RWP features completely free during this prototyping phase
-		</div>
-		<div class="subscription-card">
-			<div class="sub-status">
-				<span class="sub-status-label">Current Plan:</span>
-				<span class="sub-status-value {subscriptionInfo.status}">
-					{subscriptionInfo.status === 'free'
-						? 'Free Tier'
-						: subscriptionInfo.status === 'monthly'
-							? 'Monthly Premium'
-							: 'Yearly Premium'}
-				</span>
-			</div>
+		<h2 class="section-title">Account Management</h2>
 
-			{#if subscriptionInfo.status !== 'free' && subscriptionInfo.nextBillingDate}
-				<div class="sub-details">
-					<span class="sub-label">Next billing date:</span>
-					<span class="sub-value"
-						>{new Date(subscriptionInfo.nextBillingDate).toLocaleDateString()}</span
-					>
-				</div>
-			{/if}
-
-			<div class="sub-features">
-				<h3 class="sub-features-title">Plan Features:</h3>
-				<ul class="features-list">
-					{#if subscriptionInfo.status === 'free'}
-						<li class="feature">Access to all FSI course materials</li>
-						<li class="feature">Limited to 1 RWP exercise generation per day</li>
-						<li class="feature-upgrade">
-							Upgrade to Premium for unlimited RWP exercises and to support this site
-						</li>
-					{:else}
-						<li class="feature">Access to all FSI course materials</li>
-						<li class="feature">Unlimited RWP exercise generation</li>
-						<li class="feature">Priority support</li>
-						<li class="feature">Early access to new features</li>
-					{/if}
-				</ul>
-			</div>
-
-			<div class="sub-actions">
-				{#if subscriptionInfo.status === 'free'}
-					<button class="tape-button upgrade">Upgrade to Premium</button>
-				{:else}
-					<button class="tape-button manage">Manage Subscription</button>
-				{/if}
-			</div>
-		</div>
-
-		{#if subscriptionInfo.status === 'free'}
-			<div class="subscription-message">
-				Your subscription helps support the continued development of this site and keeps all the
-				core material free for everyone.
-			</div>
-		{/if}
-	</section>
-
-	<section class="account-section">
-		<h2 class="section-title">Account Managment</h2>
-		<div class="flex-box my-2 gap-2">
+		<!-- Password Change -->
+		<div class="management-item">
+			<h3 class="subsection-title">Password</h3>
 			{#if !changePasswordVisible}
 				<button class="tape-button secondary" on:click={() => (changePasswordVisible = true)}>
 					Change Password
@@ -247,19 +179,20 @@
 					</div>
 				</div>
 			{/if}
-			<div>
-				<button class="tape-button danger my-2" on:click={() => dispatch('signOut')}>
-					Sign Out
-				</button>
-			</div>
+		</div>
+
+		<!-- Session Management -->
+		<div class="management-item">
+			<button class="tape-button danger" on:click={() => dispatch('signOut')}> Sign Out </button>
 		</div>
 	</section>
 
+	<!-- Danger Zone Section -->
 	<section class="account-section danger-section">
 		<h2 class="section-title">Delete Account</h2>
 		<p class="danger-text">
-			Deleting your account will permanently remove all your data, including saved preferences,
-			personal context, and generated exercises.
+			Deleting your account will permanently remove everything related to your account, including
+			preferences, personal context, and RWP exercises.
 		</p>
 		<button class="tape-button danger" on:click={() => (deleteAccountVisible = true)}>
 			Delete Account
@@ -284,12 +217,12 @@
 		<p>
 			This action <strong>cannot</strong> be undone. All your data will be permanently deleted.
 		</p>
-		<p>Please type <strong>DELETE</strong> to confirm:</p>
+		<p>Please type <strong>delete</strong> to confirm:</p>
 		<input
 			type="text"
 			class="form-input"
 			bind:value={deleteConfirmText}
-			placeholder="Type DELETE"
+			placeholder="Type delete"
 		/>
 	</ConfirmationModal>
 {/if}
@@ -313,12 +246,38 @@
 		border-bottom: 1px solid #e8e5d7;
 	}
 
+	.account-section:last-child {
+		margin-bottom: 0;
+		padding-bottom: 0;
+		border-bottom: none;
+	}
+
 	.section-title {
 		margin-bottom: 1.25rem;
 		font-family: 'Arvo', serif;
 		font-size: 1.25rem;
 		font-weight: 600;
 		color: #33312e;
+	}
+
+	.subsection-title {
+		font-family: 'Work Sans', sans-serif;
+		font-size: 1rem;
+		font-weight: 600;
+		margin-bottom: 0.5rem;
+		color: #555;
+	}
+
+	.management-item {
+		margin-bottom: 1.5rem;
+		padding-bottom: 1.5rem;
+		border-bottom: 1px solid #eee;
+	}
+
+	.management-item:last-child {
+		margin-bottom: 0;
+		padding-bottom: 0;
+		border-bottom: none;
 	}
 
 	.info-grid {
@@ -336,6 +295,17 @@
 		box-shadow: inset 0 1px 3px rgba(51, 49, 46, 0.1);
 	}
 
+	.info-label {
+		font-size: 0.875rem;
+		color: #70594a;
+		margin-bottom: 0.25rem;
+	}
+
+	.info-value {
+		font-weight: 500;
+		color: #33312e;
+	}
+
 	/* Profile reminder */
 	.profile-reminder {
 		background-color: rgba(52, 102, 127, 0.1);
@@ -345,7 +315,7 @@
 		padding-left: 1rem;
 		padding-right: 1rem;
 		padding-bottom: 0.1rem;
-		margin-top: 0.5rem;
+		margin-bottom: 1.5rem;
 	}
 
 	.profile-reminder h3 {
@@ -356,34 +326,12 @@
 		color: #34667f;
 	}
 
-	.subscription-card {
-		padding: 1.25rem;
-		background-color: #e8e5d7;
-		border: 1px solid #a0998a;
-		border-radius: 8px;
-		box-shadow: inset 0 1px 3px rgba(51, 49, 46, 0.1);
-		margin-bottom: 1rem;
-	}
-
-	.sub-status-value {
-		padding: 0.25rem 0.75rem;
-		border-radius: 16px;
-		font-weight: 600;
-		font-size: 0.875rem;
-	}
-
-	.sub-status-value.free {
-		background-color: #a0998a;
-		color: #f4f1de;
-	}
-
-	.sub-status-value.monthly,
-	.sub-status-value.yearly {
-		background-color: #ddb967;
+	.profile-reminder p {
+		margin-bottom: 0;
 		color: #33312e;
 	}
 
-	/* Updated form elements styling */
+	/* Form elements styling */
 	.form-input {
 		width: 100%;
 		padding: 0.75rem;
@@ -395,9 +343,8 @@
 		box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
 	}
 
-	/* Updated button classes to match the style guide */
+	/* Button styling */
 	.tape-button {
-		/* width: 100%; */
 		display: inline-flex;
 		align-items: center;
 		justify-content: center;
@@ -411,6 +358,7 @@
 		box-shadow: 0 2px 0 #826d5b;
 		transition: all 0.2s;
 		cursor: pointer;
+		width: 100%;
 	}
 
 	.tape-button:hover:not(:disabled) {
@@ -432,11 +380,6 @@
 		color: #f4f1de;
 	}
 
-	.tape-button.upgrade {
-		background-color: #ddb967;
-		color: #33312e;
-	}
-
 	.tape-button:hover {
 		filter: brightness(0.95);
 	}
@@ -451,67 +394,11 @@
 		cursor: not-allowed;
 	}
 
-	.tape-button.manage {
-		background-color: #a0998a;
-	}
-
 	.danger-section {
 		background-color: #f9f0ed;
 		padding: 1.25rem;
 		border-radius: 8px;
 		border-left: 3px solid #c17c74;
-	}
-
-	.sub-details {
-		margin-bottom: 1rem;
-	}
-
-	.sub-label {
-		color: #70594a;
-		margin-right: 0.5rem;
-	}
-
-	.sub-value {
-		font-weight: 500;
-		color: #33312e;
-	}
-
-	.sub-features {
-		margin-bottom: 1.25rem;
-	}
-
-	.sub-features-title {
-		font-size: 1rem;
-		font-weight: 600;
-		margin-bottom: 0.5rem;
-		color: #33312e;
-	}
-
-	.features-list {
-		padding-left: 1.5rem;
-	}
-
-	.feature {
-		margin-bottom: 0.25rem;
-		color: #33312e;
-	}
-
-	.feature-upgrade {
-		margin-top: 0.5rem;
-		font-weight: 500;
-		color: #826d5b;
-	}
-
-	.sub-actions {
-		margin-top: 1rem;
-	}
-
-	.subscription-message {
-		font-size: 0.875rem;
-		font-style: italic;
-		color: #70594a;
-		text-align: center;
-		margin-top: 0.5rem;
 	}
 
 	.password-form {
@@ -542,13 +429,6 @@
 		display: flex;
 		justify-content: flex-end;
 		gap: 0.75rem;
-	}
-
-	.danger-section {
-		background-color: #f9f0ed;
-		padding: 1.25rem;
-		border-radius: 0.5rem;
-		border-left: 3px solid #c17c74;
 	}
 
 	.danger-text {
