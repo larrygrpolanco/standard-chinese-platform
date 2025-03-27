@@ -5,22 +5,38 @@ import { supabase, getCurrentUser } from '$lib/supabase/client';
 
 function createAuthStore() {
 	const { subscribe, set } = writable(null);
+	let initializationPromise = null;
 
 	async function initialize() {
-		if (!browser) return;
+		if (!browser) return null;
 
-		// Set initial state
-		const user = await getCurrentUser();
-		set(user);
+		// Only initialize once
+		if (!initializationPromise) {
+			initializationPromise = (async () => {
+				try {
+					// Set initial state
+					const user = await getCurrentUser();
+					set(user);
 
-		// Listen for auth changes
-		supabase.auth.onAuthStateChange((event, session) => {
-			if (event === 'SIGNED_IN') {
-				set(session?.user || null);
-			} else if (event === 'SIGNED_OUT') {
-				set(null);
-			}
-		});
+					// Set up auth listener
+					supabase.auth.onAuthStateChange((event, session) => {
+						if (event === 'SIGNED_IN') {
+							set(session?.user || null);
+						} else if (event === 'SIGNED_OUT') {
+							set(null);
+						}
+					});
+
+					return user;
+				} catch (error) {
+					console.error('Auth initialization error:', error);
+					set(null);
+					return null;
+				}
+			})();
+		}
+
+		return initializationPromise;
 	}
 
 	async function signOut() {
@@ -32,7 +48,7 @@ function createAuthStore() {
 	return {
 		subscribe,
 		initialize,
-		signOut 
+		signOut
 	};
 }
 

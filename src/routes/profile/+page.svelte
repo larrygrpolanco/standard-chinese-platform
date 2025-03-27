@@ -1,8 +1,9 @@
 <!-- src/routes/profile/+page.svelte -->
 <script>
 	import { onMount } from 'svelte';
+    import { browser } from '$app/environment';
+	import { goto, pushState, replaceState } from '$app/navigation';
 	import { authStore } from '$lib/stores/authStore';
-	import { goto } from '$app/navigation';
 	import { getUserPreferences, saveUserPreferences, getCurrentUser } from '$lib/supabase/client';
 	import ModuleQuestions from '$lib/components/ModuleQuestions.svelte';
 	import Toast from '$lib/components/UI/Toast.svelte';
@@ -18,6 +19,7 @@
 	let user = null;
 	let userPreferences = null;
 	let loading = true;
+	let authCheckComplete = false;
 
 	// Toast state
 	let toastVisible = false;
@@ -57,29 +59,51 @@
 	}
 
 	onMount(async () => {
-		// Redirect if not logged in
-		if (!$authStore) {
-			goto('/login');
-			return;
-		}
-
-		user = $authStore;
+		loading = true;
 
 		try {
+			// Ensure auth store is initialized and wait for it
+			await authStore.initialize();
+
+			// Check auth state only after initialization
+			if (!$authStore) {
+				goto('/login');
+				return;
+			}
+
+			user = $authStore;
+			authCheckComplete = true;
+
+			// Check if URL has #subscription hash and select that tab
+			if (browser && window.location.hash === '#subscription') {
+				activeTab = 'subscription';
+			}
+
 			// Fetch user preferences
 			const prefs = await getUserPreferences();
 			userPreferences = prefs || {};
-			loading = false;
 		} catch (error) {
-			console.error('Error loading preferences:', error);
+			console.error('Error loading profile:', error);
+			showToast('Failed to load profile data', 'error');
+		} finally {
 			loading = false;
-			showToast('Failed to load preferences', 'error');
 		}
 	});
 
-	// Function to handle tab switching
+	// Update the setActiveTab function to also update the URL hash
+	// but only for subscription tab
 	function setActiveTab(tabId) {
 		activeTab = tabId;
+
+		// Only update URL hash for subscription tab
+		if (browser) {
+			if (tabId === 'subscription') {
+				replaceState({}, '/profile#subscription');
+			} else if (window.location.hash) {
+				// Clear the hash when switching to other tabs
+				replaceState({}, '/profile');
+			}
+		}
 	}
 </script>
 

@@ -11,11 +11,10 @@
 		getUnitVocabularyData
 	} from '$lib/supabase/client.js';
 	import { authStore } from '$lib/stores/authStore';
-
 	import { generateRwpExercise } from '$lib/rwp/rwpGenerator.js';
+	import { STRIPE_CONFIG } from '$lib/stripe/config';
 
 	import Loader from '$lib/components/UI/Loader.svelte';
-
 	import Toast from '$lib/components/UI/Toast.svelte';
 	import ModuleQuestions from '$lib/components/ModuleQuestions.svelte';
 	import ComprehensionExercise from '$lib/components/rwp/ComprehensionExercise.svelte';
@@ -49,6 +48,10 @@
 
 	// Get unit ID from URL parameter
 	const unitId = parseInt($page.params.unit_id);
+
+	function goToProfile() {
+		window.location.href = '/profile#subscription';
+	}
 
 	// Subscribe to auth store
 	authStore.subscribe((value) => {
@@ -285,16 +288,24 @@
 											</div>
 										{/if}
 
-										<!-- Generate Button -->
 										<button
-											class="generate-button {generating ? 'generating' : ''}"
-											on:click={generateExercise}
-											disabled={generating}
+											class={`generate-button ${generating ? 'generating' : ''} ${!rwpStatus?.allowed ? 'disabled' : ''}`}
+											on:click={rwpStatus?.allowed
+												? generateExercise
+												: rwpStatus?.tier === 'free'
+													? goToProfile
+													: null}
+											disabled={generating ||
+												(rwpStatus?.tier === 'premium' && !rwpStatus?.allowed)}
 										>
 											<div class="button-content">
 												{#if generating}
 													<div class="tape-spinner"></div>
 													<span>Creating your practice...</span>
+												{:else if !rwpStatus?.allowed && rwpStatus?.tier === 'free'}
+													<span>Support Taped Chinese</span>
+												{:else if !rwpStatus?.allowed && rwpStatus?.tier === 'premium'}
+													<span>Regenerate Practice</span>
 												{:else if rwpContent}
 													<svg class="button-icon" viewBox="0 0 24 24">
 														<path
@@ -312,6 +323,21 @@
 												{/if}
 											</div>
 										</button>
+
+										{#if !rwpStatus?.allowed}
+											<div class="limit-message">
+												{#if rwpStatus?.tier === 'free'}
+													You've used all {STRIPE_CONFIG.FREE_TIER_LIMITS.rwp_per_week} weekly exercises.
+													Supporting Taped Chinese gives you {STRIPE_CONFIG.PREMIUM_TIER_LIMITS
+														.rwp_per_day} exercises every day. Don't worry - you'll always keep the exercises
+													you've already generated.
+												{:else}
+													You've reached today's limit of {STRIPE_CONFIG.PREMIUM_TIER_LIMITS
+														.rwp_per_day} exercises. This limit helps us maintain the service for everyone.
+													Please check back tomorrow for more!
+												{/if}
+											</div>
+										{/if}
 									</div>
 								{/if}
 							</div>
@@ -407,14 +433,24 @@
 								</p>
 								{#if user}
 									<button
-										class="generate-button large {generating ? 'generating' : ''}"
-										on:click={generateExercise}
-										disabled={generating}
+										class="generate-button large {generating
+											? 'generating'
+											: ''} {!rwpStatus?.allowed ? 'disabled' : ''}"
+										on:click={rwpStatus?.allowed
+											? generateExercise
+											: rwpStatus?.tier === 'free'
+												? goToProfile
+												: null}
+										disabled={generating || (rwpStatus?.tier === 'premium' && !rwpStatus?.allowed)}
 									>
 										<div class="button-content">
 											{#if generating}
 												<div class="tape-spinner"></div>
 												<span>Creating your practice...</span>
+											{:else if !rwpStatus?.allowed && rwpStatus?.tier === 'free'}
+												<span>Support Taped Chinese</span>
+											{:else if !rwpStatus?.allowed && rwpStatus?.tier === 'premium'}
+												<span>Daily Limit Reached</span>
 											{:else}
 												<svg class="button-icon" viewBox="0 0 24 24">
 													<path d="M19 12H5M12 19V5" stroke="currentColor" stroke-width="2" />
@@ -786,6 +822,28 @@
 	.button-icon {
 		width: 18px;
 		height: 18px;
+	}
+
+	.generate-button.disabled {
+		opacity: 0.6;
+	}
+
+        /* If the button is .large and .disabled, add slightly different styling */
+    .generate-button.large.disabled {
+        background-color: #f3f3f3;
+        border: 1px solid #d97706;
+        color: #d97706;
+    }
+
+	.limit-message {
+		margin-top: 12px;
+		padding: 8px 12px;
+		background: #fff8e6;
+		border: 1px solid #ffd78a;
+		border-radius: 4px;
+		font-size: 14px;
+		line-height: 1.5;
+		color: #78350f;
 	}
 
 	/* Tape spinner animation */

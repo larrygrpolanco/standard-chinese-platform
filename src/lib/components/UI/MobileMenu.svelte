@@ -4,6 +4,7 @@
 	export let navItems = [];
 	export let coreModules = [];
 	export let isLoggedIn = false;
+	export let subscription = { tier: 'free' };
 
 	import { createEventDispatcher } from 'svelte';
 	const dispatch = createEventDispatcher();
@@ -97,7 +98,10 @@
 				<!-- Login button (future implementation) -->
 				<div class="login-section">
 					{#if isLoggedIn}
-						<a href="/profile" class="mobile-login-button">
+						<a
+							href="/profile"
+							class="mobile-login-button {subscription.tier === 'premium' ? 'premium-button' : ''}"
+						>
 							<span>Profile</span>
 							<div class="login-button-highlight"></div>
 						</a>
@@ -394,5 +398,13 @@
 		border-top-left-radius: 9999px;
 		border-top-right-radius: 9999px;
 		background-color: rgba(255, 255, 255, 0.2);
+	}
+	/* Add to the style block in the main component */
+	.premium-button {
+		background-color: #ddb967; /* Gold color */
+	}
+
+	.premium-button:hover {
+		background-color: #c9a658; /* Darker gold on hover */
 	}
 </style>

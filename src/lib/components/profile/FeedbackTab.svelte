@@ -2,8 +2,12 @@
 <script>
 	import { createEventDispatcher } from 'svelte';
 	import { saveUserPreferences, getCurrentUser } from '$lib/supabase/client';
+	import UpgradePrompt from '$lib/components/UI/UpgradePrompt.svelte';
+	import { createCheckoutSession } from '$lib/supabase/client';
 
 	export let user;
+	let upgradeLoading = false;
+	let upgradeError = null;
 
 	const dispatch = createEventDispatcher();
 
@@ -17,10 +21,7 @@
 
 		try {
 			submitting = true;
-
 			// For now, we'll just save feedback to user_preferences.feedback
-			// In a real implementation, you might want to create a dedicated feedback table
-
 			// Get current user preferences
 			const currentUser = await getCurrentUser();
 
@@ -55,6 +56,23 @@
 	function resetFeedbackForm() {
 		feedbackText = '';
 		feedbackSubmitted = false;
+	}
+
+	async function handleUpgrade() {
+		try {
+			upgradeLoading = true;
+			upgradeError = null;
+			const url = await createCheckoutSession();
+			window.location.href = url;
+		} catch (err) {
+			upgradeError = err.message;
+			dispatch('toast', {
+				message: 'Failed to start checkout: ' + err.message,
+				type: 'error'
+			});
+		} finally {
+			upgradeLoading = false;
+		}
 	}
 </script>
 
@@ -127,8 +145,8 @@
 			<div class="support-icon">♥</div>
 			<h3 class="support-heading">Why Your Support Matters</h3>
 			<p class="support-text">
-				Taped Chinese was created to make the FSI learning materials accessible to everyone.
-				The core course materials will always remain free, but your subscription helps cover server
+				Taped Chinese was created to make the FSI learning materials accessible to everyone. The
+				core course materials will always remain free, but your subscription helps cover server
 				costs, development time, and enables new features like the Relevant World Practice (RWP)
 				exercises.
 			</p>
@@ -137,7 +155,13 @@
 				exercise per day.
 			</p>
 			<div class="support-action">
-				<button class="tape-button upgrade">Upgrade to Premium</button>
+				<button class="tape-button upgrade" on:click={handleUpgrade} disabled={upgradeLoading}>
+					{upgradeLoading ? 'Loading...' : 'Upgrade to Premium'}
+				</button>
+
+				{#if upgradeError}
+					<p class="mt-2 text-sm text-red-600">{upgradeError}</p>
+				{/if}
 			</div>
 		</div>
 	</section>

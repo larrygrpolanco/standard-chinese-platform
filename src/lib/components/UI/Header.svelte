@@ -99,12 +99,6 @@
 			</div>
 		</a>
 
-		{#if subscription.tier === 'premium'}
-			<span class="ml-2 rounded-full bg-amber-500 px-2 py-0.5 text-xs font-medium text-white">
-				Premium
-			</span>
-		{/if}
-
 		<!-- Desktop Navigation -->
 		<nav class="desktop-nav">
 			<!-- Home link -->
@@ -125,7 +119,10 @@
 
 			<!-- Conditional /profile button -->
 			{#if $authStore}
-				<a href="/profile" class="login-button">
+				<a
+					href="/profile"
+					class="login-button {subscription.tier === 'premium' ? 'premium-button' : ''}"
+				>
 					<span>Profile</span>
 					<div class="login-button-highlight"></div>
 				</a>
@@ -142,6 +139,7 @@
 			isOpen={mobileMenuOpen}
 			{navItems}
 			{coreModules}
+			{subscription}
 			on:toggleMenu={toggleMobileMenu}
 			on:toggleModuleDropdown={toggleModuleDropdown}
 			isLoggedIn={$authStore !== null}
@@ -270,5 +268,13 @@
 		border-top-left-radius: 9999px;
 		border-top-right-radius: 9999px;
 		background-color: rgba(255, 255, 255, 0.2);
+	}
+	/* Add to the style block in the main component */
+	.premium-button {
+		background-color: #ddb967; /* Gold color */
+	}
+
+	.premium-button:hover {
+		background-color: #c9a658; /* Darker gold on hover */
 	}
 </style>

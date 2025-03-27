@@ -1,4 +1,4 @@
-<!-- StoryTape.svelte -->
+<!-- src/lib/components/rwp/StoryTape.svelte -->
 <script>
 	import { checkTTSAvailability, incrementTTSUsage } from '$lib/supabase/client';
 	import AudioPlayer from '$lib/components/AudioPlayer.svelte';
@@ -12,6 +12,7 @@
 	export let storyTitle = ''; // For reference
 	export let language = 'zh'; // Default language (Chinese)
 	export let instructions = ''; // Optional instructions for speech style
+	let ttsStatus;
 
 	// Cache settings
 	const MAX_CACHE_SIZE = 5 * 1024 * 1024; // 5MB max cache size
@@ -45,7 +46,7 @@
 			.replace(/\s+/g, '_')
 			.toLowerCase();
 
-	// Cache management functions (keeping your existing functions)
+	// Cache management functions
 	function getSessionStorageSize() {
 		let total = 0;
 		for (let i = 0; i < sessionStorage.length; i++) {
@@ -124,7 +125,7 @@
 				return;
 			}
 
-			// Call our API endpoint to generate the speech (keep your existing API call)
+			// Call our API endpoint to generate the speech
 			const response = await fetch('/api/tts', {
 				method: 'POST',
 				headers: {
@@ -186,7 +187,10 @@
 	}
 
 	// On mount, check if this audio is already cached
-	onMount(() => {
+	onMount(async () => {
+		// Get TTS availability status on component mount
+		ttsStatus = await checkTTSAvailability();
+
 		const cachedAudio = sessionStorage.getItem(cacheKey);
 		if (cachedAudio) {
 			audioUrl = cachedAudio;
@@ -196,59 +200,68 @@
 			sessionStorage.setItem(`${cacheKey}_meta`, JSON.stringify(metadata));
 		}
 	});
+
+	function goToProfile() {
+		window.location.href = '/profile#subscription';
+	}
 </script>
 
 <section class="section-container">
 	<!-- Audio Player Container -->
-	<div class="audio-player-wrapper bg-beige border-warm-gray rounded-lg border">
-		<div class="audio-player-grid-container p-4">
-			{#if isLoading}
-				<div class="loading-state">
-					<Loader />
-					<p class="text-sm">Creating audio...</p>
+	<div class="audio-player-wrapper">
+		{#if ttsStatus && !ttsStatus.allowed}
+			<!-- Overlay when TTS is unavailable -->
+			<div class="audio-content disabled">
+				<div class="disabled-overlay">
+					{#if ttsStatus.reason === 'TTS requires premium subscription'}
+						<div class="message-container">
+							<h3 class="message-title">Listening Exercises</h3>
+							<p class="message-text">
+								Support Taped Chinese by becoming a subscriber and unlock RWP audio recordings to
+								improve your listening skills.
+							</p>
+							<p class="message-note">
+								You'll always keep access to any practice exercises you've already generated.
+							</p>
+							<button class="subscribe-button" on:click={goToProfile}> Become a Supporter </button>
+						</div>
+					{:else}
+						<div class="message-container">
+							<h3 class="message-title">Daily Limit Reached</h3>
+							<p class="message-text">
+								You've used all your daily audio exercises for today. Don't worry, your limit will
+								reset tomorrow.
+							</p>
+							<p class="message-note">
+								We set these limits to allow fair usage for all supporters.
+							</p>
+						</div>
+					{/if}
 				</div>
-			{:else if error}
-				<div class="error-message">
-					<p>Sorry, there was a problem. Please try again.</p>
-					<button class="retry-button mt-3" on:click={generateSpeech}>Try Again</button>
-				</div>
-			{:else if audioUrl}
-				<div class="audio-player-container">
-					<!-- Small voice selector in top right corner -->
-					<div class="voice-select-container mb-3 text-right">
-						<label for="voice-select" class="text-warm-gray text-xs">Voice:</label>
-						<select
-							id="voice-select"
-							class="voice-select border-warm-gray bg-cream-paper ml-2 rounded border p-1 text-xs"
-							bind:value={selectedVoice}
-							on:change={handleVoiceChange}
-						>
-							{#each voices as voice}
-								<option value={voice.id}>{voice.name}</option>
-							{/each}
-						</select>
+			</div>
+		{:else}
+			<!-- Normal component content -->
+			<div class="audio-player-grid-container">
+				{#if isLoading}
+					<div class="loading-state">
+						<Loader />
+						<p>Creating audio...</p>
 					</div>
-
-					<AudioPlayer audioSrc={audioUrl} />
-
-					<div class="mt-2 flex justify-center">
-						<button class="text-warm-gray hover:text-terracotta text-xs" on:click={clearCache}>
-							Regenerate Audio
-						</button>
+				{:else if error}
+					<div class="error-message">
+						<p>Sorry, there was a problem. Please try again.</p>
+						<button class="retry-button" on:click={generateSpeech}>Try Again</button>
 					</div>
-				</div>
-			{:else}
-				<div class="audio-placeholder-container">
-					<p class="mb-3 text-sm">Hear this story read aloud in Chinese</p>
-
-					<div class="flex flex-col space-y-3">
-						<!-- Voice selector before button when no audio yet -->
+				{:else if audioUrl}
+					<div class="audio-player-container">
+						<!-- Small voice selector in top right corner -->
 						<div class="voice-select-container">
-							<label for="voice-select-initial" class="text-warm-gray text-xs">Voice:</label>
+							<label for="voice-select">Voice:</label>
 							<select
-								id="voice-select-initial"
-								class="voice-select border-warm-gray bg-cream-paper ml-2 rounded border p-1 text-xs"
+								id="voice-select"
+								class="voice-select"
 								bind:value={selectedVoice}
+								on:change={handleVoiceChange}
 							>
 								{#each voices as voice}
 									<option value={voice.id}>{voice.name}</option>
@@ -256,84 +269,117 @@
 							</select>
 						</div>
 
-						<!-- Advanced options toggle -->
-						<div class="flex items-center">
-							<button
-								class="text-warm-gray text-xs underline"
-								on:click={() => (showAdvancedOptions = !showAdvancedOptions)}
-							>
-								{showAdvancedOptions ? 'Hide' : 'Show'} advanced options
+						<AudioPlayer audioSrc={audioUrl} />
+
+						<div class="regenerate-container">
+							<button class="regenerate-button" on:click={clearCache}> Regenerate Audio </button>
+						</div>
+					</div>
+				{:else}
+					<div class="audio-placeholder-container">
+						<p><em>Hear this story read aloud in Chinese</em></p>
+
+						<div class="options-container">
+							<!-- Voice selector before button when no audio yet -->
+							<div class="voice-select-container">
+								<label for="voice-select-initial">Voice:</label>
+								<select id="voice-select-initial" class="voice-select" bind:value={selectedVoice}>
+									{#each voices as voice}
+										<option value={voice.id}>{voice.name}</option>
+									{/each}
+								</select>
+							</div>
+
+							<!-- Advanced options toggle -->
+							<div class="advanced-toggle">
+								<button
+									class="toggle-button"
+									on:click={() => (showAdvancedOptions = !showAdvancedOptions)}
+								>
+									{showAdvancedOptions ? 'Hide' : 'Show'} advanced options
+								</button>
+							</div>
+
+							<!-- Advanced options (instructions) -->
+							{#if showAdvancedOptions}
+								<div class="advanced-options">
+									<label for="custom-instructions"> Speech instructions (optional): </label>
+									<textarea
+										id="custom-instructions"
+										class="instructions-input"
+										rows="2"
+										placeholder="E.g., 'Speak slowly and clearly' or 'Use a cheerful tone'"
+										bind:value={customInstructions}
+									></textarea>
+								</div>
+							{/if}
+
+							<button class="generate-button" on:click={generateSpeech}>
+								<svg
+									class="button-icon"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="2"
+								>
+									<path d="M12 6v12M8 9v6M4 10v4M16 9v6M20 10v4" />
+								</svg>
+								Create Listening Tape
 							</button>
 						</div>
-
-						<!-- Advanced options (instructions) -->
-						{#if showAdvancedOptions}
-							<div class="mt-2">
-								<label for="custom-instructions" class="text-warm-gray mb-1 block text-xs">
-									Speech instructions (optional):
-								</label>
-								<textarea
-									id="custom-instructions"
-									class="border-warm-gray bg-cream-paper w-full rounded border p-2 text-xs"
-									rows="2"
-									placeholder="E.g., 'Speak slowly and clearly' or 'Use a cheerful tone'"
-									bind:value={customInstructions}
-								></textarea>
-							</div>
-						{/if}
-
-						<button class="generate-button mt-2" on:click={generateSpeech}>
-							<svg
-								class="mr-2 h-5 w-5"
-								viewBox="0 0 24 24"
-								fill="none"
-								stroke="currentColor"
-								stroke-width="2"
-							>
-								<path d="M15.5 8.5a7 7 0 110 7m-9-7v7m0 0l3-3m-3 3l-3-3"></path>
-							</svg>
-							Create Audio
-						</button>
 					</div>
-				</div>
-			{/if}
-		</div>
+				{/if}
+			</div>
+		{/if}
 	</div>
 </section>
 
 <style>
+	/* Container styling */
 	.audio-player-wrapper {
 		position: relative;
 		min-height: 180px;
 		overflow: hidden;
+		border: 1px solid var(--color-warm-gray, #a0998a);
+		border-radius: 0.5rem;
+		background-color: var(--color-beige, #f4f1de);
 	}
 
 	.audio-player-grid-container {
 		background-color: var(--color-cream-paper, #f5f2e8);
+		padding: 1rem;
 		/* Vintage paper texture */
 		background-image:
 			url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23a09a8a' fill-opacity='0.05' fill-rule='evenodd'/%3E%3C/svg%3E"),
 			linear-gradient(to bottom, rgba(255, 255, 255, 0.05), rgba(0, 0, 0, 0.02));
 	}
 
+	/* Voice selection styling */
 	.voice-select-container {
 		display: flex;
 		align-items: center;
+		margin-bottom: 0.75rem;
 		justify-content: center;
 	}
 
 	.voice-select {
-		border-color: var(--color-warm-gray);
+		border: 1px solid var(--color-warm-gray, #a0998a);
+		background-color: var(--color-cream-paper, #f5f2e8);
+		border-radius: 0.25rem;
+		padding: 0.25rem 0.5rem;
+		margin-left: 0.5rem;
+		font-size: 0.75rem;
 	}
 
+	/* States styling */
 	.loading-state,
 	.error-message,
 	.audio-placeholder-container {
-		padding: 16px;
+		padding: 1rem;
 		text-align: center;
-		background-color: var(--color-cream-paper);
-		border: 1px dashed var(--color-warm-gray);
-		border-radius: 8px;
+		background-color: var(--color-cream-paper, #f5f2e8);
+		border: 1px dashed var(--color-warm-gray, #a0998a);
+		border-radius: 0.5rem;
 	}
 
 	.loading-state {
@@ -344,42 +390,66 @@
 	}
 
 	.error-message {
-		color: var(--color-terracotta);
+		color: var(--color-terracotta, #d97706);
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		text-align: center;
+		gap: 0.5rem;
 	}
 
+	/* Buttons styling */
 	.retry-button {
-		background-color: var(--color-gold);
-		padding: 8px 16px;
-		border-radius: 4px;
-		font-weight: 600;
-		transition: all 0.2s;
+		background-color: var(--color-terracotta, #d97706);
+		border-radius: 0.375rem;
+		padding: 0.5rem 1rem;
+		font-size: 0.875rem;
+		font-weight: 500;
+		color: white;
+		border: none;
+		cursor: pointer;
+		margin-top: 0.75rem;
+		transition: background-color 0.2s ease;
 	}
 
 	.retry-button:hover {
-		background-color: var(--color-gold-dark, #c4a255);
+		background-color: var(--color-terracotta-dark, #b45309);
 	}
 
 	.audio-placeholder-container {
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		gap: 0.5rem;
+		gap: 1rem;
+	}
+
+	.options-container {
+		display: flex;
+		flex-direction: column;
+		gap: 0.75rem;
+		width: 100%;
+		max-width: 400px;
+		align-items: center;
 	}
 
 	.generate-button {
+		background-color: var(--color-terracotta, #d97706);
 		display: flex;
 		align-items: center;
-		padding: 10px 16px;
-		background-color: var(--color-gold);
-		color: var(--color-charcoal);
-		border-radius: 6px;
-		font-weight: 600;
-		transition: all 0.2s;
+		justify-content: center;
+		border-radius: 0.375rem;
+		padding: 0.5rem 1rem;
+		font-size: 0.875rem;
+		font-weight: 500;
+		color: white;
+		border: none;
+		cursor: pointer;
+		transition: background-color 0.2s ease;
 	}
 
 	.generate-button:hover {
-		background-color: var(--color-gold-dark, #c4a255);
-		transform: translateY(-2px);
+		background-color: var(--color-terracotta-dark, #b45309);
 	}
 
 	.audio-player-container {
@@ -387,52 +457,132 @@
 		flex-direction: column;
 	}
 
-	.generate-button {
-		background-color: var(--terracotta, #d97706);
+	.button-icon {
+		width: 1.25rem;
+		height: 1.25rem;
+		margin-right: 0.5rem;
+	}
+
+	.regenerate-container {
+		display: flex;
+		justify-content: center;
+		margin-top: 0.5rem;
+	}
+
+	.regenerate-button {
+		color: var(--color-warm-gray, #a0998a);
+		font-size: 0.75rem;
+		background: none;
+		border: none;
+		cursor: pointer;
+		text-decoration: underline;
+	}
+
+	.regenerate-button:hover {
+		color: var(--color-terracotta, #d97706);
+	}
+
+	.advanced-toggle {
+		display: flex;
+		align-items: center;
+	}
+
+	.toggle-button {
+		color: var(--color-warm-gray, #a0998a);
+		font-size: 0.75rem;
+		background: none;
+		border: none;
+		cursor: pointer;
+		text-decoration: underline;
+	}
+
+	.advanced-options {
+		margin-top: 0.5rem;
+	}
+
+	.advanced-options label {
+		display: block;
+		margin-bottom: 0.25rem;
+		color: var(--color-warm-gray, #a0998a);
+		font-size: 0.75rem;
+	}
+
+	.instructions-input {
+		width: 100%;
+		border: 1px solid var(--color-warm-gray, #a0998a);
+		background-color: var(--color-cream-paper, #f5f2e8);
+		border-radius: 0.25rem;
+		padding: 0.5rem;
+		font-size: 0.75rem;
+	}
+
+	/* Fixed disabled state styling */
+	.audio-content.disabled {
+		position: relative;
+		height: 100%;
+		min-height: 180px;
+		background-color: var(--color-cream-paper, #f5f2e8);
+		padding: 1rem;
+		/* Same texture as the audio player */
+		background-image:
+			url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23a09a8a' fill-opacity='0.05' fill-rule='evenodd'/%3E%3C/svg%3E"),
+			linear-gradient(to bottom, rgba(255, 255, 255, 0.05), rgba(0, 0, 0, 0.02));
+	}
+
+	.disabled-overlay {
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		background-color: rgba(244, 241, 222, 0.9);
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		border-radius: 0.375rem;
-		padding: 0.5rem 1rem;
-		font-size: 0.875rem;
-		font-weight: 500;
-		color: white;
-		transition: background-color 0.2s ease;
+		z-index: 10;
 	}
 
-	.generate-button:hover {
-		background-color: var(--terracotta-dark, #b45309);
-	}
-
-	.retry-button {
-		background-color: var(--terracotta, #d97706);
-		border-radius: 0.375rem;
-		padding: 0.5rem 1rem;
-		font-size: 0.875rem;
-		font-weight: 500;
-		color: white;
-		transition: background-color 0.2s ease;
-	}
-
-	.retry-button:hover {
-		background-color: var(--terracotta-dark, #b45309);
-	}
-
-	.loading-state {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		justify-content: center;
-		gap: 0.75rem;
-	}
-
-	.error-message {
-		color: var(--terracotta, #d97706);
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		justify-content: center;
+	.message-container {
+		max-width: 90%;
 		text-align: center;
-		gap: 0.25rem;
+		padding: 1rem;
+	}
+
+	.message-title {
+		font-size: 1.125rem;
+		color: var(--color-charcoal, #33312e);
+		margin-bottom: 0.5rem;
+		font-weight: 600;
+	}
+
+	.message-text {
+		color: var(--color-charcoal, #33312e);
+		margin-bottom: 0.5rem;
+		line-height: 1.4;
+		font-size: 0.875rem;
+	}
+
+	.message-note {
+		color: var(--color-warm-gray, #a0998a);
+		font-size: 0.75rem;
+		font-style: italic;
+		margin-bottom: 0.75rem;
+	}
+
+	.subscribe-button {
+		background-color: var(--color-terracotta, #d97706);
+		color: white;
+		border: none;
+		padding: 0.5rem 1rem;
+		border-radius: 0.375rem;
+		font-weight: 500;
+		font-size: 0.875rem;
+		cursor: pointer;
+		transition: all 0.2s ease;
+	}
+
+	.subscribe-button:hover {
+		background-color: var(--color-terracotta-dark, #b45309);
+		transform: translateY(-1px);
 	}
 </style>
