@@ -74,7 +74,7 @@
 				<!-- Right column: Contact & Subscription links -->
 				<div class="footer-column">
 					<h3 class="footer-heading">Contact</h3>
-					<a href="/policies#contact" class="footer-link">Contact Us</a>
+					<a href="/policies#contact" class="footer-link">Contact Me</a>
 
 					<h3 class="footer-heading subscription-heading">Subscription</h3>
 					<a href="/policies#premium" class="footer-link">Subscription Features</a>

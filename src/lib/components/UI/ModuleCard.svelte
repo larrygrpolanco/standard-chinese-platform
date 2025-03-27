@@ -203,7 +203,7 @@
 		position: relative;
 		margin-left: auto;
 		margin-right: auto;
-		margin-bottom: 2rem;
+		/* margin-bottom: 2rem; */
 		width: 100%;
 		max-width: 36rem;
 	}

@@ -1,44 +1,35 @@
 <!-- src/routes/+page.svelte -->
 <script>
 	import { onMount } from 'svelte';
-	import { fade } from 'svelte/transition';
+	import { fade, fly, slide } from 'svelte/transition';
 	import { authStore } from '$lib/stores/authStore';
 	import { getLatestUnit, getUserProgress } from '$lib/supabase/client';
 	import ModuleCard from '$lib/components/UI/ModuleCard.svelte';
+
+	let visible = false;
+
+	// Function to check if element is in viewport
+	function checkVisibility() {
+		const section = document.querySelector('.rwp-section');
+		if (!section) return;
+
+		const rect = section.getBoundingClientRect();
+		const isVisible = rect.top <= window.innerHeight * 0.7;
+
+		if (isVisible) {
+			visible = true;
+		}
+	}
 
 	let latestUnit = null;
 	let completedCount = 0;
 
 	onMount(async () => {
-		// Parallax action for Svelte elements
-		function parallax(node, params = { speed: 0.02, direction: 1 }) {
-			let { speed, direction } = params;
+		// Initial check
+		checkVisibility();
 
-			function updatePosition() {
-				const scrollPosition = window.scrollY;
-				const rect = node.getBoundingClientRect();
-
-				if (rect.top < window.innerHeight && rect.bottom > 0) {
-					node.style.transform = `translateY(${scrollPosition * speed * direction}px)`;
-				}
-			}
-
-			window.addEventListener('scroll', updatePosition);
-
-			// Initial update
-			updatePosition();
-
-			// Clean up when component is destroyed
-			return {
-				destroy() {
-					window.removeEventListener('scroll', updatePosition);
-				},
-				update(newParams) {
-					speed = newParams.speed;
-					direction = newParams.direction;
-				}
-			};
-		}
+		// Add scroll listener
+		window.addEventListener('scroll', checkVisibility);
 
 		// Wait for auth initialization to complete
 		await authStore.initialize();
@@ -57,6 +48,9 @@
 			if (progressData && progressData.length > 0) {
 				completedCount = progressData.filter((item) => item.status === 'completed').length;
 			}
+			return () => {
+				window.removeEventListener('scroll', checkVisibility);
+			};
 		}
 	});
 </script>
@@ -150,65 +144,67 @@
 				<h2 class="section-title">Relevant World Practice (RWP)</h2>
 
 				<div class="rwp-explanation">
-					<div use:parallax={{ speed: 0.02, direction: 1 }} class="explanation-highlight">
-						<p class="highlight-text">
-							Chinese learning that adapts to <em>your</em> life, not the other way around
-						</p>
-					</div>
+					{#if visible}
+						<div in:fade={{ duration: 700, delay: 100 }} class="explanation-highlight">
+							<p class="highlight-text">
+								Exercises that adapt to <em>your</em> story, not the other way around
+							</p>
+						</div>
 
-					<div class="explanation-grid">
-						<div use:parallax={{ speed: 0.01, direction: -1 }} class="explanation-item">
-							<div class="item-number">1</div>
-							<div class="item-content">
-								<h3 class="item-title">Personalized Stories</h3>
-								<p class="item-description">
-									AI-generated stories and dialogs that use each unit's vocabulary in contexts
-									relevant to your life, interests, and goals
-								</p>
+						<div class="explanation-grid">
+							<div in:fly={{ y: 20, duration: 600, delay: 200 }} class="explanation-item">
+								<div class="item-number pulse-animate">1</div>
+								<div class="item-content">
+									<h3 class="item-title">Personalized Stories</h3>
+									<p class="item-description">
+										Generated stories that use each unit's vocabulary and dialogues
+										relevant to your interests and goals
+									</p>
+								</div>
+							</div>
+
+							<div in:fly={{ y: 20, duration: 600, delay: 350 }} class="explanation-item">
+								<div class="item-number pulse-animate">2</div>
+								<div class="item-content">
+									<h3 class="item-title">Custom Audio</h3>
+									<p class="item-description">
+										Listen to your RWPs with text-to-speech voices for
+										extra listening practice
+									</p>
+								</div>
+							</div>
+
+							<div in:fly={{ y: 20, duration: 600, delay: 500 }} class="explanation-item">
+								<div class="item-number pulse-animate">3</div>
+								<div class="item-content">
+									<h3 class="item-title">Targeted Practice</h3>
+									<p class="item-description">
+										Multiple-choice, short-answer, and reflection questions that test your
+										comprehension in meaningful contexts
+									</p>
+								</div>
 							</div>
 						</div>
 
-						<div use:parallax={{ speed: 0.03, direction: 1 }} class="explanation-item">
-							<div class="item-number">2</div>
-							<div class="item-content">
-								<h3 class="item-title">Custom Audio</h3>
-								<p class="item-description">
-									Listen to your personalized content with natural-sounding AI voices for authentic
-									listening practice
-								</p>
-							</div>
+						<div in:fade={{ duration: 700, delay: 700 }} class="rwp-footer">
+							<p class="rwp-tagline">
+								While the classic FSI course excels at teaching structural patterns, RWP bridges the
+								gap between memorization and creative, personally relevant language use.
+							</p>
+
+							<a href="/rwp" class="rwp-button">
+								<span class="button-text">See How It Works</span>
+								<svg class="arrow-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+									<path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2"
+										d="M14 5l7 7m0 0l-7 7m7-7H3"
+									/>
+								</svg>
+							</a>
 						</div>
-
-						<div use:parallax={{ speed: 0.01, direction: -1 }} class="explanation-item">
-							<div class="item-number">3</div>
-							<div class="item-content">
-								<h3 class="item-title">Targeted Practice</h3>
-								<p class="item-description">
-									Multiple-choice, short-answer, and reflection questions that test your
-									comprehension in meaningful contexts
-								</p>
-							</div>
-						</div>
-					</div>
-
-					<div use:parallax={{ speed: 0.02, direction: 1 }} class="rwp-footer">
-						<p class="rwp-tagline">
-							While the classic FSI course excels at teaching structural patterns, RWP bridges the
-							gap between memorization and creative, personally relevant language use.
-						</p>
-
-						<a href="/rwp" class="rwp-button">
-							<span class="button-text">See How It Works</span>
-							<svg class="arrow-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-								<path
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									stroke-width="2"
-									d="M14 5l7 7m0 0l-7 7m7-7H3"
-								/>
-							</svg>
-						</a>
-					</div>
+					{/if}
 				</div>
 			</div>
 		</div>
@@ -219,7 +215,7 @@
 		<div class="stats-container">
 			<!-- Centered heading with decorative elements -->
 			<div class="stats-header">
-				<h2 class="stats-title">That's a lot of Chinese!</h2>
+				<h2 class="stats-title">That's a lot of Chinese</h2>
 			</div>
 
 			<!-- Stat grid -->
@@ -281,10 +277,10 @@
 								d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
 							/>
 						</svg>
-						<h3 class="feature-title">Authentic Materials</h3>
+						<h3 class="feature-title">Comprehension Materials</h3>
 					</div>
 					<p class="feature-description">
-						Created by linguists to train US diplomats - tried, tested, and effective.
+						Created to train US diplomats up to a professional proficiency in a short time.
 					</p>
 				</div>
 
@@ -298,7 +294,7 @@
 								d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"
 							/>
 						</svg>
-						<h3 class="feature-title">Flexible Learning</h3>
+						<h3 class="feature-title">"Modular" Learning</h3>
 					</div>
 					<p class="feature-description">
 						Choose your own path through the material - learn at your own pace and style.
@@ -322,14 +318,10 @@
 					Taped Chinese digitizes the Foreign Service Institute's "Standard Chinese: A Modular
 					Approach" course materials from the 1970s, which were created to be flexible enough to
 					meet the requirements of government agencies and academic institutions. While dated, it is
-					comprehensive, structured, and parts of it still hold up to modern language pedagogy
-					standards.
+					comprehensive, structured, and in the public domain, so its free.
 				</p>
 				<p class="about-text">
-					While the original cassette tapes and materials may be vintage, some of the teaching
-					methods and philosophies still hold up to modern language teaching standards. Our goal is
-					to preserve this resource and make it accessible to modern language learners. Everything
-					is freely available as these materials are in the public domain.
+					While vintage and flawed, these language materials still contain some solid teaching foundations that still hold up to modern language teaching standards. The goal of Taped Chinese is to make these resources accessible digitally, and the added RWPs address the original course's weaknesses while still taking advantage of what it does well, structured comprehensible input. If you find this project valuable, please consider supporting it for $5/month to help with operating costs and future work.
 				</p>
 			</div>
 
@@ -491,12 +483,14 @@
 		display: flex;
 		flex-direction: column;
 		align-items: center;
+		justify-content: center;
 		max-width: 36rem;
 	}
 
 	.resource-button {
 		display: inline-flex;
 		align-items: center;
+		justify-content: center;
 		padding: 0.75rem 1.5rem;
 		background-color: var(--color-cream-dark);
 		border: 2px solid var(--color-text);
@@ -511,6 +505,7 @@
 		margin-bottom: 0.25rem;
 		overflow: hidden;
 		position: relative;
+		width: 100%;
 	}
 
 	.resource-button:hover {
@@ -632,6 +627,29 @@
 		padding: 1rem 1.5rem;
 		margin-bottom: 2rem;
 		border-radius: 0 0.25rem 0.25rem 0;
+		position: relative;
+		overflow: hidden;
+	}
+
+	.explanation-highlight::before {
+		content: '';
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 3px;
+        opacity: .7;
+		background: linear-gradient(-90deg, var(--color-gold), transparent);
+		animation: shimmer 10s infinite;
+	}
+
+	@keyframes shimmer {
+		0% {
+			transform: translateX(-100%);
+		}
+		100% {
+			transform: translateX(100%);
+		}
 	}
 
 	.highlight-text {
@@ -646,6 +664,26 @@
 		font-style: normal;
 		color: var(--color-navy);
 		font-weight: 600;
+		position: relative;
+		display: inline-block;
+	}
+
+	.highlight-text em::after {
+		content: '';
+		position: absolute;
+		bottom: 0;
+		left: 0;
+		width: 100%;
+		height: 2px;
+		background-color: var(--color-navy);
+		transform: scaleX(0);
+		transform-origin: bottom right;
+		transition: transform 0.4s ease-out;
+	}
+
+	.highlight-text:hover em::after {
+		transform: scaleX(1);
+		transform-origin: bottom left;
 	}
 
 	.explanation-grid {
@@ -668,14 +706,31 @@
 		border-radius: 0.5rem;
 		padding: 1rem;
 		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-		transition:
-			transform 0.3s ease,
-			box-shadow 0.3s ease;
+		transition: all 0.3s ease;
+		position: relative;
+		overflow: hidden;
 	}
 
 	.explanation-item:hover {
 		transform: translateY(-3px);
 		box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+	}
+
+	.explanation-item::after {
+		content: '';
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		background: radial-gradient(circle at center, rgba(255, 255, 255, 0.8) 0%, transparent 70%);
+		opacity: 0;
+		transition: opacity 0.4s ease;
+		pointer-events: none;
+	}
+
+	.explanation-item:hover::after {
+		opacity: 0.4;
 	}
 
 	.item-number {
@@ -691,14 +746,74 @@
 		color: white;
 		font-family: var(--font-serif);
 		font-weight: 700;
+		position: relative;
+	}
+
+	.pulse-animate {
+		position: relative;
+	}
+
+	.pulse-animate::after {
+		content: '';
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		border-radius: 50%;
+		animation: pulse 2s ease-out infinite;
+	}
+
+	@keyframes pulse {
+		0% {
+			box-shadow: 0 0 0 0 rgba(125, 140, 92, 0.5);
+		}
+		70% {
+			box-shadow: 0 0 0 10px rgba(125, 140, 92, 0);
+		}
+		100% {
+			box-shadow: 0 0 0 0 rgba(125, 140, 92, 0);
+		}
 	}
 
 	.explanation-item:nth-child(2) .item-number {
 		background-color: var(--color-terracotta);
 	}
 
+	.explanation-item:nth-child(2) .pulse-animate::after {
+		animation: pulse-red 2s ease-out infinite;
+	}
+
+	@keyframes pulse-red {
+		0% {
+			box-shadow: 0 0 0 0 rgba(193, 124, 116, 0.5);
+		}
+		70% {
+			box-shadow: 0 0 0 10px rgba(193, 124, 116, 0);
+		}
+		100% {
+			box-shadow: 0 0 0 0 rgba(193, 124, 116, 0);
+		}
+	}
+
 	.explanation-item:nth-child(3) .item-number {
 		background-color: var(--color-navy);
+	}
+
+	.explanation-item:nth-child(3) .pulse-animate::after {
+		animation: pulse-navy 2s ease-out infinite;
+	}
+
+	@keyframes pulse-navy {
+		0% {
+			box-shadow: 0 0 0 0 rgba(52, 102, 127, 0.5);
+		}
+		70% {
+			box-shadow: 0 0 0 10px rgba(52, 102, 127, 0);
+		}
+		100% {
+			box-shadow: 0 0 0 0 rgba(52, 102, 127, 0);
+		}
 	}
 
 	.item-content {
@@ -711,6 +826,24 @@
 		font-weight: 700;
 		color: var(--color-text);
 		margin: 0 0 0.5rem 0;
+		position: relative;
+		display: inline-block;
+	}
+
+	.item-title::after {
+		content: '';
+		position: absolute;
+		bottom: -2px;
+		left: 0;
+		width: 40px;
+		height: 2px;
+		background-color: currentColor;
+		opacity: 0.4;
+		transition: width 0.3s ease;
+	}
+
+	.explanation-item:hover .item-title::after {
+		width: 100%;
 	}
 
 	.item-description {
@@ -724,6 +857,19 @@
 	.rwp-footer {
 		text-align: center;
 		margin-top: 2rem;
+		position: relative;
+	}
+
+	.rwp-footer::before {
+		content: '';
+		position: absolute;
+		top: -1rem;
+		left: 50%;
+		transform: translateX(-50%);
+		width: 150px;
+		height: 1px;
+		background: linear-gradient(90deg, transparent, var(--color-text-light), transparent);
+		opacity: 0.2;
 	}
 
 	.rwp-tagline {
@@ -739,6 +885,7 @@
 	.rwp-button {
 		display: inline-flex;
 		align-items: center;
+        justify-content: center;
 		padding: 0.5rem 1.5rem;
 		background-color: var(--color-cream-paper);
 		border: 2px solid var(--color-terracotta);
@@ -749,6 +896,24 @@
 		text-decoration: none;
 		box-shadow: 2px 2px 0 var(--color-shadow);
 		transition: all 0.2s ease;
+		position: relative;
+		overflow: hidden;
+        width: 100%;
+	}
+
+	.rwp-button::before {
+		content: '';
+		position: absolute;
+		top: 0;
+		left: -100%;
+		width: 100%;
+		height: 100%;
+		background: rgba(193, 124, 116, 0.1);
+		transition: transform 0.5s ease;
+	}
+
+	.rwp-button:hover::before {
+		transform: translateX(100%);
 	}
 
 	.rwp-button:hover {
