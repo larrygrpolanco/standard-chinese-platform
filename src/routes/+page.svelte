@@ -77,7 +77,7 @@
 			</div>
 
 			<p class="subtitle">
-				Foriegn Service Institute diplomat language training, now digitized and improved
+				Foreign Service Institute diplomat language training, now digitized and improved
 			</p>
 
 			<!-- Core Module Card -->
@@ -157,8 +157,7 @@
 								<div class="item-content">
 									<h3 class="item-title">Personalized Stories</h3>
 									<p class="item-description">
-										Generated stories that use each unit's vocabulary and dialogues
-										relevant to your interests and goals
+										Generated stories that use each unit's vocabulary and dialogues, making them relevant to your interests and goals
 									</p>
 								</div>
 							</div>
@@ -188,7 +187,7 @@
 
 						<div in:fade={{ duration: 700, delay: 700 }} class="rwp-footer">
 							<p class="rwp-tagline">
-								While the classic FSI course excels at teaching structural patterns, RWP bridges the
+								While the classic FSI course excels at teaching language forms, RWP means to bridge the
 								gap between memorization and creative, personally relevant language use.
 							</p>
 
@@ -277,10 +276,10 @@
 								d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
 							/>
 						</svg>
-						<h3 class="feature-title">Comprehension Materials</h3>
+						<h3 class="feature-title">Comprehensive Materials</h3>
 					</div>
 					<p class="feature-description">
-						Created to train US diplomats up to a professional proficiency in a short time.
+						Created to train US diplomats up to a professional proficiency in a relatively short time.
 					</p>
 				</div>
 
@@ -321,7 +320,7 @@
 					comprehensive, structured, and in the public domain, so its free.
 				</p>
 				<p class="about-text">
-					While vintage and flawed, these language materials still contain some solid teaching foundations that still hold up to modern language teaching standards. The goal of Taped Chinese is to make these resources accessible digitally, and the added RWPs address the original course's weaknesses while still taking advantage of what it does well, structured comprehensible input. If you find this project valuable, please consider supporting it for $5/month to help with operating costs and future work.
+					While vintage and flawed, these language materials contain some solid teaching foundations that still hold up to modern language teaching standards. The goal of Taped Chinese is to make these resources accessible digitally, and the added RWPs address the original course's weaknesses while still taking advantage of what it does well, structured comprehensible input. If you find this project valuable, please consider supporting it for $5/month to help with operating costs and future work.
 				</p>
 			</div>
 

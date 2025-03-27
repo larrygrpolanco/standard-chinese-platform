@@ -135,10 +135,15 @@
 			</div>
 
 			<p class="page-description">
-				<br />
-				Explore all 9 core modules of the FSI Standard Chinese course. These materials were originally
-				developed for U.S. diplomats and come with authentic vintage audio recordings from the original
-				tape collection.
+
+				Explore the 9 core modules of the FSI Standard Chinese: A Modular Approach. These modules are
+				designed to break down Mandarin systematically and provide practical language skills.
+			</p>
+			<p class="resource-description">
+				Please note, this resource is not meant to be a standalone learning solution. Instead, it works
+				best when used with Chinese language classes or other practice methods.
+				If Pinyin and Chinese characters are entirely new to you—or if you're seeking a comprehensive
+				refresher—be sure to explore the resource modules in the Guide page.
 			</p>
 		</header>
 
@@ -302,11 +307,21 @@
 
 	.page-description {
 		margin-top: 1.5rem;
-		max-width: 36rem;
+		/* max-width: 36rem; */
 		font-family: 'Work Sans', sans-serif;
 		line-height: 1.625;
 		color: #33312e;
 		opacity: 0.8;
+	}
+
+	.resource-description {
+		font-family: var(--font-sans);
+		/* max-width: 36rem; */
+		font-size: 0.875rem;
+		font-style: italic;
+		color: var(--color-text);
+		opacity: 0.6;
+
 	}
 
 	/* Module cards container */

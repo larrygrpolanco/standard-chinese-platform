@@ -65,7 +65,7 @@
 			</p>
 
 			<div class="header-buttons">
-				<a href="/modules" class="primary-button">
+				<!-- <a href="/modules" class="primary-button">
 					Get Started
 					<svg class="button-arrow" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 						<path
@@ -75,7 +75,7 @@
 							d="M14 5l7 7m0 0l-7 7m7-7H3"
 						/>
 					</svg>
-				</a>
+				</a> -->
 				<!-- Changed from button to anchor linking to more-info page -->
 				<a href="/resource/more-info" class="secondary-button">
 					A Deeper Look
@@ -91,14 +91,14 @@
 			</div>
 		</header>
 
-        <div id="learning-guide" class="content-section">
+		<div id="learning-guide" class="content-section">
 			<h2 class="section-title">Why FSI</h2>
 			<div class="section-content">
 				<p>
 					The Foreign Service Institute (FSI) materials are in the public domain, free, and
 					exceptionally well-structured. However, these resources are decades old, which makes them
 					difficult to access and use effectively. This platform digitizes and modernizes these
-					valuable materials, making them more accessible to leaners.
+					materials, making them more accessible to learners.
 				</p>
 			</div>
 		</div>
@@ -121,28 +121,30 @@
 				<div class="resource-module-warning">
 					<p>
 						<strong>Note:</strong> This course will not be easy for complete beginners as it was made
-						to be used along with classroom learning. It should be used as a supplement or for someone
-						looking to brush up. The resource module tapes above cover a lot of the basics, but they
-						are dense, repative, and possibly soul crushingly boring.
+						to be used along with classroom learning. The resource module tapes above cover a lot of
+						the basics, but they are dense, repetive, and possibly soul crushingly boring.
 					</p>
 				</div>
 			</div>
 		</div>
 
 		<!-- Learning Guide Sections -->
-		
 
 		<div class="content-section">
 			<h2 class="section-title">Problems with FSI</h2>
 			<div class="section-content">
 				<p>
-					It is old, so it needs to be used to the best of its ability. This will not help you too
-					much with speaking and some language is outdated, but language form does not change as
-					fast as vocabulary so this is a great resource for practicing listening.
+					It is old, you will learn the Chinese word for comrade. It needs to be used to the best of
+					its ability. FSI Standard Chinese is great for practicing listening, vocabulary and
+					grammar. This resource alone will not help you too much with speaking skills, but
+					improving your listening is vital to being able to respond.
 				</p>
 				<p>
-					One of its biggest weaknesses, over focus on form, can become a strength. This is why I
-					did not include the drill tapes. This is also boring so how do we use it?
+					One of its biggest weaknesses is an overfocus on form. FSI courses are famous for their
+					drills and their tedium. Most modern language courses do not have hours of drills anymore
+					for a good reason. The drill tapes were not added to this website. These weaknesses can
+					become a strength if used as a supplement to learning parts of the language. So how do we
+					best use this resource?
 				</p>
 			</div>
 		</div>
@@ -151,15 +153,15 @@
 			<h2 class="section-title">How to Use This Resource</h2>
 			<div class="section-content">
 				<p>
-					It is called a modular approach because you can pick and choose what you need. The clear
-					way is listening to the review tapes then look over vocabulary then try the exercises and
-					finally the RWP.
+					It is called a modular approach because you can pick and choose what you need. The
+					straightforward way is to go through each unit starting from first to last, listening to
+					the two review tapes for each unit, then complete the exercise tapes and questions.
 				</p>
 				<p>
-					But I also recommend going backwards starting with whichever module you need and with the
-					exercises or the RWP. Test yourself and if it is easy keep skipping the previous steps as
-					they are meant to build you up. However if you find the RWP difficult try the exercises
-					and if that is hard then listen to the review and if that is hard try an earlier module.
+					But I also recommend starting with whichever module you need and with the exercises or the
+					RWP. Test yourself and if it is easy keep following the study flow that works for you.
+					However if you find the RWP difficult, then try the exercises and if that is hard, then
+					listen to the review, and if it still isn't clicking, try going back to an earlier unit.
 				</p>
 				<p>
 					This course is structured really well and if you start from beginning to end you will be
@@ -317,7 +319,7 @@
 		color: #33312e;
 		margin-bottom: 1rem;
 		position: relative;
-        margin-top: 0;
+		margin-top: 0;
 		padding-bottom: 0.5rem;
 	}
 
@@ -343,8 +345,8 @@
 
 	/* Resource modules warning */
 	.resource-module-warning {
-		padding: 1rem;
-		margin: 1.5rem;
+		padding: .5rem 1rem;
+		margin: 0.5rem;
 		background-color: rgba(193, 124, 116, 0.1);
 		border-left: 4px solid #c17c74;
 		border-radius: 0.25rem;
@@ -365,7 +367,7 @@
 		opacity: 0.7;
 	}
 
-    /* Info link */
+	/* Info link */
 	.info-link {
 		display: inline-flex;
 		align-items: center;
