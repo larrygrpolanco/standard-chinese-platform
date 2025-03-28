@@ -853,10 +853,17 @@ export async function createCustomerPortalSession() {
 
 // Google OAuth
 export async function signInWithGoogle() {
+	// Get the current domain, defaulting to production URL if not in development
+	const isDevelopment = window.location.hostname === 'localhost';
+
+	const redirectTo = isDevelopment
+		? `${window.location.origin}/auth/callback`
+		: `https://www.tapedchinese.com/auth/callback`;
+
 	const { data, error } = await supabase.auth.signInWithOAuth({
 		provider: 'google',
 		options: {
-			redirectTo: `${window.location.origin}/profile`
+			redirectTo
 		}
 	});
 

@@ -67,7 +67,8 @@
 				<div class="footer-column">
 					<h3 class="footer-heading">Information</h3>
 					<nav class="footer-nav">
-						<a href="/policies" class="footer-link">Terms & Policies</a>
+						<a href="/policies" class="footer-link">Privacy Policy</a>
+                        <a href="/policies#terms" class="footer-link">Terms of Service</a>
 					</nav>
 				</div>
 

@@ -90,11 +90,11 @@
 		<div class="policies-nav">
 			<h2 class="nav-title">Policies</h2>
 			<ul class="nav-links">
-				<li><a href="#terms">Terms of Service</a></li>
 				<li><a href="#privacy">Privacy Policy</a></li>
 				<li><a href="#premium">Premium Features</a></li>
 				<li><a href="#refunds">Refund Policy</a></li>
 				<li><a href="#cancellation">Cancellation Policy</a></li>
+				<li><a href="#terms">Terms of Service</a></li>
 				<li><a href="#contact">Contact Us</a></li>
 			</ul>
 
@@ -110,81 +110,6 @@
 		<div class="policies-content">
 			<h1 class="page-title">Policies & Terms</h1>
 			<div class="title-underline"></div>
-
-			<!-- Terms of Service -->
-			<section id="terms" class="policy-section">
-				<h2 class="section-title">Terms of Service</h2>
-
-				<div class="section-content">
-					<p>
-						Welcome to Taped Chinese. By using our website, you agree to these Terms of Service.
-					</p>
-
-					<h3>1. About Our Service</h3>
-					<p>
-						Taped Chinese is an educational platform that digitizes the Foreign Service Institute's
-						"Standard Chinese: A Modular Approach" course materials. We offer both free and premium
-						subscription services.
-					</p>
-
-					<h3>2. Account Responsibilities</h3>
-					<p>
-						You are responsible for maintaining the confidentiality of your account information and
-						for all activities that occur under your account. You must immediately notify us of any
-						unauthorized use of your account.
-					</p>
-
-					<h3>3. Acceptable Use</h3>
-					<p>You agree not to:</p>
-					<ul>
-						<li>Use the service for any illegal purpose or in violation of any laws</li>
-						<li>Attempt to gain unauthorized access to any part of the service</li>
-						<li>Interfere with or disrupt the service or servers</li>
-						<li>Scrape or collect data from the service without permission</li>
-						<li>Share your account or subscription benefits with others</li>
-					</ul>
-
-					<h3>4. Content and Intellectual Property</h3>
-					<p>
-						The core FSI materials are in the public domain. Our digitized interface, design, and
-						additional features (such as RWP exercises) are protected by intellectual property laws.
-						You may not reproduce, distribute, modify, or create derivative works based on these
-						elements without permission.
-					</p>
-
-					<h3>5. User-Generated Content</h3>
-					<p>
-						By submitting feedback or other content to our site, you grant us a non-exclusive,
-						royalty-free license to use, reproduce, and display such content in connection with
-						providing and promoting the service.
-					</p>
-
-					<h3>6. Subscription Terms</h3>
-					<p>
-						Premium subscriptions are charged on a recurring basis. You can cancel at any time
-						through your account page. For more details, see our Refund and Cancellation policies.
-					</p>
-
-					<h3>7. Disclaimer of Warranties</h3>
-					<p>
-						The service is provided "as is" without warranties of any kind, either express or
-						implied. We do not guarantee that the service will be error-free or uninterrupted.
-					</p>
-
-					<h3>8. Limitation of Liability</h3>
-					<p>
-						To the maximum extent permitted by law, Taped Chinese shall not be liable for any
-						indirect, incidental, special, consequential, or punitive damages resulting from your
-						use or inability to use the service.
-					</p>
-
-					<h3>9. Changes to Terms</h3>
-					<p>
-						We may modify these terms at any time. Continued use of the service after any changes
-						indicates your acceptance of the modified terms.
-					</p>
-				</div>
-			</section>
 
 			<!-- Privacy Policy -->
 			<section id="privacy" class="policy-section">
@@ -376,6 +301,81 @@
 						You can reactivate your subscription at any time. If you reactivate during the same
 						billing period in which you cancelled, your premium access will simply continue without
 						interruption.
+					</p>
+				</div>
+			</section>
+
+			<!-- Terms of Service -->
+			<section id="terms" class="policy-section">
+				<h2 class="section-title">Terms of Service</h2>
+
+				<div class="section-content">
+					<p>
+						Welcome to Taped Chinese. By using our website, you agree to these Terms of Service.
+					</p>
+
+					<h3>1. About Our Service</h3>
+					<p>
+						Taped Chinese is an educational platform that digitizes the Foreign Service Institute's
+						"Standard Chinese: A Modular Approach" course materials. We offer both free and premium
+						subscription services.
+					</p>
+
+					<h3>2. Account Responsibilities</h3>
+					<p>
+						You are responsible for maintaining the confidentiality of your account information and
+						for all activities that occur under your account. You must immediately notify us of any
+						unauthorized use of your account.
+					</p>
+
+					<h3>3. Acceptable Use</h3>
+					<p>You agree not to:</p>
+					<ul>
+						<li>Use the service for any illegal purpose or in violation of any laws</li>
+						<li>Attempt to gain unauthorized access to any part of the service</li>
+						<li>Interfere with or disrupt the service or servers</li>
+						<li>Scrape or collect data from the service without permission</li>
+						<li>Share your account or subscription benefits with others</li>
+					</ul>
+
+					<h3>4. Content and Intellectual Property</h3>
+					<p>
+						The core FSI materials are in the public domain. Our digitized interface, design, and
+						additional features (such as RWP exercises) are protected by intellectual property laws.
+						You may not reproduce, distribute, modify, or create derivative works based on these
+						elements without permission.
+					</p>
+
+					<h3>5. User-Generated Content</h3>
+					<p>
+						By submitting feedback or other content to our site, you grant us a non-exclusive,
+						royalty-free license to use, reproduce, and display such content in connection with
+						providing and promoting the service.
+					</p>
+
+					<h3>6. Subscription Terms</h3>
+					<p>
+						Premium subscriptions are charged on a recurring basis. You can cancel at any time
+						through your account page. For more details, see our Refund and Cancellation policies.
+					</p>
+
+					<h3>7. Disclaimer of Warranties</h3>
+					<p>
+						The service is provided "as is" without warranties of any kind, either express or
+						implied. We do not guarantee that the service will be error-free or uninterrupted.
+					</p>
+
+					<h3>8. Limitation of Liability</h3>
+					<p>
+						To the maximum extent permitted by law, Taped Chinese shall not be liable for any
+						indirect, incidental, special, consequential, or punitive damages resulting from your
+						use or inability to use the service.
+					</p>
+
+					<h3>9. Changes to Terms</h3>
+					<p>
+						We may modify these terms at any time. Continued use of the service after any changes
+						indicates your acceptance of the modified terms.
 					</p>
 				</div>
 			</section>
