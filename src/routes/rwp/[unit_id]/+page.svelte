@@ -37,7 +37,7 @@
 	let user;
 	let unitVocabulary = [];
 	let generationPhase = 'init';
-	let debug = false; 
+	let debug = false;
 
 	// Collapsible panel state - only for context panel
 	let contextPanelOpen = false; // Open by default for first-time users
@@ -207,7 +207,9 @@
 						<span class="module-badge-text">RWP</span>
 					</a>
 					<div class="dropdown-wrapper">
-						<UnitDropdown currentUnitId={unitId.toString()} currentUnit={unitData} />
+						{#if unitData && unitData.module && unitData.module.id}
+							<UnitDropdown currentUnitId={unitId.toString()} currentUnit={unitData} />
+						{/if}
 					</div>
 				</div>
 
@@ -542,29 +544,29 @@
 	}
 
 	.module-badge {
-    display: flex;
-    height: 3rem;
-    min-width: 3rem;
-    padding: 0 0.75rem;
-    align-items: center;
-    justify-content: center;
-    border-radius: 9999px;
-    background-color: #c17c74;
-    color: white;
-    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-    transition: transform 0.2s;
-}
+		display: flex;
+		height: 3rem;
+		min-width: 3rem;
+		padding: 0 0.75rem;
+		align-items: center;
+		justify-content: center;
+		border-radius: 9999px;
+		background-color: #c17c74;
+		color: white;
+		box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+		transition: transform 0.2s;
+	}
 
-.module-badge:hover {
-    transform: scale(1.05);
-}
+	.module-badge:hover {
+		transform: scale(1.05);
+	}
 
-.module-badge-text {
-    font-family: 'Arvo', serif;
-    font-size: 1.25rem;
-    font-weight: 700;
-    white-space: nowrap;
-}
+	.module-badge-text {
+		font-family: 'Arvo', serif;
+		font-size: 1.25rem;
+		font-weight: 700;
+		white-space: nowrap;
+	}
 
 	.dropdown-wrapper {
 		position: relative;
