@@ -184,17 +184,11 @@
 		letter-spacing: 0.05em;
 	}
 
-	/* Navigation buttons styling */
+	/* Navigation buttons styling
 	.navigation-buttons {
 		display: flex;
 		gap: 4px;
-	}
-
-	/* Navigation buttons styling */
-	.navigation-buttons {
-		display: flex;
-		gap: 4px;
-	}
+	} */
 
 	/* Button shadow and 3D effect */
 
@@ -229,12 +223,12 @@
 		transition: all 0.1s ease;
 	}
 
-	.button-icon {
+	/* .button-icon {
 		width: 45.305px;
 		height: 28px;
 		position: relative;
 		z-index: 2;
-	}
+	} */
 
 	/* Make sure SVG is visible */
 	.nav-button svg {

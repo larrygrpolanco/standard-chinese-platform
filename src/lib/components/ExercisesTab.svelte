@@ -241,13 +241,13 @@
 </div>
 
 <style>
-	.section-header {
+	/* .section-header {
 		font-family: 'Arvo', serif;
 		font-size: 1.5rem;
 		color: var(--color-charcoal);
 		margin-bottom: 1rem;
 		font-weight: 500;
-	}
+	} */
 
 	/* Vintage card styling */
 	.exercise-card {
@@ -364,7 +364,7 @@
 		padding: 1rem 1.5em;
 	}
 
-	.exercise-title {
+	/* .exercise-title {
 		font-family: 'Arvo', serif;
 		font-size: 1.25rem;
 		font-weight: 600;
@@ -372,7 +372,7 @@
 		margin-bottom: 1rem;
 		padding-bottom: 0.5rem;
 		border-bottom: 1px dashed var(--color-warm-gray);
-	}
+	} */
 
 	/* New styles for multiple page display */
 	.exercise-pages {
@@ -479,14 +479,14 @@
 		transform: translateX(0);
 	}
 
-	.page-indicator {
+	/* .page-indicator {
 		text-align: center;
 		font-size: 0.875rem;
 		color: var(--color-charcoal);
 		opacity: 0.7;
 		margin-top: 0.5rem;
 		font-family: 'Courier New', monospace;
-	}
+	} */
 
 	/* Image loader styling */
 	.image-loader {

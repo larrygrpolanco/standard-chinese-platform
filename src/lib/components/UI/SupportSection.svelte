@@ -202,7 +202,7 @@
 		align-items: center;
 	}
 
-	.premium-badge {
+	/* .premium-badge {
 		display: inline-block;
 		background: linear-gradient(135deg, #ddb967 0%, #c9a043 100%);
 		color: #33312e;
@@ -213,7 +213,7 @@
 		margin-top: 0.25rem;
 		margin-bottom: 0.5rem;
 		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-	}
+	} */
 
 	.benefits {
 		padding: 0.5rem;

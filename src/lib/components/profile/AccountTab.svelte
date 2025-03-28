@@ -132,7 +132,7 @@
 
 		<!-- Password Change -->
 		<div class="management-item">
-			<h3 class="subsection-title"></h3>
+			<!-- <h3 class="subsection-title">Password</h3> -->
 			{#if !changePasswordVisible}
 				<button class="tape-button secondary" on:click={() => (changePasswordVisible = true)}>
 					Change Password
@@ -259,13 +259,13 @@
 		color: #33312e;
 	}
 
-	.subsection-title {
+	/* .subsection-title {
 		font-family: 'Work Sans', sans-serif;
 		font-size: 1rem;
 		font-weight: 600;
 		margin-bottom: 0.5rem;
 		color: #555;
-	}
+	} */
 
 	.management-item {
 		/* margin-bottom: 1.5rem; */

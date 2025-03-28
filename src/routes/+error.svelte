@@ -1,4 +1,4 @@
-<!-- <script>
+<script>
 	import { page } from '$app/stores';
 </script>
 
@@ -21,4 +21,4 @@
 		margin: 0 auto;
 		text-align: center;
 	}
-</style> -->
+</style>

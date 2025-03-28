@@ -294,10 +294,10 @@
 		transform: translateX(0.25rem);
 	}
 
-	.large-button {
+	/* .large-button {
 		padding: 0.75rem 1.5rem;
 		font-size: 1.1rem;
-	}
+	} */
 
 	/* Content sections */
 	.content-section {
@@ -417,12 +417,12 @@
 		padding-bottom: 0.25rem;
 	}
 
-	.support-note {
+	/* .support-note {
 		background-color: rgba(193, 124, 116, 0.1);
 		border-left: 4px solid #c17c74;
 		border-radius: 0.25rem;
 		padding: 1rem;
-	}
+	} */
 
 	/* Info link */
 	.info-link {

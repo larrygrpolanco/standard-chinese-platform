@@ -534,7 +534,7 @@
 		color: var(--tape-dark);
 	}
 
-	.click-helper {
+	/* .click-helper {
 		margin-top: 1rem;
 		text-align: center;
 	}
@@ -544,7 +544,7 @@
 		color: var(--tape-muted);
 		font-style: italic;
 		margin: 0;
-	}
+	} */
 
 	/* Animations */
 	@keyframes slight-wobble {

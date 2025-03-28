@@ -384,9 +384,9 @@
 			box-shadow 0.1s ease;
 	}
 
-	.cassette-tape:hover {
-		/* background-image: radial-gradient(circle, #e8e5d7, #e6dfc5, #e6d9b4, #e5d3a2, #e6cc91); */
-	}
+	/* .cassette-tape:hover {
+		background-image: radial-gradient(circle, #e8e5d7, #e6dfc5, #e6d9b4, #e5d3a2, #e6cc91);
+	} */
 
 	.cassette-tape:active,
 	.cassette-tape.pressed {

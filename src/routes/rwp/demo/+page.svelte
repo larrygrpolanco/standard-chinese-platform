@@ -1061,11 +1061,11 @@
 		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 	}
 
-	.cassette-large {
+	/* .cassette-large {
 		width: 48px;
 		height: 48px;
 		color: var(--color-warm-gray, #a0998a);
-	}
+	} */
 
 	.empty-state-title {
 		font-family: 'Arvo', 'DM Serif Display', serif;

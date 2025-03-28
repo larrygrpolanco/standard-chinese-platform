@@ -89,10 +89,10 @@
 		color: var(--color-charcoal, #33312e);
 	}
 
-	.note-content small {
+	/* .note-content small {
 		color: var(--color-warm-gray, #a0998a);
 		font-style: italic;
-	}
+	} */
 
 	.empty-state {
 		text-align: center;

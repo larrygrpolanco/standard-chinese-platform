@@ -277,10 +277,10 @@
 			display: none; /* Chrome, Safari, Edge */
 		}
 
-		.tab-button {
+		/* .tab-button {
 			flex: 0 0 auto;
 			font-size: 0.9rem;
 			padding: 0.5rem 0.75rem;
-		}
+		} */
 	}
 </style>

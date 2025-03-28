@@ -379,10 +379,10 @@
 		border-top: 1px solid #a0998a;
 	}
 
-	.login-text {
+	/* .login-text {
 		color: #c17c74;
 		font-weight: 500;
-	}
+	} */
     
 	.mobile-login-button {
 		position: relative;

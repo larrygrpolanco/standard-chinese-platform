@@ -241,10 +241,10 @@
 		margin: 0 0 1rem;
 	}
 
-	.attribution {
+	/* .attribution {
 		font-size: 0.8rem;
 		color: #665e4d;
-	}
+	} */
 
 	.copyright {
 		font-size: 0.875rem;
@@ -272,9 +272,9 @@
 		animation: rotate 20s linear infinite reverse;
 	}
 
-	.scanner-line {
+	/* .scanner-line {
 		animation: scan 4s ease-in-out infinite;
-	}
+	} */
 
 	/* Responsive adjustments */
 	@media (max-width: 768px) {
@@ -311,12 +311,6 @@
 		font-size: 0.875rem;
 		color: #33312e;
 		margin-bottom: 0.5rem;
-	}
-
-	.attribution {
-		font-size: 0.875rem;
-		color: #33312e;
-		margin-bottom: 0.75rem;
 	}
 
 	.footer-note {

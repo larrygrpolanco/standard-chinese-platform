@@ -601,11 +601,11 @@
 		margin-bottom: 1rem;
 	}
 
-	.connection-label {
+	/* .connection-label {
 		font-weight: 500;
 		color: #5c5c5c;
 		margin-bottom: 0.5rem;
-	}
+	} */
 
 	.connections-list {
 		list-style: none;
