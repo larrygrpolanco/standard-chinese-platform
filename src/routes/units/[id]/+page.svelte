@@ -67,22 +67,40 @@
 		error = null;
 
 		try {
-			unitData = await getUnitBasicInfo(unitId);
+			// Use Promise.race to implement a timeout
+			const timeoutPromise = new Promise((_, reject) => {
+				setTimeout(() => reject(new Error('Database query timeout')), 10000);
+			});
+			
+			const dataPromise = getUnitBasicInfo(unitId);
+			unitData = await Promise.race([dataPromise, timeoutPromise]);
 
 			if (!unitData) {
 				error = 'Unit not found';
 			} else {
-				// Load initial tab data
-				await loadTabData(activeTab);
-
+				// Load initial tab data with Promise.all for better performance
+				const promises = [loadTabData(activeTab)];
+				
 				// Load user progress if logged in
 				if (user) {
-					userProgress = await getUserProgress(unitId);
+					promises.push(getUserProgress(unitId).then(progress => {
+						userProgress = progress;
+					}));
 				}
+				
+				// Wait for all data to load with timeout protection
+				await Promise.race([
+					Promise.all(promises),
+					new Promise((_, reject) => setTimeout(() => reject(new Error('Tab data timeout')), 8000))
+				]);
 			}
 		} catch (err) {
 			console.error('Error loading unit:', err);
-			error = 'Failed to load unit data';
+			if (err.message.includes('timeout')) {
+				error = 'Loading took too long. Please try refreshing the page.';
+			} else {
+				error = 'Failed to load unit data';
+			}
 		} finally {
 			loading = false;
 		}

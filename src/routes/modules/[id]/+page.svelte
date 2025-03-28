@@ -71,35 +71,68 @@
 		]
 	};
 	onMount(async () => {
+		loading = true;
 		const moduleId = $page.params.id;
+		let hasTimedOut = false;
 
-		// Fetch module and units
-		module = await getModuleById(moduleId);
-		if (module) {
-			units = await getUnitsByModuleId(moduleId);
-
-			// Fetch user progress for all units
-			const progressData = await getUserProgress();
-
-			// Create a lookup map of unit completion status
-			unitProgressMap = progressData.reduce((map, progress) => {
-				map[progress.unit_id] = progress.status === 'completed';
-				return map;
-			}, {});
-		}
-		loading = false;
-
-		// Staggered reveal of units after loading is complete
-		if (units.length > 0) {
-			// Start with empty array
-			visibleUnits = [];
-
-			// Show each unit with a delay
-			units.forEach((unit, index) => {
+		try {
+			// Set up a master timeout for the entire data loading process
+			const timeoutPromise = new Promise((_, reject) => {
 				setTimeout(() => {
-					visibleUnits = [...visibleUnits, unit.id];
-				}, 150 * index);
+					hasTimedOut = true;
+					reject(new Error('Data loading timeout'));
+				}, 8000);
 			});
+			
+			// Create promise for module and units data
+			const moduleDataPromise = (async () => {
+				// Fetch module first
+				module = await getModuleById(moduleId);
+				
+				if (module) {
+					// Fetch units and user progress in parallel
+					const [unitsData, progressData] = await Promise.all([
+						getUnitsByModuleId(moduleId),
+						getUserProgress().catch(err => {
+							console.error('Error fetching user progress:', err);
+							return [];
+						})
+					]);
+					
+					units = unitsData;
+					
+					// Create a lookup map of unit completion status
+					unitProgressMap = progressData.reduce((map, progress) => {
+						map[progress.unit_id] = progress.status === 'completed';
+						return map;
+					}, {});
+				}
+			})();
+			
+			// Race the data loading against the timeout
+			await Promise.race([moduleDataPromise, timeoutPromise]);
+			
+		} catch (err) {
+			console.error('Error loading module data:', err);
+			if (hasTimedOut) {
+				// If we hit the timeout but still have basic module data, show what we have
+				console.warn('Module data loading timed out, showing partial data');
+			}
+		} finally {
+			loading = false;
+			
+			// Staggered reveal of units after loading is complete
+			if (units.length > 0) {
+				// Start with empty array
+				visibleUnits = [];
+				
+				// Show each unit with a delay
+				units.forEach((unit, index) => {
+					setTimeout(() => {
+						visibleUnits = [...visibleUnits, unit.id];
+					}, 100 * index); // Slightly faster animation
+				});
+			}
 		}
 	});
 

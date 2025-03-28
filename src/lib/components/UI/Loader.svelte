@@ -3,6 +3,9 @@
 
 	// Props with defaults
 	export let message = 'Loading tape...';
+	
+	// Add a safety mechanism to protect against potentially stuck loaders
+	let safetyTimeoutId;
 
 	// Animation states
 	let counter = 0;

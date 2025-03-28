@@ -15,8 +15,20 @@
 	let message = '';
 
 	// Initialize auth store when component mounts
-	onMount(() => {
-		authStore.initialize();
+	onMount(async () => {
+		try {
+			// Initialize with a timeout to prevent hanging
+			const initPromise = authStore.initialize();
+			const timeoutPromise = new Promise((_, reject) => 
+				setTimeout(() => reject(new Error("Auth initialization timeout")), 5000)
+			);
+			
+			await Promise.race([initPromise, timeoutPromise]);
+		} catch (err) {
+			console.error("Auth component initialization error:", err);
+			// Reset loading state if initialization times out
+			loading = false;
+		}
 	});
 
 	async function handleGoogleSignIn() {
@@ -27,6 +39,14 @@
 		try {
 			await signInWithGoogle();
 			// No need to redirect, OAuth will handle it
+			
+			// Set a timeout to reset loading state if OAuth redirect doesn't happen
+			setTimeout(() => {
+				if (loading) {
+					console.log('OAuth redirect timeout - resetting loading state');
+					loading = false;
+				}
+			}, 5000);
 		} catch (e) {
 			console.error('Google sign-in error:', e);
 			error = e.message || 'Authentication error';
@@ -72,12 +92,24 @@
 					return;
 				}
 
-				await signIn(email, password);
+				// Set a timeout for the sign-in operation
+				const signInPromise = signIn(email, password);
+				const timeoutPromise = new Promise((_, reject) => 
+					setTimeout(() => reject(new Error("Sign in timed out")), 8000)
+				);
+				
+				await Promise.race([signInPromise, timeoutPromise]);
+				
+				// Only try to navigate if we haven't already timed out
 				goto('/'); // Redirect to home after login
 			}
 		} catch (e) {
 			console.error('Auth error:', e);
-			error = e.message || 'Authentication error';
+			if (e.message.includes("timed out")) {
+				error = "Sign in is taking longer than expected. Please refresh the page and try again.";
+			} else {
+				error = e.message || 'Authentication error';
+			}
 		} finally {
 			loading = false;
 		}

@@ -5,9 +5,30 @@
 	import { authStore } from '$lib/stores/authStore';
 	import Header from '$lib/components/UI/Header.svelte';
 	import Breadcrumb from '$lib/components/UI/Breadcrumb.svelte';
+	import { navigating } from '$app/stores';
+	import { tick } from 'svelte';
 
-	onMount(() => {
-		authStore.initialize();
+	let isLoading = false;
+	
+	// Track page navigation state
+	$: if ($navigating) {
+		isLoading = true;
+		console.log("Page navigation started", $navigating?.to?.url?.pathname);
+	} else if (isLoading) {
+		// Navigation completed
+		tick().then(() => {
+			isLoading = false;
+			console.log("Page navigation completed");
+		});
+	}
+
+	onMount(async () => {
+		// Initialize auth store and wait for it to complete
+		try {
+			await authStore.initialize();
+		} catch (error) {
+			console.error("Auth initialization failed:", error);
+		}
 	});
 </script>
 
