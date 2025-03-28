@@ -42,12 +42,35 @@
 		blinkerInterval = setInterval(() => {
 			blinker = !blinker;
 		}, 800);
+		
+		// Safety timeout - if a loader is visible for more than 30 seconds,
+		// it might be stuck due to a failed async operation
+		safetyTimeoutId = setTimeout(() => {
+			console.warn(`Loader showing "${message}" has been visible for 30+ seconds, might be stuck`);
+			
+			// Track loader stuck event in session storage for diagnostics
+			try {
+				const stuckLoaders = JSON.parse(sessionStorage.getItem('stuckLoaders') || '[]');
+				stuckLoaders.push({
+					message,
+					timestamp: new Date().toISOString(),
+					location: window.location.pathname
+				});
+				sessionStorage.setItem('stuckLoaders', JSON.stringify(stuckLoaders));
+				
+				// Log to console for debugging
+				console.warn('Stuck loaders history:', stuckLoaders);
+			} catch (err) {
+				console.error('Error tracking stuck loader:', err);
+			}
+		}, 30000); // 30 seconds threshold
 	});
 
 	onDestroy(() => {
 		clearInterval(counterInterval);
 		clearInterval(dotsInterval);
 		clearInterval(blinkerInterval);
+		clearTimeout(safetyTimeoutId); // Clear safety timeout on unmount
 	});
 
 	// Format counter display
