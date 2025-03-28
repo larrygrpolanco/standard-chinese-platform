@@ -417,7 +417,6 @@ export async function getUserPreferences() {
 	return data;
 }
 
-
 export async function deleteUserAccount() {
 	const { data: sessionData } = await supabase.auth.getSession();
 	const token = sessionData?.session?.access_token;
@@ -850,4 +849,44 @@ export async function createCustomerPortalSession() {
 
 	const data = await response.json();
 	return data.url;
+}
+
+// Google OAuth
+export async function signInWithGoogle() {
+	const { data, error } = await supabase.auth.signInWithOAuth({
+		provider: 'google',
+		options: {
+			redirectTo: `${window.location.origin}/profile`
+		}
+	});
+
+	if (error) throw error;
+	return data;
+}
+
+// Add this to handle user setup for OAuth users
+export async function setupUserIfNeeded() {
+	const user = await getCurrentUser();
+	if (!user) return null;
+
+	// Check if user has subscription record
+	const { data: subscription } = await supabase
+		.from('user_subscriptions')
+		.select('user_id')
+		.eq('user_id', user.id)
+		.maybeSingle();
+
+	if (!subscription) {
+		// Create initial user records (same as in your signUp function)
+		try {
+			await supabase.from('user_subscriptions').insert({
+				user_id: user.id,
+				subscription_status: 'free'
+			});
+		} catch (err) {
+			console.error('Error setting up new user:', err);
+		}
+	}
+
+	return true;
 }
