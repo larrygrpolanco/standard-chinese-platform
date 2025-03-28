@@ -1217,7 +1217,6 @@
 		align-items: center;
 		flex: 1;
 		min-height: 12rem;
-        max-width: 36rem;
+		max-width: 36rem;
 	}
-
 </style>
