@@ -139,8 +139,8 @@
 </svelte:head>
 
 <!-- Subtle paper texture background -->
-<div  class="page-background">
-	<section  class="container">
+<div class="page-background">
+	<section class="container">
 		<!-- Vintage-inspired header -->
 		<header class="page-header">
 			<!-- Title with retro underline -->
@@ -150,14 +150,15 @@
 			</div>
 
 			<p class="page-description">
-				Explore the 9 core modules of the FSI Standard Chinese: A Modular Approach. These modules
-				are designed to break down Mandarin systematically and provide practical language skills.
+				FSI Standard Chinese: A Modular Approach is divided into 9 core modules each with a
+				different focus. These modules were designed by linguist to break down Mandarin systematically and
+				provide practical language skills.
 			</p>
 			<p class="resource-description">
 				Please note, this resource is not meant to be a standalone learning solution. Instead, it
 				works best when used with Chinese language classes or other practice methods. If Pinyin and
-				Chinese characters are entirely new to you—or if you're seeking a comprehensive refresher—be
-				sure to explore the resource modules in the Guide page.
+				Chinese characters are entirely new to you, or if you're seeking a comprehensive refresher,be
+				sure to explore the resource modules in the Guide Page.
 			</p>
 		</header>
 
@@ -301,10 +302,10 @@
 		padding-top: 1.5rem;
 	}
 
-    .container {
-        margin: auto;
-        padding: 0 1rem;
-    }
+	.container {
+		margin: auto;
+		padding: 0 1rem;
+	}
 
 	.title-container {
 		position: relative;

@@ -6,6 +6,9 @@ import { VITE_SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY } from '$env/static/privat
 const supabaseAdmin = createClient(VITE_SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
 export async function handle({ event, resolve }) {
+	console.log(`Request path: ${event.url.pathname}`);
+	console.log(`Request headers:`, Object.fromEntries(event.request.headers));
+
 	// Get the auth token from the request headers
 	const authHeader = event.request.headers.get('Authorization');
 	let session = null;

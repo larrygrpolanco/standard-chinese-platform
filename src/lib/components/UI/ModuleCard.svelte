@@ -135,8 +135,7 @@
 			<!-- Module description -->
 			<div class="description-section">
 				<p class="description-text">
-					The FSI Standard Chinese course is divided into 9 core modules each with a different
-					focus. Start with the module you feel is at your leve or with the topic you need most.
+					I recommend you start with the module topic you need or want the most. Figure out your learning style. Take what works for you and leave what doesn't. Learning a language is hard and it isn't linear. 加油！
 				</p>
 			</div>
 
