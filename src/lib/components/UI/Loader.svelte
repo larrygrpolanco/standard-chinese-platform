@@ -16,6 +16,9 @@
 	let blinker = false;
 	let blinkerInterval;
 
+	// State variables for timeout message
+	let showTimeoutMessage = false;
+	
 	// Initialize animations
 	onMount(() => {
 		// Start tape insertion after a short delay
@@ -53,6 +56,9 @@
 			}
 			
 			console.warn(`Loader showing "${message}" has been visible for 30+ seconds, might be stuck`);
+			
+			// Show timeout message to user
+			showTimeoutMessage = true;
 			
 			// Track loader stuck event in session storage for diagnostics
 			try {
@@ -156,6 +162,12 @@
 			</div>
 		</div>
 	</div>
+
+	{#if showTimeoutMessage}
+		<div class="timeout-message">
+			This is taking longer than expected. Please try reloading the page.
+		</div>
+	{/if}
 
 	<!-- Screen reader text -->
 	<span class="sr-only">Loading content, please wait</span>
@@ -502,6 +514,27 @@
 		99% {
 			opacity: 0.3;
 		}
+	}
+
+	/* Timeout message */
+	.timeout-message {
+		margin-top: 12px;
+		padding: 8px 12px;
+		border-radius: 4px;
+		background-color: #f9f8f4; /* Light cream paper */
+		border: 1px solid #c17c74; /* Terracotta */
+		color: #33312e; /* Charcoal */
+		font-size: 0.875rem;
+		text-align: center;
+		font-family: 'Work Sans', sans-serif;
+		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+		animation: fadeIn 0.3s ease-in-out;
+		width: 100%;
+	}
+
+	@keyframes fadeIn {
+		from { opacity: 0; transform: translateY(-4px); }
+		to { opacity: 1; transform: translateY(0); }
 	}
 
 	/* Accessibility */
