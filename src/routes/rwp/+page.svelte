@@ -48,7 +48,7 @@
 			<div class="header-buttons">
 				{#if !user}
 					<a href="/login?redirect=/rwp" class="primary-button">
-						Sign In To Get Started
+						Sign In For Full Access
 						<svg class="button-arrow" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 							<path
 								stroke-linecap="round"
@@ -172,7 +172,7 @@
 					{/if}
 
 					<button on:click={handleDemoClick} class="secondary-button">
-						Demo
+						Try The Demo
 						<svg class="button-arrow" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 							<path
 								stroke-linecap="round"
