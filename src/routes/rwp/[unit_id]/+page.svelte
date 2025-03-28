@@ -226,24 +226,13 @@
 				<!-- Action buttons area -->
 				<div class="action-buttons">
 					<a href={`/units/${unitId}`} class="back-to-unit-button">
-						<svg
-							class="button-icon"
-							viewBox="0 0 24 24"
-							fill="none"
-							xmlns="http://www.w3.org/2000/svg"
-						>
-							<rect
-								x="3"
-								y="6"
-								width="18"
-								height="12"
-								rx="1"
-								stroke="currentColor"
+						<svg class="button-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path
+								stroke-linecap="round"
+								stroke-linejoin="round"
 								stroke-width="2"
-							/>
-							<circle cx="8" cy="12" r="2" stroke="currentColor" stroke-width="2" />
-							<circle cx="16" cy="12" r="2" stroke="currentColor" stroke-width="2" />
-							<line x1="10" y1="12" x2="14" y2="12" stroke="currentColor" stroke-width="2" />
+								d="M15 19l-7-7 7-7"
+							></path>
 						</svg>
 						Back to Unit {unitId}
 					</a>
@@ -373,14 +362,6 @@
 							<!-- Sign-in prompt -->
 							<div class="vintage-panel">
 								<div class="panel-content signup-prompt">
-									<div class="tape-icon">
-										<svg viewBox="0 0 24 24" class="cassette-icon">
-											<rect x="2" y="6" width="20" height="12" rx="2" />
-											<circle cx="8" cy="12" r="2" />
-											<circle cx="16" cy="12" r="2" />
-											<path d="M8 12h8" />
-										</svg>
-									</div>
 									<h3 class="prompt-title">Create Your Personal Language Practice</h3>
 									<p class="prompt-text">
 										Sign in to save your preferences and generate exercises tailored to your
@@ -478,7 +459,7 @@
 									</button>
 								{:else}
 									<a href="/login?redirect=/rwp/{unitId}" class="vintage-button large">
-										<span class="button-text">Sign In to Create Practice</span>
+										<span class="button-text">Sign In to Create Exercises</span>
 									</a>
 								{/if}
 							</div>

@@ -268,11 +268,8 @@
 		color: #e74c3c;
 	}
 
-	.cassette-icon {
-		color: var(--color-warm-gray, #a0998a);
-		width: 61.8%; /* Golden ratio: 1/φ ≈ 61.8% */
-		height: 61.8%;
-	}
+    
+    
 
 	@media (max-width: 640px) {
 		.support-card {

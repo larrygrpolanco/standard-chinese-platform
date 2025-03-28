@@ -9,47 +9,25 @@
 	import { tick } from 'svelte';
 
 	let isLoading = false;
-
-	// Track page navigation state with timeout
+	
+	// Track page navigation state
 	$: if ($navigating) {
 		isLoading = true;
-		console.log('Page navigation started', $navigating?.to?.url?.pathname);
-
-		// Set a 15-second timeout to reset loading state if navigation gets stuck
-		const navigationTimeout = setTimeout(() => {
-			console.error('Navigation timeout - resetting state');
-			isLoading = false;
-			window.__navigationInProgress = false;
-		}, 15000);
-
-		window.__navigationTimeoutId = navigationTimeout;
-		window.__navigationInProgress = true;
+		console.log("Page navigation started", $navigating?.to?.url?.pathname);
 	} else if (isLoading) {
-		// Clear timeout when navigation completes normally
-		if (window.__navigationTimeoutId) {
-			clearTimeout(window.__navigationTimeoutId);
-			window.__navigationTimeoutId = null;
-		}
-
+		// Navigation completed
 		tick().then(() => {
 			isLoading = false;
-			console.log('Page navigation completed');
-			window.__navigationInProgress = false;
+			console.log("Page navigation completed");
 		});
 	}
 
 	onMount(async () => {
-		// Initialize auth store with timeout protection
+		// Initialize auth store and wait for it to complete
 		try {
-			const authPromise = authStore.initialize();
-			const timeoutPromise = new Promise((_, reject) =>
-				setTimeout(() => reject(new Error('Auth initialization timed out')), 8000)
-			);
-
-			await Promise.race([authPromise, timeoutPromise]);
+			await authStore.initialize();
 		} catch (error) {
-			console.error('Auth initialization failed:', error);
-			// Continue without auth rather than getting stuck
+			console.error("Auth initialization failed:", error);
 		}
 	});
 </script>
@@ -62,7 +40,7 @@
 		<slot />
 	</main>
 
-	<!-- Footer section remains unchanged -->
+	<!-- src/routes/+layout.svelte (Footer section only) -->
 	<footer class="site-footer">
 		<div class="footer-container">
 			<!-- Top scanner line effect -->
@@ -111,7 +89,7 @@
 					<h3 class="footer-heading">Information</h3>
 					<nav class="footer-nav">
 						<a href="/policies" class="footer-link">Privacy Policy</a>
-						<a href="/policies#terms" class="footer-link">Terms of Service</a>
+                        <a href="/policies#terms" class="footer-link">Terms of Service</a>
 					</nav>
 				</div>
 
