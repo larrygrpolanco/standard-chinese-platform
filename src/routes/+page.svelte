@@ -3,8 +3,13 @@
 	import { onMount } from 'svelte';
 	import { fade, fly, slide } from 'svelte/transition';
 	import { authStore } from '$lib/stores/authStore';
-	import { getLatestUnit, getUserProgress } from '$lib/supabase/client';
+	import { getLatestUnit, getUserProgress, createCheckoutSession } from '$lib/supabase/client';
 	import ModuleCard from '$lib/components/UI/ModuleCard.svelte';
+	import SupportSection from '$lib/components/UI/SupportSection.svelte';
+
+	// Add dispatch for toast events
+	import { createEventDispatcher } from 'svelte';
+	const dispatch = createEventDispatcher();
 
 	let visible = false;
 
@@ -157,7 +162,8 @@
 								<div class="item-content">
 									<h3 class="item-title">Personalized Stories</h3>
 									<p class="item-description">
-										Generated stories that use each unit's vocabulary and dialogues, making them relevant to your interests and goals
+										Generated stories that use each unit's vocabulary and dialogues, making them
+										relevant to your interests and goals
 									</p>
 								</div>
 							</div>
@@ -167,8 +173,7 @@
 								<div class="item-content">
 									<h3 class="item-title">Custom Audio</h3>
 									<p class="item-description">
-										Listen to your RWPs with text-to-speech voices for
-										extra listening practice
+										Listen to your RWPs with text-to-speech voices for extra listening practice
 									</p>
 								</div>
 							</div>
@@ -187,8 +192,8 @@
 
 						<div in:fade={{ duration: 700, delay: 700 }} class="rwp-footer">
 							<p class="rwp-tagline">
-								While the classic FSI course excels at teaching language forms, RWP means to bridge the
-								gap between memorization and creative, personally relevant language use.
+								While the classic FSI course excels at teaching language forms, RWP means to bridge
+								the gap between memorization and creative, personally relevant language use.
 							</p>
 
 							<a href="/rwp" class="rwp-button">
@@ -279,7 +284,8 @@
 						<h3 class="feature-title">Comprehensive Materials</h3>
 					</div>
 					<p class="feature-description">
-						Created to train US diplomats up to a professional proficiency in a relatively short time.
+						Created to train US diplomats up to a professional proficiency in a relatively short
+						time.
 					</p>
 				</div>
 
@@ -320,33 +326,18 @@
 					comprehensive, structured, and in the public domain, so its free.
 				</p>
 				<p class="about-text">
-					While vintage and flawed, these language materials contain some solid teaching foundations that still hold up to modern language teaching standards. The goal of Taped Chinese is to make these resources accessible digitally, and the added RWPs address the original course's weaknesses while still taking advantage of what it does well, structured comprehensible input. If you find this project valuable, please consider supporting it for $5/month to help with operating costs and future work.
+					While vintage and flawed, these language materials contain some solid teaching foundations
+					that still hold up to modern language teaching standards. The goal of Taped Chinese is to
+					make these resources accessible digitally, and the added RWPs address the original
+					course's weaknesses while still taking advantage of what it does well, structured
+					comprehensible input. If you find this project valuable, please consider supporting it for
+					$5/month to help with operating costs and future work.
 				</p>
 			</div>
 
 			<!-- Decorative side -->
-			<div class="about-decoration">
-				<div class="stacked-items">
-					<!-- Book illustration -->
-					<div class="book-item">
-						<div class="book-header"></div>
-						<div class="book-lines">
-							<div class="book-line"></div>
-							<div class="book-line"></div>
-							<div class="book-line"></div>
-							<div class="book-line"></div>
-						</div>
-					</div>
-
-					<!-- Cassette illustration -->
-					<div class="cassette-item">
-						<div class="cassette-readout"></div>
-						<div class="cassette-reels">
-							<div class="cassette-reel"></div>
-							<div class="cassette-reel"></div>
-						</div>
-					</div>
-				</div>
+			<div class="about-support">
+				<SupportSection on:toast={(e) => dispatch('toast', e.detail)} />
 			</div>
 		</div>
 	</section>
@@ -637,7 +628,7 @@
 		left: 0;
 		width: 100%;
 		height: 3px;
-        opacity: .7;
+		opacity: 0.7;
 		background: linear-gradient(-90deg, var(--color-gold), transparent);
 		animation: shimmer 10s infinite;
 	}
@@ -884,7 +875,7 @@
 	.rwp-button {
 		display: inline-flex;
 		align-items: center;
-        justify-content: center;
+		justify-content: center;
 		padding: 0.5rem 1.5rem;
 		background-color: var(--color-cream-paper);
 		border: 2px solid var(--color-terracotta);
@@ -897,7 +888,7 @@
 		transition: all 0.2s ease;
 		position: relative;
 		overflow: hidden;
-        width: 100%;
+		width: 100%;
 	}
 
 	.rwp-button::before {
@@ -1220,98 +1211,13 @@
 		margin-bottom: 1rem;
 	}
 
-	.about-decoration {
+	.about-support {
 		display: flex;
 		justify-content: center;
 		align-items: center;
 		flex: 1;
 		min-height: 12rem;
+        max-width: 36rem;
 	}
 
-	.stacked-items {
-		position: relative;
-		height: 12rem;
-		width: 16rem;
-	}
-
-	.book-item {
-		position: absolute;
-		bottom: 0;
-		left: 1rem;
-		height: 9rem;
-		width: 12rem;
-		transform: rotate(-8deg);
-		border: 2px solid var(--color-text);
-		border-radius: 0.25rem;
-		background-color: #f9f4e8;
-		overflow: hidden;
-	}
-
-	.book-header {
-		height: 2rem;
-		width: 100%;
-		border-bottom: 2px solid var(--color-text);
-		background-color: var(--color-avocado);
-	}
-
-	.book-lines {
-		padding: 1rem;
-	}
-
-	.book-line {
-		height: 0.5rem;
-		background-color: #a0998a;
-		margin-bottom: 0.75rem;
-	}
-
-	.cassette-item {
-		position: absolute;
-		top: 0;
-		right: 0;
-		height: 7rem;
-		width: 11rem;
-		transform: rotate(5deg);
-		border: 2px solid var(--color-text);
-		border-radius: 0.375rem;
-		background-color: var(--color-cream-dark);
-		overflow: hidden;
-	}
-
-	.cassette-readout {
-		position: absolute;
-		top: 0.5rem;
-		left: 1rem;
-		right: 1rem;
-		height: 0.5rem;
-		background-color: rgba(51, 49, 46, 0.1);
-	}
-
-	.cassette-readout::before {
-		content: '';
-		position: absolute;
-		top: 0;
-		left: 0;
-		height: 100%;
-		width: 1.5rem;
-		background-color: rgba(193, 124, 116, 0.6);
-		animation: scan 3s infinite;
-	}
-
-	.cassette-reels {
-		position: absolute;
-		top: 50%;
-		left: 50%;
-		transform: translate(-50%, -50%);
-		width: 7rem;
-		height: 3.5rem;
-		display: flex;
-		justify-content: space-between;
-	}
-
-	.cassette-reel {
-		height: 2rem;
-		width: 2rem;
-		border-radius: 50%;
-		border: 1px solid var(--color-text);
-	}
 </style>

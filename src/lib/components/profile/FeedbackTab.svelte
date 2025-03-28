@@ -2,13 +2,10 @@
 <script>
 	import { createEventDispatcher } from 'svelte';
 	import { saveUserPreferences, getCurrentUser } from '$lib/supabase/client';
-	import UpgradePrompt from '$lib/components/UI/UpgradePrompt.svelte';
 	import { createCheckoutSession } from '$lib/supabase/client';
+	import SupportSection from '$lib/components/UI/SupportSection.svelte';
 
 	export let user;
-	let upgradeLoading = false;
-	let upgradeError = null;
-
 	const dispatch = createEventDispatcher();
 
 	let feedbackText = '';
@@ -56,23 +53,6 @@
 	function resetFeedbackForm() {
 		feedbackText = '';
 		feedbackSubmitted = false;
-	}
-
-	async function handleUpgrade() {
-		try {
-			upgradeLoading = true;
-			upgradeError = null;
-			const url = await createCheckoutSession();
-			window.location.href = url;
-		} catch (err) {
-			upgradeError = err.message;
-			dispatch('toast', {
-				message: 'Failed to start checkout: ' + err.message,
-				type: 'error'
-			});
-		} finally {
-			upgradeLoading = false;
-		}
 	}
 </script>
 
@@ -138,33 +118,11 @@
 		{/if}
 	</section>
 
-	<section class="support-section">
-		<h2 class="section-title">About Subscriptions</h2>
-
-		<div class="support-card">
-			<div class="support-icon">♥</div>
-			<h3 class="support-heading">Why Your Support Matters</h3>
-			<p class="support-text">
-				Taped Chinese was created to make the FSI learning materials accessible to everyone. The
-				core course materials will always remain free, but your subscription helps cover server
-				costs, development time, and enables new features like the Relevant World Practice (RWP)
-				exercises.
-			</p>
-			<p class="support-text highlight">
-				Premium subscribers get unlimited access to RWP exercises, while free users can generate one
-				exercise per day.
-			</p>
-			<div class="support-action">
-				<button class="tape-button upgrade" on:click={handleUpgrade} disabled={upgradeLoading}>
-					{upgradeLoading ? 'Loading...' : 'Upgrade to Premium'}
-				</button>
-
-				{#if upgradeError}
-					<p class="mt-2 text-sm text-red-600">{upgradeError}</p>
-				{/if}
-			</div>
-		</div>
-	</section>
+	<SupportSection 
+		{user} 
+		{createCheckoutSession} 
+		on:toast={(e) => dispatch('toast', e.detail)} 
+	/>
 </div>
 
 <style>
@@ -218,39 +176,7 @@
 		border-radius: 50%;
 	}
 
-	.support-card {
-		padding: 1.5rem;
-		background-color: rgba(221, 185, 103, 0.1);
-		border: 1px solid #ddb967;
-		border-radius: 8px;
-		text-align: center;
-		box-shadow: inset 0 1px 3px rgba(51, 49, 46, 0.1);
-	}
-
-	.support-icon {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		width: 3rem;
-		height: 3rem;
-		margin: 0 auto 1rem;
-		background-color: #ddb967;
-		color: #33312e;
-		font-size: 1.5rem;
-		border-radius: 50%;
-	}
-
-	.support-text.highlight {
-		padding: 0.75rem;
-		background-color: #f4f1de;
-		border-radius: 8px;
-		font-weight: 500;
-		color: #33312e;
-		box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
-	}
-
-	.feedback-section,
-	.support-section {
+	.feedback-section {
 		margin-bottom: 2.5rem;
 	}
 
@@ -329,22 +255,6 @@
 		color: #70594a;
 	}
 
-	.support-heading {
-		margin-bottom: 1rem;
-		font-family: 'Arvo', serif;
-		font-size: 1.25rem;
-		color: #33312e;
-	}
-
-	.support-text {
-		margin-bottom: 1rem;
-		color: #70594a;
-	}
-
-	.support-action {
-		margin-top: 1.5rem;
-	}
-
 	.tape-button {
 		padding: 0.75rem 1.25rem;
 		font-family: 'Work Sans', sans-serif;
@@ -371,11 +281,6 @@
 		background-color: #a0998a;
 	}
 
-	.tape-button.upgrade {
-		background-color: #826d5b;
-		padding: 0.75rem 1.5rem;
-	}
-
 	.tape-button:hover:not(:disabled) {
 		filter: brightness(0.95);
 	}
@@ -391,8 +296,7 @@
 		}
 
 		.form-card,
-		.thank-you-message,
-		.support-card {
+		.thank-you-message {
 			padding: 1rem;
 		}
 	}

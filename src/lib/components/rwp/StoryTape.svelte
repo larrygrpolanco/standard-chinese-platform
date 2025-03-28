@@ -217,8 +217,7 @@
 						<div class="message-container">
 							<h3 class="message-title">Listening Exercises</h3>
 							<p class="message-text">
-								Support Taped Chinese by becoming a subscriber and unlock RWP audio recordings to
-								improve your listening skills.
+								Please subscribe to access RWP audio recordings.
 							</p>
 							<p class="message-note">
 								You'll always keep access to any practice exercises you've already generated.

@@ -448,7 +448,7 @@
 												<div class="tape-spinner"></div>
 												<span>Creating your practice...</span>
 											{:else if !rwpStatus?.allowed && rwpStatus?.tier === 'free'}
-												<span>Support Taped Chinese</span>
+												<span>Subscribe for More Exercises</span>
 											{:else if !rwpStatus?.allowed && rwpStatus?.tier === 'premium'}
 												<span>Daily Limit Reached</span>
 											{:else}
@@ -828,12 +828,12 @@
 		opacity: 0.6;
 	}
 
-        /* If the button is .large and .disabled, add slightly different styling */
-    .generate-button.large.disabled {
-        background-color: #f3f3f3;
-        border: 1px solid #d97706;
-        color: #d97706;
-    }
+	/* If the button is .large and .disabled, add slightly different styling */
+	.generate-button.large.disabled {
+		background-color: #f3f3f3;
+		border: 1px solid #d97706;
+		color: #d97706;
+	}
 
 	.limit-message {
 		margin-top: 12px;

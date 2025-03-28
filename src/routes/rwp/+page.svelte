@@ -185,8 +185,7 @@
 				<div class="beta-note">
 					<p>
 						<strong>Note:</strong> RWP is still being improved on. While it works well most of the time,
-						you may occasionally need to regenerate an exercise if there are issues. If have any ideas
-						or feedback please let me know from the profile page feedback tab.
+						you may occasionally need to regenerate an exercise if there are issues.
 					</p>
 				</div>
 
@@ -414,7 +413,7 @@
 		border-left: 4px solid #ddb967;
 		border-radius: 0.25rem;
 		padding: 1rem;
-		margin-bottom: 1rem;
+		padding-bottom: .25rem;
 	}
 
 	.support-note {
