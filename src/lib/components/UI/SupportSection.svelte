@@ -71,19 +71,24 @@
 			<div class="card-header">
 				<div class="tape-icon">
 					<!-- Cassette tape icon -->
-					<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+					<svg
+						class="cassette-icon"
+						viewBox="0 0 24 24"
+						fill="none"
+						xmlns="http://www.w3.org/2000/svg"
+					>
 						<rect
-							x="2"
-							y="5"
-							width="20"
-							height="14"
-							rx="2"
+							x="3"
+							y="6"
+							width="18"
+							height="12"
+							rx="1"
 							stroke="currentColor"
 							stroke-width="2"
 						/>
-						<circle cx="7" cy="12" r="2" stroke="currentColor" stroke-width="2" />
-						<circle cx="17" cy="12" r="2" stroke="currentColor" stroke-width="2" />
-						<line x1="9" y1="12" x2="15" y2="12" stroke="currentColor" stroke-width="2" />
+						<circle cx="8" cy="12" r="2" stroke="currentColor" stroke-width="2" />
+						<circle cx="16" cy="12" r="2" stroke="currentColor" stroke-width="2" />
+						<line x1="10" y1="12" x2="14" y2="12" stroke="currentColor" stroke-width="2" />
 					</svg>
 				</div>
 				<h3 class="support-heading">

@@ -291,7 +291,6 @@
 					Module {unitData.module.id}:
 					<span class="module-title-highlight">{unitData.module.title}</span>
 				</p>
-                
 
 				{#if unitData.description}
 					<p class="unit-description">{unitData.description}</p>
@@ -546,35 +545,24 @@
 							<!-- Empty State -->
 							<div class="empty-state">
 								<div class="empty-state-icon">
-									<svg viewBox="0 0 24 24" class="cassette-large">
+									<svg
+										class="cassette-icon"
+										viewBox="0 0 24 24"
+										fill="none"
+										xmlns="http://www.w3.org/2000/svg"
+									>
 										<rect
-											x="2"
-											y="5"
-											width="20"
-											height="14"
-											rx="2"
+											x="3"
+											y="6"
+											width="18"
+											height="12"
+											rx="1"
 											stroke="currentColor"
-											fill="none"
-											stroke-width="1.5"
+											stroke-width="2"
 										/>
-										<circle
-											cx="8"
-											cy="12"
-											r="3"
-											stroke="currentColor"
-											fill="none"
-											stroke-width="1.5"
-										/>
-										<circle
-											cx="16"
-											cy="12"
-											r="3"
-											stroke="currentColor"
-											fill="none"
-											stroke-width="1.5"
-										/>
-										<line x1="8" y1="12" x2="16" y2="12" stroke="currentColor" stroke-width="1.5" />
-										<line x1="5" y1="7" x2="19" y2="7" stroke="currentColor" stroke-width="1.5" />
+										<circle cx="8" cy="12" r="2" stroke="currentColor" stroke-width="2" />
+										<circle cx="16" cy="12" r="2" stroke="currentColor" stroke-width="2" />
+										<line x1="10" y1="12" x2="14" y2="12" stroke="currentColor" stroke-width="2" />
 									</svg>
 								</div>
 								<h3 class="empty-state-title">Ready to Practice?</h3>
