@@ -22,7 +22,7 @@ function createAuthStore() {
 			console.log('Starting auth store initialization');
 			initializationPromise = (async () => {
 				try {
-					// CHANGE 1: Use Promise.race with a timeout for user fetch
+					// Use Promise.race with a timeout for user fetch
 					const userPromise = getCurrentUser();
 					const timeoutPromise = new Promise((_, reject) =>
 						setTimeout(() => reject(new Error('Auth initialization timeout')), 10000)
@@ -32,7 +32,7 @@ function createAuthStore() {
 					set(user);
 					console.log('Auth store: User state set initially', !!user);
 
-					// CHANGE 2: Set up auth listener with error handling
+					// Set up auth listener with error handling
 					// before running the potentially slow setupUserIfNeeded
 					if (!authStateChangeSetup) {
 						try {
@@ -44,7 +44,7 @@ function createAuthStore() {
 								if (event === 'SIGNED_IN') {
 									set(session?.user || null);
 
-									// CHANGE 3: Handle user initialization without awaiting
+									// Handle user initialization without awaiting
 									// This prevents blocking if setupUserIfNeeded is slow
 									if (session?.user) {
 										setupUserIfNeeded().catch((err) =>
@@ -63,10 +63,10 @@ function createAuthStore() {
 						}
 					}
 
-					// CHANGE 4: Set initialized before the potentially slow setupUserIfNeeded
+					// Set initialized before the potentially slow setupUserIfNeeded
 					initialized = true;
 
-					// CHANGE 5: Handle user setup separately after initialization
+					// Handle user setup separately after initialization
 					if (user) {
 						try {
 							// Set a timeout for setupUserIfNeeded
@@ -99,7 +99,7 @@ function createAuthStore() {
 
 	async function signOut() {
 		try {
-			// CHANGE 6: Add timeout to signOut
+			// Add timeout to signOut
 			const signOutPromise = supabase.auth.signOut();
 			const timeoutPromise = new Promise((_, reject) =>
 				setTimeout(() => reject(new Error('Sign out timeout')), 5000)
@@ -114,91 +114,6 @@ function createAuthStore() {
 			set(null);
 			throw error;
 		}
-	}
-
-	return {
-		subscribe,
-		initialize,
-		signOut
-	};
-}
-
-export const authStore = createAuthStore(); // src/lib/stores/authStore.js
-import { writable } from 'svelte/store';
-import { browser } from '$app/environment';
-import { supabase, getCurrentUser, setupUserIfNeeded } from '$lib/supabase/client';
-
-function createAuthStore() {
-	const { subscribe, set } = writable(null);
-	let initializationPromise = null;
-	let initialized = false;
-	let authStateChangeSetup = false;
-
-	async function initialize() {
-		if (!browser) return null;
-
-		// If already initialized, just return the promise
-		if (initialized) {
-			return initializationPromise;
-		}
-
-		// Only initialize once
-		if (!initializationPromise) {
-			console.log('Starting auth store initialization');
-			initializationPromise = (async () => {
-				try {
-					// Set initial state
-					const user = await getCurrentUser();
-					set(user);
-					console.log('Auth store: User state set initially', !!user);
-
-					// Set up new user if needed
-					if (user) {
-						await setupUserIfNeeded();
-					}
-
-					// Only set up the auth listener once
-					if (!authStateChangeSetup) {
-						// Set up auth listener
-						const {
-							data: { subscription }
-						} = supabase.auth.onAuthStateChange(async (event, session) => {
-							console.log('Auth state change:', event);
-							if (event === 'SIGNED_IN') {
-								set(session?.user || null);
-
-								// Handle user initialization for OAuth sign-ins
-								if (session?.user) {
-									await setupUserIfNeeded();
-								}
-							} else if (event === 'SIGNED_OUT') {
-								set(null);
-							}
-						});
-
-						authStateChangeSetup = true;
-					}
-
-					initialized = true;
-					return user;
-				} catch (error) {
-					console.error('Auth initialization error:', error);
-					set(null);
-					// Reset the promise and initialized state on error to allow retry
-					initializationPromise = null;
-					initialized = false;
-					return null;
-				}
-			})();
-		}
-
-		return initializationPromise;
-	}
-
-	async function signOut() {
-		const { error } = await supabase.auth.signOut();
-		if (error) throw error;
-		return true;
 	}
 
 	return {
