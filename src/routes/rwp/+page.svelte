@@ -42,7 +42,7 @@
 			<p class="page-description">
 				Practice Chinese in contexts that matter to you personally. RWP exercises connects what
 				you're learning to your relevant-world experiences, making language study more relevant,
-				effective, and hopefully fun. 
+				effective, and hopefully fun.
 			</p>
 
 			<div class="header-buttons">
@@ -79,8 +79,8 @@
 			<div class="section-content">
 				<p>
 					<strong>Relevant World Practice (RWP)</strong> tries to improve on one of the biggest issues
-					with the FSI course by creating personalized reading and listening exercises that connect directly to your life and
-					interests.
+					with the FSI course by creating personalized reading and listening exercises that connect directly
+					to your life and interests.
 				</p>
 				<p>
 					RWPs are generated first person narrative stories with multiple choice, short answer, and
@@ -151,24 +151,14 @@
 			<h2 class="section-title">Try out RWP</h2>
 			<div class="section-content">
 				<p>
-					Check it out with this demo based on the most important langauge learning topic, food shoping. See how Dracula might learn how to use chinese to buy food at Taiwanese night markets.
+					Check it out with this demo based on the most important langauge learning topic, food
+					shoping. See how Dracula might learn how to use chinese to buy food at Taiwanese night
+					markets.
 				</p>
 
 				<div class="cta-container">
-					<button on:click={handleDemoClick} class="primary-button">
-						Demo
-						<svg class="button-arrow" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-							<path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="2"
-								d="M14 5l7 7m0 0l-7 7m7-7H3"
-							/>
-						</svg>
-					</button>
-
 					{#if !user}
-						<a href="/login?redirect=/rwp" class="secondary-button large-button">
+						<a href="/login?redirect=/rwp" class="primary-button">
 							Sign In For Full Access
 							<svg class="button-arrow" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 								<path
@@ -180,6 +170,18 @@
 							</svg>
 						</a>
 					{/if}
+
+					<button on:click={handleDemoClick} class="secondary-button">
+						Demo
+						<svg class="button-arrow" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+							<path
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								stroke-width="2"
+								d="M14 5l7 7m0 0l-7 7m7-7H3"
+							/>
+						</svg>
+					</button>
 				</div>
 
 				<div class="beta-note">
@@ -188,7 +190,6 @@
 						you may occasionally need to regenerate an exercise if there are issues.
 					</p>
 				</div>
-
 			</div>
 		</div>
 	</section>
@@ -413,7 +414,7 @@
 		border-left: 4px solid #ddb967;
 		border-radius: 0.25rem;
 		padding: 1rem;
-		padding-bottom: .25rem;
+		padding-bottom: 0.25rem;
 	}
 
 	.support-note {
