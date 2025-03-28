@@ -124,14 +124,14 @@
 	}
 
 	// Interactive feedback messages
-	$: clickMessage =
-		clickCounter > 10
-			? 'Winding faster! Keep going!'
-			: clickCounter > 5
-				? 'The tape is moving faster now!'
-				: clickCounter > 0
-					? 'That helps!'
-					: 'Click or drag the reels to speed up recording';
+	// $: clickMessage =
+	// 	clickCounter > 10
+	// 		? 'Winding faster! Keep going!'
+	// 		: clickCounter > 5
+	// 			? 'The tape is moving faster now!'
+	// 			: clickCounter > 0
+	// 				? 'That helps!'
+	// 				: 'Click or drag the reels to speed up recording';
 
 	onMount(() => {
 		// Start reel animation
@@ -180,7 +180,7 @@
 					>
 						<div class="reel-center"></div>
 					</div>
-					<div class="tape-line" style="width: {40 + tapeProgress / 5}%;"></div>
+					
 					<div
 						class="reel right-reel"
 						style="transform: rotate({rightReelRotation}deg);"
@@ -227,9 +227,9 @@
 				{/each}
 			</div>
 
-			<div class="click-helper">
+			<!-- <div class="click-helper">
 				<p class="helper-text">{clickMessage}</p>
-			</div>
+			</div> -->
 		</div>
 	{/if}
 </div>
@@ -411,19 +411,7 @@
 		transform: translate(-50%, -50%) rotate(-45deg);
 	}
 
-	.tape-line {
-		position: absolute;
-		height: 3px;
-		width: 60%;
-		background-color: var(--tape-accent);
-		top: 50%;
-		left: 50%;
-		transform: translate(-50%, -50%);
-		z-index: 1;
-		border-radius: 2px;
-		opacity: 0.8;
-		transition: width 0.5s ease-out;
-	}
+	
 
 	.tape-details {
 		margin-top: 12px;

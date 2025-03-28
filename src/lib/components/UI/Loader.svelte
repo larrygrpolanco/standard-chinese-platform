@@ -23,7 +23,7 @@
 			setTimeout(() => {
 				animationStage = 2;
 			}, 1500); // Time for insertion animation
-		}, 250);
+		}, 2000);
 
 		// Digital counter animation
 		counterInterval = setInterval(() => {

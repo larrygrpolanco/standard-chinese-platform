@@ -118,7 +118,7 @@
 	<!-- Exercise Display Section -->
 	<section class="section-container mt-6">
 		<div class="mb-4">
-			<h3 class="section-header">Workbook Exercises</h3>
+			<!-- <h3 class="section-header">Exercises</h3> -->
 		</div>
 
 		<div class="exercise-display-container">
@@ -145,7 +145,7 @@
 						</button>
 
 						<div class="exercise-counter">
-							<span class="counter-text">{currentExerciseIndex + 1}/{filteredExercises.length}</span
+							<span class="counter-text"> Exercise <br/> {currentExerciseIndex + 1}/{filteredExercises.length}</span
 							>
 						</div>
 
@@ -270,7 +270,7 @@
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
-		padding: 0.75rem 1rem;
+		padding: 0.5rem .75rem;
 		background-color: var(--color-beige);
 		background-image: linear-gradient(to bottom, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0));
 		border-bottom: 1px solid var(--color-warm-gray);
@@ -344,6 +344,7 @@
 
 	/* Retro counter styling */
 	.exercise-counter {
+        text-align: center;
 		background-color: rgba(255, 255, 255, 0.5);
 		border: 1px solid rgba(160, 152, 138, 0.3);
 		border-radius: 12px;
@@ -352,6 +353,7 @@
 	}
 
 	.counter-text {
+
 		font-family: 'Courier New', monospace;
 		font-size: 0.875rem;
 		color: var(--color-charcoal);

@@ -21,6 +21,7 @@
 	import TapeConstruction from '$lib/components/UI/TapeConstruction.svelte';
 
 	import { checkRWPAvailability } from '$lib/supabase/client';
+	import UnitDropdown from '$lib/components/UI/UnitDropdown.svelte';
 
 	let rwpStatus;
 
@@ -48,6 +49,14 @@
 
 	// Get unit ID from URL parameter
 	const unitId = parseInt($page.params.unit_id);
+
+	function handleRwpUnitChange(event) {
+		// You can implement custom behavior when a user changes units from the dropdown
+		const newUnitId = event.detail.unitId;
+		if (newUnitId && newUnitId !== unitId) {
+			window.location.href = `/rwp/${newUnitId}`;
+		}
+	}
 
 	function goToProfile() {
 		window.location.href = '/profile#subscription';
@@ -191,10 +200,31 @@
 	{:else}
 		<div class="page-container">
 			<!-- Page Header -->
-			<header class="page-header">
-				<div class="header-top">
-					<a href="/units/{unitId}" class="back-button">
-						<svg viewBox="0 0 24 24" class="back-icon">
+			<header class="unit-header">
+				<div class="module-nav">
+					<!-- Modified badge that links back to RWP page -->
+					<a href="/rwp" class="module-badge" title="Go to RWP page">
+						<span class="module-badge-text">RWP</span>
+					</a>
+					<div class="dropdown-wrapper">
+						<UnitDropdown currentUnitId={unitId.toString()} currentUnit={unitData} />
+					</div>
+				</div>
+
+				<!-- Module title at bottom of header -->
+				<p class="module-title">
+					Module {unitData.module.id}:
+					<span class="module-title-highlight">{unitData.module.title}</span>
+				</p>
+
+				{#if unitData.description}
+					<p class="unit-description">{unitData.description}</p>
+				{/if}
+
+				<!-- Action buttons area -->
+				<div class="action-buttons">
+					<a href={`/units/${unitId}`} class="back-to-unit-button">
+						<svg class="button-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path
 								stroke-linecap="round"
 								stroke-linejoin="round"
@@ -202,24 +232,9 @@
 								d="M15 19l-7-7 7-7"
 							></path>
 						</svg>
-						<span>Back to Unit</span>
+						Back to Unit {unitId}
 					</a>
-
-					<div class="unit-badge">Unit {unitId}</div>
 				</div>
-
-				<h1 class="unit-title">{unitData.title} RWP</h1>
-
-				<p class="unit-description">{unitData.description}</p>
-
-				<div class="module-info">
-					<span class="module-label">Module {unitData.module.id}:</span>
-					<span class="module-title">{unitData.module.title}</span>
-				</div>
-
-				<p class="page-description">
-					Apply what you've learned with content that connects to your personal context.
-				</p>
 			</header>
 
 			<!-- Content Layout -->
@@ -481,7 +496,7 @@
 	.page-wrapper {
 		width: 100%;
 		min-height: 100vh;
-		background-color: var(--color-cream-paper, #f4f1de);
+		background-color: #f4f1de;
 		background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23a09a8a' fill-opacity='0.05' fill-rule='evenodd'/%3E%3C/svg%3E");
 	}
 
@@ -512,78 +527,48 @@
 		min-height: 50vh;
 	}
 
-	/* ===== HEADER STYLING ===== */
-	.page-header {
-		display: flex;
-		flex-direction: column;
-		gap: 0.5rem;
-		margin-bottom: 2rem;
-		padding-bottom: 1rem;
-		border-bottom: 1px solid var(--color-warm-gray, #a0998a);
+	/* Unit header styling */
+	.unit-header {
+		margin-bottom: 1rem;
+		border-bottom: 1px solid #a0998a;
+		padding-bottom: 0.5rem;
 	}
 
-	.header-top {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-	}
-
-	.back-button {
-		display: inline-flex;
-		align-items: center;
-		padding: 0.5rem 0.75rem;
-		border-radius: 20px;
-		color: var(--color-navy, #34667f);
-		font-size: 0.875rem;
-		font-weight: 600;
-		text-decoration: none;
-		transition: all 0.2s;
-	}
-
-	.back-button:hover {
-		color: var(--color-terracotta, #c17c74);
-		transform: translateX(-2px);
-	}
-
-	.back-icon {
-		width: 20px;
-		height: 20px;
-		margin-right: 0.375rem;
-	}
-
-	.unit-badge {
-		display: inline-block;
-		background-color: var(--color-terracotta, #c17c74);
-		color: white;
-		padding: 0.25rem 0.75rem;
-		border-radius: 16px;
-		font-size: 0.875rem;
-		font-weight: 600;
-	}
-
-	.unit-title {
-		font-family: 'Arvo', 'DM Serif Display', serif;
-		font-size: 1.75rem;
-		color: var(--color-charcoal, #33312e);
-		margin: 0.5rem 0;
-	}
-
-	.unit-description {
-		margin-top: 0.5rem;
-		font-size: 1.125rem;
-		color: #33312e;
-	}
-
-	.module-info {
-		display: flex;
-		align-items: center;
-		gap: 0.5rem;
+	.module-nav {
 		margin-bottom: 0.5rem;
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
 	}
 
-	.module-label {
-		font-weight: 600;
-		color: var(--color-navy, #34667f);
+	.module-badge {
+    display: flex;
+    height: 3rem;
+    min-width: 3rem;
+    padding: 0 0.75rem;
+    align-items: center;
+    justify-content: center;
+    border-radius: 9999px;
+    background-color: #c17c74;
+    color: white;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    transition: transform 0.2s;
+}
+
+.module-badge:hover {
+    transform: scale(1.05);
+}
+
+.module-badge-text {
+    font-family: 'Arvo', serif;
+    font-size: 1.25rem;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+	.dropdown-wrapper {
+		position: relative;
+		z-index: 20;
 	}
 
 	.module-title {
@@ -593,11 +578,78 @@
 		font-style: italic;
 	}
 
-	.page-description {
-		color: var(--color-warm-gray, #a0998a);
-		font-size: 1rem;
-		margin: 0;
-		line-height: 1.5;
+	.module-title-highlight {
+		color: #c17c74;
+	}
+
+	.unit-description {
+		margin-top: 0.5rem;
+		font-size: 1.125rem;
+		color: #33312e;
+	}
+
+	.action-buttons {
+		margin-top: 1.5rem;
+		display: flex;
+		flex-direction: column;
+		gap: 1rem;
+	}
+
+	@media (min-width: 640px) {
+		.action-buttons {
+			flex-direction: row;
+			flex-wrap: wrap;
+			align-items: center;
+			gap: 1rem;
+			margin-top: 1rem;
+		}
+	}
+
+	.back-to-unit-button {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		padding: 8px 16px;
+		border-radius: 16px;
+		background-color: #34667f;
+		color: #f4f1de;
+		border: 1px solid #295267;
+		font-weight: 600;
+		font-size: 0.875rem;
+		cursor: pointer;
+		transition: all 0.2s;
+		min-width: 140px;
+		text-decoration: none;
+	}
+
+	.back-to-unit-button:hover {
+		transform: translateY(-1px);
+		box-shadow: 0 2px 4px rgba(41, 82, 103, 0.3);
+		background-color: #295267;
+	}
+
+	.back-to-unit-button:active {
+		transform: translateY(1px);
+		box-shadow: none;
+	}
+
+	.button-icon {
+		height: 1rem;
+		width: 1rem;
+		margin-right: 0.375rem;
+	}
+
+	.rwp-badge {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		padding: 8px 16px;
+		border-radius: 16px;
+		background-color: #7d8c5c;
+		color: #f4f1de;
+		border: 1px solid #6a7a4b;
+		font-weight: 600;
+		font-size: 0.875rem;
 	}
 
 	/* ===== CONTENT AREA ===== */

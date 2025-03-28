@@ -153,7 +153,7 @@
 
 				<!-- Module title at bottom of header -->
 				<p class="module-title">
-					Module:
+					Module {unitData.module.id}:
 					<span class="module-title-highlight">{unitData.module.title}</span>
 				</p>
 
@@ -169,7 +169,7 @@
 							initialStatus={userProgress?.status || 'in_progress'}
 						/>
 
-						<a href="/rwp/{unitData.id}" class="rwp-button"> Real World Practice </a>
+						<a href="/rwp/{unitData.id}" class="rwp-button"> Relevant World Practice </a>
 					{:else}
 						<a href="/login?redirect=/units/{unitData.id}" class="signin-button">
 							Sign-in to Unlock Progress Tracking

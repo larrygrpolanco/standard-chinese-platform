@@ -2,11 +2,13 @@
 <script>
 	import { onMount } from 'svelte';
 	import { getModules, getUserProgress, supabase } from '$lib/supabase/client';
+	import { fade } from 'svelte/transition';
 	import Loader from '$lib/components/UI/Loader.svelte';
 
 	let modules = [];
 	let loading = true;
 	let moduleProgress = {};
+	let visibleModules = [];
 
 	// Define total units per module (based on your counts)
 	const totalUnitsPerModule = {
@@ -54,6 +56,19 @@
 		} finally {
 			// Always set loading to false, even if there's an error
 			loading = false;
+
+			// Staggered reveal of modules
+			if (modules.length > 0) {
+				// Start with empty array
+				visibleModules = [];
+
+				// Show each module with a delay
+				modules.forEach((module, index) => {
+					setTimeout(() => {
+						visibleModules = [...visibleModules, module.id];
+					}, 150 * index);
+				});
+			}
 		}
 	});
 
@@ -124,8 +139,8 @@
 </svelte:head>
 
 <!-- Subtle paper texture background -->
-<div class="page-background">
-	<section class="container mx-auto px-4">
+<div  class="page-background">
+	<section  class="container">
 		<!-- Vintage-inspired header -->
 		<header class="page-header">
 			<!-- Title with retro underline -->
@@ -135,15 +150,14 @@
 			</div>
 
 			<p class="page-description">
-
-				Explore the 9 core modules of the FSI Standard Chinese: A Modular Approach. These modules are
-				designed to break down Mandarin systematically and provide practical language skills.
+				Explore the 9 core modules of the FSI Standard Chinese: A Modular Approach. These modules
+				are designed to break down Mandarin systematically and provide practical language skills.
 			</p>
 			<p class="resource-description">
-				Please note, this resource is not meant to be a standalone learning solution. Instead, it works
-				best when used with Chinese language classes or other practice methods.
-				If Pinyin and Chinese characters are entirely new to you—or if you're seeking a comprehensive
-				refresher—be sure to explore the resource modules in the Guide page.
+				Please note, this resource is not meant to be a standalone learning solution. Instead, it
+				works best when used with Chinese language classes or other practice methods. If Pinyin and
+				Chinese characters are entirely new to you—or if you're seeking a comprehensive refresher—be
+				sure to explore the resource modules in the Guide page.
 			</p>
 		</header>
 
@@ -156,110 +170,113 @@
 				{#each modules as module}
 					<!-- Module card styled as vintage cassette case -->
 					{@const colors = getModuleColors(module.id)}
-					<a
-						href="/modules/{module.id}"
-						class="module-card"
-						style="--accent-color: {colors.accent}; --bg-color: {colors.bg};"
-					>
-						<!-- Top colored binding -->
-						<div class="module-binding"></div>
+					{#if visibleModules.includes(module.id)}
+						<a
+							href="/modules/{module.id}"
+							class="module-card"
+							in:fade={{ duration: 400 }}
+							style="--accent-color: {colors.accent}; --bg-color: {colors.bg};"
+						>
+							<!-- Top colored binding -->
+							<div class="module-binding"></div>
 
-						<!-- Card content -->
-						<div class="module-content">
-							<!-- Left section with title and badge -->
-							<div class="module-header">
-								<!-- Module number and title container -->
-								<div class="module-title-section">
-									<!-- Module number badge -->
-									<div class="module-number-badge">
-										<span class="module-number">{module.id}</span>
-									</div>
+							<!-- Card content -->
+							<div class="module-content">
+								<!-- Left section with title and badge -->
+								<div class="module-header">
+									<!-- Module number and title container -->
+									<div class="module-title-section">
+										<!-- Module number badge -->
+										<div class="module-number-badge">
+											<span class="module-number">{module.id}</span>
+										</div>
 
-									<!-- Title -->
-									<h2 class="module-title">{module.title}</h2>
+										<!-- Title -->
+										<h2 class="module-title">{module.title}</h2>
 
-									<!-- Small tape icon -->
-									<div class="tape-icon">
-										<svg
-											width="24"
-											height="24"
-											viewBox="0 0 24 24"
-											fill="none"
-											xmlns="http://www.w3.org/2000/svg"
-										>
-											<rect
-												x="2"
-												y="4"
-												width="20"
-												height="16"
-												rx="2"
-												stroke="#33312E"
-												stroke-width="2"
-											/>
-											<circle cx="7" cy="12" r="2.5" stroke="#33312E" stroke-width="1.5" />
-											<circle cx="17" cy="12" r="2.5" stroke="#33312E" stroke-width="1.5" />
-											<line
-												x1="9.5"
-												y1="12"
-												x2="14.5"
-												y2="12"
-												stroke="#33312E"
-												stroke-width="1.5"
-											/>
-										</svg>
-									</div>
-								</div>
-
-								<!-- Progress meter styled as tape counter -->
-								<div class="progress-meter-container">
-									<div class="progress-label-container">
-										<div class="progress-label">PROGRESS:</div>
-										<div class="progress-bar-container">
-											<!-- Progress bar -->
-											<div
-												class="progress-bar"
-												style="width: {moduleProgress[module.id]?.percentage || 0}%"
-											></div>
-
-											<!-- Tick marks -->
-											<div class="progress-ticks">
-												{#each Array(4) as _, i}
-													<span class="progress-tick"></span>
-												{/each}
-											</div>
+										<!-- Small tape icon -->
+										<div class="tape-icon">
+											<svg
+												width="24"
+												height="24"
+												viewBox="0 0 24 24"
+												fill="none"
+												xmlns="http://www.w3.org/2000/svg"
+											>
+												<rect
+													x="2"
+													y="4"
+													width="20"
+													height="16"
+													rx="2"
+													stroke="#33312E"
+													stroke-width="2"
+												/>
+												<circle cx="7" cy="12" r="2.5" stroke="#33312E" stroke-width="1.5" />
+												<circle cx="17" cy="12" r="2.5" stroke="#33312E" stroke-width="1.5" />
+												<line
+													x1="9.5"
+													y1="12"
+													x2="14.5"
+													y2="12"
+													stroke="#33312E"
+													stroke-width="1.5"
+												/>
+											</svg>
 										</div>
 									</div>
-									<p class="progress-status">{getProgressStatusText(module.id)}</p>
+
+									<!-- Progress meter styled as tape counter -->
+									<div class="progress-meter-container">
+										<div class="progress-label-container">
+											<div class="progress-label">PROGRESS:</div>
+											<div class="progress-bar-container">
+												<!-- Progress bar -->
+												<div
+													class="progress-bar"
+													style="width: {moduleProgress[module.id]?.percentage || 0}%"
+												></div>
+
+												<!-- Tick marks -->
+												<div class="progress-ticks">
+													{#each Array(4) as _, i}
+														<span class="progress-tick"></span>
+													{/each}
+												</div>
+											</div>
+										</div>
+										<p class="progress-status">{getProgressStatusText(module.id)}</p>
+									</div>
+								</div>
+
+								<!-- Middle divider -->
+								<div class="module-divider"></div>
+
+								<!-- Bottom section with description and CTA -->
+								<div class="module-footer">
+									<!-- Module description -->
+									<div class="module-description-container">
+										<p class="module-description">{module.description}</p>
+									</div>
+
+									<!-- Call to action styled as a mechanical button -->
+									<div class="module-cta-container">
+										<span class="module-cta-button">
+											Start learning
+											<svg class="cta-arrow" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+												<path
+													stroke-linecap="round"
+													stroke-linejoin="round"
+													stroke-width="2"
+													d="M14 5l7 7m0 0l-7 7m7-7H3"
+												/>
+											</svg>
+										</span>
+									</div>
 								</div>
 							</div>
-
-							<!-- Middle divider -->
-							<div class="module-divider"></div>
-
-							<!-- Bottom section with description and CTA -->
-							<div class="module-footer">
-								<!-- Module description -->
-								<div class="module-description-container">
-									<p class="module-description">{module.description}</p>
-								</div>
-
-								<!-- Call to action styled as a mechanical button -->
-								<div class="module-cta-container">
-									<span class="module-cta-button">
-										Start learning
-										<svg class="cta-arrow" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-											<path
-												stroke-linecap="round"
-												stroke-linejoin="round"
-												stroke-width="2"
-												d="M14 5l7 7m0 0l-7 7m7-7H3"
-											/>
-										</svg>
-									</span>
-								</div>
-							</div>
-						</div>
-					</a>
+						</a>
+					{/if}
 				{/each}
 			</div>
 		{/if}
@@ -283,6 +300,11 @@
 		margin-bottom: 2.5rem;
 		padding-top: 1.5rem;
 	}
+
+    .container {
+        margin: auto;
+        padding: 0 1rem;
+    }
 
 	.title-container {
 		position: relative;
@@ -321,7 +343,6 @@
 		font-style: italic;
 		color: var(--color-text);
 		opacity: 0.6;
-
 	}
 
 	/* Module cards container */

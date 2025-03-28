@@ -11,6 +11,7 @@
 	let units = [];
 	let loading = true;
 	let unitProgressMap = {}; // Map unit IDs to completion status
+	let visibleUnits = []; // Track which units are visible
 
 	// Learning objectives by module ID - customize these later
 	const moduleObjectives = {
@@ -69,7 +70,6 @@
 			'Complete practical exercises to reinforce your learning'
 		]
 	};
-
 	onMount(async () => {
 		const moduleId = $page.params.id;
 
@@ -88,9 +88,20 @@
 			}, {});
 		}
 		loading = false;
-	});
 
-    
+		// Staggered reveal of units after loading is complete
+		if (units.length > 0) {
+			// Start with empty array
+			visibleUnits = [];
+
+			// Show each unit with a delay
+			units.forEach((unit, index) => {
+				setTimeout(() => {
+					visibleUnits = [...visibleUnits, unit.id];
+				}, 150 * index);
+			});
+		}
+	});
 
 	$: objectives = module ? moduleObjectives[module.id] || moduleObjectives.default : [];
 </script>
@@ -99,48 +110,48 @@
 	<title>{module?.title || 'Module'} | Taped Chinese</title>
 </svelte:head>
 
-<div class="container mx-auto max-w-4xl px-4 py-2">
+<div class="container">
 	{#if loading}
 		<Loader />
 	{:else if module}
 		<div in:fade={{ duration: 300 }}>
-			<div class="mb-6 flex items-center gap-3">
+			<div class="module-header">
 				<a
 					href="/modules"
-					class="flex h-12 w-12 items-center justify-center rounded-full bg-[#C17C74] text-white shadow-sm transition-transform hover:scale-105"
+					class="module-back-button"
 					title="Back to All Modules"
 				>
-					<span class="font-['Arvo',serif] text-xl font-bold">{module.id}</span>
+					<span class="module-number">{module.id}</span>
 				</a>
-				<h1 class="font-['Arvo',serif] text-2xl font-bold text-[#33312E] md:text-3xl">
+				<h1 class="module-title">
 					{module.title}
 				</h1>
 			</div>
 
 			<!-- Compact info section with description and objectives -->
-			<div class="mb-8 rounded-lg border border-[#A0998A] bg-[#E8E5D7] p-4 shadow-sm">
-				<div class="flex flex-col md:flex-row md:gap-6">
+			<div class="info-section">
+				<div class="info-content">
 					<!-- Module description -->
-					<div class="mb-4 md:mb-0 md:w-1/2">
-						<h2 class="mb-2 font-['Arvo',serif] text-lg font-semibold text-[#33312E]">
+					<div class="description-container">
+						<h2 class="section-subtitle">
 							About This Module
 						</h2>
-						<p class="text-sm leading-relaxed text-[#33312E]">{module.description}</p>
+						<p class="description-text">{module.description}</p>
 					</div>
 
 					<!-- Divider for mobile -->
-					<div class="mb-4 h-px w-full bg-[#A0998A] opacity-30 md:hidden"></div>
+					<div class="mobile-divider"></div>
 
 					<!-- Learning objectives -->
-					<div class="md:w-1/2">
-						<h2 class="mb-2 font-['Arvo',serif] text-lg font-semibold text-[#33312E]">
+					<div class="objectives-container">
+						<h2 class="section-subtitle">
 							Learning Objectives
 						</h2>
-						<ul class="space-y-2">
+						<ul class="objectives-list">
 							{#each objectives as objective}
-								<li class="flex items-start">
+								<li class="objective-item">
 									<svg
-										class="mt-1 mr-2 h-4 w-4 flex-shrink-0 text-[#7D8C5C]"
+										class="check-icon"
 										viewBox="0 0 20 20"
 										fill="currentColor"
 									>
@@ -150,7 +161,7 @@
 											clip-rule="evenodd"
 										/>
 									</svg>
-									<span class="text-sm text-[#33312E]">{objective}</span>
+									<span class="objective-text">{objective}</span>
 								</li>
 							{/each}
 						</ul>
@@ -161,22 +172,22 @@
 
 		<!-- Units section -->
 		<section>
-			<h2 class="mb-4 font-['Arvo',serif] text-xl font-semibold text-[#33312E]">Choose a Unit</h2>
+			<h2 class="units-title">Choose a Unit</h2>
 
 			{#if units.length > 0}
-			<div class="grid grid-cols-1 gap-2 mb-4">
-				{#each units as unit, index}
-					<UnitCard 
-						{unit} 
-						{index} 
-						isCompleted={!!unitProgressMap[unit.id]} 
-					/>
-				{/each}
-			</div>
+				<div class="units-grid">
+					{#each units as unit, index}
+						{#if visibleUnits.includes(unit.id)}
+							<div in:fade={{ duration: 400 }}>
+								<UnitCard {unit} {index} isCompleted={!!unitProgressMap[unit.id]} />
+							</div>
+						{/if}
+					{/each}
+				</div>
 				<!-- Navigation footer -->
-				<div class="mt-8 flex justify-between border-t border-[#A0998A] pt-4">
-					<a href={`/modules`} class="flex items-center text-[#34667F] hover:text-[#C17C74]">
-						<svg class="mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+				<div class="navigation-footer">
+					<a href={`/modules`} class="back-link">
+						<svg class="back-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path
 								stroke-linecap="round"
 								stroke-linejoin="round"
@@ -188,11 +199,11 @@
 					</a>
 				</div>
 			{:else}
-				<div class="rounded-lg border border-[#A0998A] bg-[#E8E5D7] p-6 text-center">
-					<p class="mb-2 text-[#33312E]">No units found in this module.</p>
+				<div class="empty-state">
+					<p class="empty-message">No units found in this module.</p>
 					<a
 						href="/modules"
-						class="inline-block font-medium text-[#34667F] hover:text-[#C17C74] hover:underline"
+						class="return-link"
 					>
 						Return to all modules
 					</a>
@@ -200,17 +211,265 @@
 			{/if}
 		</section>
 	{:else}
-		<div class="py-16 text-center">
-			<h1 class="mb-4 font-['Arvo',serif] text-xl text-[#C17C74]">Module Not Found</h1>
-			<p class="mb-4 text-[#33312E]">
+		<div class="not-found">
+			<h1 class="not-found-title">Module Not Found</h1>
+			<p class="not-found-message">
 				The module you're looking for doesn't exist or has been removed.
 			</p>
 			<a
 				href="/modules"
-				class="inline-block rounded-lg bg-[#C17C74] px-4 py-2 font-medium text-white transition-all hover:bg-[#aa6b64]"
+				class="browse-button"
 			>
 				Browse All Modules
 			</a>
 		</div>
 	{/if}
 </div>
+
+<style>
+	.container {
+		max-width: 56rem;
+		margin-left: auto;
+		margin-right: auto;
+		padding-left: 1rem;
+		padding-right: 1rem;
+		padding-top: 0.5rem;
+		padding-bottom: 0.5rem;
+	}
+
+	.module-header {
+		margin-bottom: 1.5rem;
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+	}
+
+	.module-back-button {
+		display: flex;
+		height: 3rem;
+		width: 3rem;
+		align-items: center;
+		justify-content: center;
+		border-radius: 9999px;
+		background-color: #C17C74;
+		color: white;
+		box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+		transition-property: transform;
+	}
+
+	.module-back-button:hover {
+		transform: scale(1.05);
+	}
+
+	.module-number {
+		font-family: 'Arvo', serif;
+		font-size: 1.25rem;
+		font-weight: bold;
+	}
+
+	.module-title {
+		font-family: 'Arvo', serif;
+		font-size: 1.5rem;
+		font-weight: bold;
+		color: #33312E;
+	}
+
+	@media (min-width: 768px) {
+		.module-title {
+			font-size: 1.875rem;
+		}
+	}
+
+	.info-section {
+		margin-bottom: 2rem;
+		border-radius: 0.5rem;
+		border: 1px solid #A0998A;
+		background-color: #E8E5D7;
+		padding: 1rem;
+		box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+	}
+
+	.info-content {
+		display: flex;
+		flex-direction: column;
+	}
+
+	@media (min-width: 768px) {
+		.info-content {
+			flex-direction: row;
+			gap: 1.5rem;
+		}
+	}
+
+	.description-container {
+		margin-bottom: 1rem;
+	}
+
+	@media (min-width: 768px) {
+		.description-container {
+			margin-bottom: 0;
+			width: 50%;
+		}
+	}
+
+	.section-subtitle {
+		margin-bottom: 0.5rem;
+		font-family: 'Arvo', serif;
+		font-size: 1.125rem;
+		font-weight: 600;
+		color: #33312E;
+	}
+
+	.description-text {
+		font-size: 0.875rem;
+		line-height: 1.625;
+		color: #33312E;
+	}
+
+	.mobile-divider {
+		margin-bottom: 1rem;
+		height: 1px;
+		width: 100%;
+		background-color: #A0998A;
+		opacity: 0.3;
+	}
+
+	@media (min-width: 768px) {
+		.mobile-divider {
+			display: none;
+		}
+	}
+
+	.objectives-container {
+		width: 100%;
+	}
+
+	@media (min-width: 768px) {
+		.objectives-container {
+			width: 50%;
+		}
+	}
+
+	.objectives-list {
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+	}
+
+	.objective-item {
+		display: flex;
+		align-items: flex-start;
+	}
+
+	.check-icon {
+		margin-top: 0.25rem;
+		margin-right: 0.5rem;
+		height: 1rem;
+		width: 1rem;
+		flex-shrink: 0;
+		color: #7D8C5C;
+	}
+
+	.objective-text {
+		font-size: 0.875rem;
+		color: #33312E;
+	}
+
+	.units-title {
+		margin-bottom: 1rem;
+		font-family: 'Arvo', serif;
+		font-size: 1.25rem;
+		font-weight: 600;
+		color: #33312E;
+	}
+
+	.units-grid {
+		margin-bottom: 1rem;
+		display: grid;
+		grid-template-columns: repeat(1, minmax(0, 1fr));
+		gap: 0.5rem;
+	}
+
+	.navigation-footer {
+		margin-top: 2rem;
+		display: flex;
+		justify-content: space-between;
+		border-top: 1px solid #A0998A;
+		padding-top: 1rem;
+	}
+
+	.back-link {
+		display: flex;
+		align-items: center;
+		color: #34667F;
+	}
+
+	.back-link:hover {
+		color: #C17C74;
+	}
+
+	.back-icon {
+		margin-right: 0.5rem;
+		height: 1.25rem;
+		width: 1.25rem;
+	}
+
+	.empty-state {
+		border-radius: 0.5rem;
+		border: 1px solid #A0998A;
+		background-color: #E8E5D7;
+		padding: 1.5rem;
+		text-align: center;
+	}
+
+	.empty-message {
+		margin-bottom: 0.5rem;
+		color: #33312E;
+	}
+
+	.return-link {
+		display: inline-block;
+		font-weight: 500;
+		color: #34667F;
+	}
+
+	.return-link:hover {
+		color: #C17C74;
+		text-decoration: underline;
+	}
+
+	.not-found {
+		padding-top: 4rem;
+		padding-bottom: 4rem;
+		text-align: center;
+	}
+
+	.not-found-title {
+		margin-bottom: 1rem;
+		font-family: 'Arvo', serif;
+		font-size: 1.25rem;
+		color: #C17C74;
+	}
+
+	.not-found-message {
+		margin-bottom: 1rem;
+		color: #33312E;
+	}
+
+	.browse-button {
+		display: inline-block;
+		border-radius: 0.5rem;
+		background-color: #C17C74;
+		padding-left: 1rem;
+		padding-right: 1rem;
+		padding-top: 0.5rem;
+		padding-bottom: 0.5rem;
+		font-weight: 500;
+		color: white;
+		transition-property: all;
+	}
+
+	.browse-button:hover {
+		background-color: #aa6b64;
+	}
+</style>

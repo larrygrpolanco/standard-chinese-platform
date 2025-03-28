@@ -276,7 +276,7 @@
 
 				<!-- Core module associations -->
 				<div class="module-associations">
-					<p class="association-label">Connected with:</p>
+					<p class="association-label">Supplementary material for</p>
 					<div class="association-tags">
 						{#each resourceInfo.modules as module}
 							<a href="/modules/{module.split(' ').pop()}" class="module-tag">
@@ -289,7 +289,7 @@
 				<!-- Tape connection notes -->
 				{#if connections.length > 0}
 					<div class="tape-connections">
-						<p class="connection-label">Tape connections:</p>
+						<!-- <p class="connection-label">To be practiced with:</p> -->
 						<ul class="connections-list">
 							{#each connections as connection}
 								<li class="connection-item">
@@ -303,8 +303,7 @@
 
 				<div class="resource-warning">
 					<p>
-						<strong>Note:</strong> These resource modules are supplementary materials and may be extra
-						boring for absolute beginners. They are best used alongside the core modules.
+						<strong>Note:</strong> These resource modules are optional materials and are best used alongside the core modules.
 					</p>
 				</div>
 			</header>
@@ -320,7 +319,7 @@
 				<!-- Exercise Display Section -->
 				<section class="section-container mt-6">
 					<div class="mb-4">
-						<h3 class="section-header">Practice Materials</h3>
+						<h3 class="section-header">Workbook Pages</h3>
 					</div>
 
 					<div class="exercise-display-container">

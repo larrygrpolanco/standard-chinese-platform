@@ -32,7 +32,7 @@
 	// Personal context state variables
 	let occupation = 'Not a Vampire Lord';
 	let location = 'Transylvania';
-	let hobbies = 'midnight beach walks, bat watching';
+	let hobbies = 'midnight walks, eating taiwanese sausages';
 	let reasonLearning = 'planning a trip to Taiwan for their famous night markets';
 
 	// Collapsible panel states
@@ -275,10 +275,32 @@
 	{:else}
 		<div class="page-container">
 			<!-- Page Header -->
-			<header class="page-header">
-				<div class="header-top">
-					<a href="/units/{unitId}" class="back-button">
-						<svg viewBox="0 0 24 24" class="back-icon">
+			<header class="unit-header">
+				<div class="module-nav">
+					<!-- Modified badge that links back to RWP page -->
+					<a href="/rwp" class="module-badge" title="Go to RWP page">
+						<span class="module-badge-text">RWP</span>
+					</a>
+					<div class="dropdown-wrapper">
+						<h1 class="unit-title"><span class="title-text">{unitData.title} Demo</span></h1>
+					</div>
+				</div>
+
+				<!-- Module title at bottom of header -->
+				<p class="module-title">
+					Module {unitData.module.id}:
+					<span class="module-title-highlight">{unitData.module.title}</span>
+				</p>
+                
+
+				{#if unitData.description}
+					<p class="unit-description">{unitData.description}</p>
+				{/if}
+
+				<!-- Action buttons area -->
+				<div class="action-buttons">
+					<a href={`/units/${unitId}`} class="back-to-unit-button">
+						<svg class="button-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path
 								stroke-linecap="round"
 								stroke-linejoin="round"
@@ -286,25 +308,9 @@
 								d="M15 19l-7-7 7-7"
 							></path>
 						</svg>
-						<span>Back to Unit</span>
+						Go to Unit {unitId}
 					</a>
-
-					<div class="unit-badge">Unit {unitId}</div>
 				</div>
-
-				<h1 class="unit-title">{unitData.title} RWP</h1>
-
-				<p class="unit-description">{unitData.description}</p>
-
-				<div class="module-info">
-					<span class="module-label">Module {unitData.module.id}:</span>
-					<span class="module-title">{unitData.module.title}</span>
-				</div>
-
-				<p class="page-description">
-					This is a demo of the personalized practice feature. Try it out by filling out the
-					learning profile and contexts
-				</p>
 			</header>
 
 			<!-- Content Layout -->
@@ -518,7 +524,7 @@
 							<div class="loading-container">
 								<TapeConstruction
 									message="Creating Your Practice"
-									submessage="This should take about a minute"
+									submessage="This will take 2-3 minutes"
 									currentPhase={generationPhase}
 									isGenerating={true}
 									vocabulary={unitVocabulary}
@@ -641,66 +647,48 @@
 		min-height: 50vh;
 	}
 
-	/* ===== HEADER STYLING ===== */
-	.page-header {
+	/* Unit header styling */
+	.unit-header {
+		margin-bottom: 1rem;
+		border-bottom: 1px solid #a0998a;
+		padding-bottom: 0.5rem;
+	}
+
+	.module-nav {
+		margin-bottom: 0.5rem;
 		display: flex;
-		flex-direction: column;
-		gap: 0.5rem;
-		margin-bottom: 2rem;
-		padding-bottom: 1rem;
-		border-bottom: 1px solid var(--color-warm-gray, #a0998a);
+		align-items: center;
+		gap: 0.75rem;
 	}
 
-	.header-top {
+	.module-badge {
 		display: flex;
-		justify-content: space-between;
+		height: 3rem;
+		min-width: 3rem;
+		padding: 0 0.75rem;
 		align-items: center;
-	}
-
-	.back-button {
-		display: inline-flex;
-		align-items: center;
-		padding: 0.5rem 0.75rem;
-		border-radius: 20px;
-		color: var(--color-navy, #34667f);
-		font-size: 0.875rem;
-		font-weight: 600;
-		text-decoration: none;
-		transition: all 0.2s;
-	}
-
-	.back-button:hover {
-		color: var(--color-terracotta, #c17c74);
-		transform: translateX(-2px);
-	}
-
-	.back-icon {
-		width: 20px;
-		height: 20px;
-		margin-right: 0.375rem;
-	}
-
-	.unit-badge {
-		display: inline-block;
-		background-color: var(--color-terracotta, #c17c74);
+		justify-content: center;
+		border-radius: 9999px;
+		background-color: #c17c74;
 		color: white;
-		padding: 0.25rem 0.75rem;
-		border-radius: 16px;
-		font-size: 0.875rem;
-		font-weight: 600;
+		box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+		transition: transform 0.2s;
 	}
 
-	.unit-title {
-		font-family: 'Arvo', 'DM Serif Display', serif;
-		font-size: 1.75rem;
-		color: var(--color-charcoal, #33312e);
-		margin: 0.5rem 0;
+	.module-badge:hover {
+		transform: scale(1.05);
 	}
 
-	.unit-description {
-		margin-top: 0.5rem;
-		font-size: 1.125rem;
-		color: #33312e;
+	.module-badge-text {
+		font-family: 'Arvo', serif;
+		font-size: 1.25rem;
+		font-weight: 700;
+		white-space: nowrap;
+	}
+
+	.dropdown-wrapper {
+		position: relative;
+		z-index: 20;
 	}
 
 	.module-title {
@@ -710,27 +698,78 @@
 		font-style: italic;
 	}
 
-	.module-info {
+	.module-title-highlight {
+		color: #c17c74;
+	}
+
+	.unit-description {
+		margin-top: 0.5rem;
+		font-size: 1.125rem;
+		color: #33312e;
+	}
+
+	.action-buttons {
+		margin-top: 1.5rem;
 		display: flex;
+		flex-direction: column;
+		gap: 1rem;
+	}
+
+	@media (min-width: 640px) {
+		.action-buttons {
+			flex-direction: row;
+			flex-wrap: wrap;
+			align-items: center;
+			gap: 1rem;
+			margin-top: 1rem;
+		}
+	}
+
+	.back-to-unit-button {
+		display: inline-flex;
 		align-items: center;
-		gap: 0.5rem;
-		margin-bottom: 0.5rem;
-	}
-
-	.module-label {
+		justify-content: center;
+		padding: 8px 16px;
+		border-radius: 16px;
+		background-color: #34667f;
+		color: #f4f1de;
+		border: 1px solid #295267;
 		font-weight: 600;
-		color: var(--color-navy, #34667f);
+		font-size: 0.875rem;
+		cursor: pointer;
+		transition: all 0.2s;
+		min-width: 140px;
+		text-decoration: none;
 	}
 
-	.module-title {
-		color: var(--color-warm-gray, #a0998a);
+	.back-to-unit-button:hover {
+		transform: translateY(-1px);
+		box-shadow: 0 2px 4px rgba(41, 82, 103, 0.3);
+		background-color: #295267;
 	}
 
-	.page-description {
-		color: var(--color-warm-gray, #a0998a);
-		font-size: 1rem;
+	.back-to-unit-button:active {
+		transform: translateY(1px);
+		box-shadow: none;
+	}
+
+	.button-icon {
+		height: 1rem;
+		width: 1rem;
+		margin-right: 0.375rem;
+	}
+
+	.unit-title {
+		font-family: 'Arvo', serif;
+		font-size: 1.5rem;
+		font-weight: bold;
+		color: #33312e;
 		margin: 0;
-		line-height: 1.5;
+	}
+	.title-text {
+		border-bottom: 1px solid #c17c74;
+		padding-bottom: 0.125rem;
+		transition: all 0.2s;
 	}
 
 	/* ===== CONTENT AREA ===== */

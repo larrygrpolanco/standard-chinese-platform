@@ -91,18 +91,6 @@
 			</div>
 		</header>
 
-		<div id="learning-guide" class="content-section">
-			<h2 class="section-title">Why FSI</h2>
-			<div class="section-content">
-				<p>
-					The Foreign Service Institute (FSI) materials are in the public domain, free, and
-					exceptionally well-structured. However, these resources are decades old, which makes them
-					difficult to access and use effectively. This platform digitizes and modernizes these
-					materials, making them more accessible to learners.
-				</p>
-			</div>
-		</div>
-
 		<!-- Resource Modules Section -->
 		<div class="content-section">
 			<h2 class="section-title">Resource Modules</h2>
@@ -129,6 +117,17 @@
 		</div>
 
 		<!-- Learning Guide Sections -->
+		<div id="learning-guide" class="content-section">
+			<h2 class="section-title">Why FSI</h2>
+			<div class="section-content">
+				<p>
+					The Foreign Service Institute (FSI) materials are in the public domain, free, and
+					exceptionally well-structured. However, these resources are decades old, which makes them
+					difficult to access and use effectively. This platform digitizes and modernizes these
+					materials, making them more accessible to learners.
+				</p>
+			</div>
+		</div>
 
 		<div class="content-section">
 			<h2 class="section-title">Problems with FSI</h2>
