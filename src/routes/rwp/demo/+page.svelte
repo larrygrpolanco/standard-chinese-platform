@@ -1297,4 +1297,10 @@
 			font-size: 1.125rem;
 		}
 	}
+
+	.cassette-icon {
+		color: var(--color-warm-gray, #a0998a);
+		width: 61.8%; /* Golden ratio: 1/φ ≈ 61.8% */
+		height: 61.8%;
+	}
 </style>
