@@ -155,6 +155,33 @@
 		</div>
 	{/if}
 
+	{#if isGenerating}
+		<div class="progress-section">
+			<div class="progress-bar">
+				<div class="progress-fill" style="width: {tapeProgress}%">
+					<div class="progress-pulse"></div>
+				</div>
+				<span class="progress-percentage">{Math.round(tapeProgress)}%</span>
+			</div>
+
+			<div class="phase-indicator">
+				{#each phases as phase}
+					<div
+						class="phase-step {phase.id === currentPhase ? 'active' : ''} 
+						{currentPhaseInfo.percentage >= phase.percentage ? 'completed' : ''}"
+					>
+						<div class="step-dot"></div>
+						<span class="step-label">{phase.label}</span>
+					</div>
+				{/each}
+			</div>
+
+			<!-- <div class="click-helper">
+				<p class="helper-text">{clickMessage}</p>
+			</div> -->
+		</div>
+	{/if}
+
 	<div class="cassette-wrapper">
 		<div class="cassette" class:pulse={isPulsing || speedBoost > 1.5}>
 			<div class="cassette-body">
@@ -180,7 +207,7 @@
 					>
 						<div class="reel-center"></div>
 					</div>
-					
+
 					<div
 						class="reel right-reel"
 						style="transform: rotate({rightReelRotation}deg);"
@@ -205,33 +232,6 @@
 			</div>
 		</div>
 	</div>
-
-	{#if isGenerating}
-		<div class="progress-section">
-			<div class="progress-bar">
-				<div class="progress-fill" style="width: {tapeProgress}%">
-					<div class="progress-pulse"></div>
-				</div>
-				<span class="progress-percentage">{Math.round(tapeProgress)}%</span>
-			</div>
-
-			<div class="phase-indicator">
-				{#each phases as phase}
-					<div
-						class="phase-step {phase.id === currentPhase ? 'active' : ''} 
-						       {currentPhaseInfo.percentage >= phase.percentage ? 'completed' : ''}"
-					>
-						<div class="step-dot"></div>
-						<span class="step-label">{phase.label}</span>
-					</div>
-				{/each}
-			</div>
-
-			<!-- <div class="click-helper">
-				<p class="helper-text">{clickMessage}</p>
-			</div> -->
-		</div>
-	{/if}
 </div>
 
 <style>
@@ -410,8 +410,6 @@
 	.right-reel::before {
 		transform: translate(-50%, -50%) rotate(-45deg);
 	}
-
-	
 
 	.tape-details {
 		margin-top: 12px;

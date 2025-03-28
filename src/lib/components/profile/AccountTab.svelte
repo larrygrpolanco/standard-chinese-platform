@@ -72,8 +72,6 @@
 		deleting = true;
 
 		try {
-			// Sign out
-			await authStore.signOut();
 			// Delete user account using our helper function
 			await deleteUserAccount();
 

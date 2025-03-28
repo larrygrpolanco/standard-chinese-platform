@@ -213,6 +213,22 @@ export async function signUp(email, password) {
 	});
 
 	if (error) throw error;
+
+	// Create necessary records for new user
+	if (data?.user) {
+		try {
+			// Create user_subscriptions record
+			await supabase.from('user_subscriptions').insert({
+				user_id: data.user.id,
+				subscription_status: 'free'
+			});
+
+			// Rest of code to create other records if needed...
+		} catch (insertError) {
+			console.error('Error creating subscription record:', insertError);
+		}
+	}
+
 	return data;
 }
 
@@ -401,7 +417,7 @@ export async function getUserPreferences() {
 	return data;
 }
 
-// Add this to src/lib/supabase/client.js
+
 export async function deleteUserAccount() {
 	const { data: sessionData } = await supabase.auth.getSession();
 	const token = sessionData?.session?.access_token;
