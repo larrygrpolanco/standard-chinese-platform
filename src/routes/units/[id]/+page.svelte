@@ -169,7 +169,7 @@
 							initialStatus={userProgress?.status || 'in_progress'}
 						/>
 
-						<a href="/rwp/{unitData.id}" class="rwp-button"> Relevant World Practice </a>
+						<a href="/rwp/{unitData.id}" class="rwp-button"> Go to RWP </a>
 					{:else}
 						<a href="/login?redirect=/units/{unitData.id}" class="signin-button">
 							Sign-in to Unlock Progress Tracking

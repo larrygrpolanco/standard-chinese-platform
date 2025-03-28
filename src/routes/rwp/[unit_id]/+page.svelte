@@ -37,7 +37,7 @@
 	let user;
 	let unitVocabulary = [];
 	let generationPhase = 'init';
-	let debug = true; // Set to false by default, developers can enable in UI
+	let debug = false; 
 
 	// Collapsible panel state - only for context panel
 	let contextPanelOpen = false; // Open by default for first-time users
@@ -674,7 +674,7 @@
 	.sidebar {
 		display: flex;
 		flex-direction: column;
-		gap: 1.5rem;
+		gap: 0.5rem;
 	}
 
 	/* Vintage panel styling */

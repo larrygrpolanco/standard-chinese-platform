@@ -22,7 +22,7 @@
 	let error = null;
 	let unitVocabulary = [];
 	let generationPhase = 'init';
-	let debug = true;
+	let debug = false;
 
 	// Demo user profile state
 	let fullName = 'Dracula';

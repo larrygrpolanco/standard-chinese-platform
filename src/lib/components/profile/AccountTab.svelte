@@ -127,9 +127,14 @@
 	<section class="account-section">
 		<h2 class="section-title">Account Management</h2>
 
+		<!-- Session Management -->
+		<div class="management-item">
+			<button class="tape-button secondary" on:click={() => dispatch('signOut')}> Sign Out </button>
+		</div>
+
 		<!-- Password Change -->
 		<div class="management-item">
-			<h3 class="subsection-title">Password</h3>
+			<h3 class="subsection-title"></h3>
 			{#if !changePasswordVisible}
 				<button class="tape-button secondary" on:click={() => (changePasswordVisible = true)}>
 					Change Password
@@ -180,11 +185,6 @@
 					</div>
 				</div>
 			{/if}
-		</div>
-
-		<!-- Session Management -->
-		<div class="management-item">
-			<button class="tape-button danger" on:click={() => dispatch('signOut')}> Sign Out </button>
 		</div>
 	</section>
 
@@ -270,7 +270,7 @@
 	}
 
 	.management-item {
-		margin-bottom: 1.5rem;
+		/* margin-bottom: 1.5rem; */
 		padding-bottom: 1.5rem;
 		border-bottom: 1px solid #eee;
 	}
@@ -372,13 +372,17 @@
 	}
 
 	.tape-button.secondary {
-		background-color: var(--color-cream-paper);
+		background-color: #f4f1de;
 		color: #33312e;
+		background-image:
+			radial-gradient(circle at, rgba(193, 124, 116, 0.08) 0%, transparent 45%),
+			radial-gradient(circle at 15% 50%, rgba(52, 102, 127, 0.08) 0%, transparent 45%);
 	}
 
 	.tape-button.danger {
-		background-color: #c17c74;
+		background-color: #c17c74cc;
 		color: #f4f1de;
+		margin-bottom: 1rem;
 	}
 
 	.tape-button:hover {
@@ -396,10 +400,10 @@
 	}
 
 	.danger-section {
-		background-color: #f9f0ed;
+		background-color: #f9f0ed86;
 		padding: 1.25rem;
 		border-radius: 8px;
-		border-left: 3px solid #c17c74;
+		border-left: 3px solid #c17c749c;
 	}
 
 	.password-form {

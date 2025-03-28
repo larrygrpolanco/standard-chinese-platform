@@ -89,7 +89,8 @@
 										d="M5 13l4 4L19 7"
 									></path>
 								</svg>
-								<span>{STRIPE_CONFIG.PREMIUM_TIER_LIMITS.rwp_per_day} RWP exercises per day</span>
+								<!-- <span>{STRIPE_CONFIG.PREMIUM_TIER_LIMITS.rwp_per_day} RWP exercises per day</span> -->
+                                <span>Unlimited RWP exercises</span>
 							</li>
 							<li class="feature">
 								<svg class="feature-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -166,7 +167,7 @@
 										d="M6 18L18 6M6 6l12 12"
 									></path>
 								</svg>
-								<span>No Text-to-Speech access</span>
+								<span>No RWP Listening Exercise access</span>
 							</li>
 						</ul>
 					</div>
@@ -177,7 +178,8 @@
 							For just {STRIPE_CONFIG.PRODUCTS.MONTHLY_SUBSCRIPTION.price}, get:
 						</p>
 						<ul class="upgrade-features">
-							<li>{STRIPE_CONFIG.PREMIUM_TIER_LIMITS.rwp_per_day} RWP exercises daily</li>
+							<!-- <li>{STRIPE_CONFIG.PREMIUM_TIER_LIMITS.rwp_per_day} RWP exercises daily</li> -->
+                            <li>Unlimited RWP exercises</li>
 							<li>RWP Listening Exercise access</li>
 						</ul>
 					</div>
