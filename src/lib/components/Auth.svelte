@@ -73,7 +73,7 @@
 				}
 
 				await signIn(email, password);
-				goto('/profile'); // Redirect to profile after login
+				goto('/'); // Redirect to home after login
 			}
 		} catch (e) {
 			console.error('Auth error:', e);
