@@ -66,7 +66,18 @@
 				<div class="modules-section">
 					<button on:click={toggleModuleDropdown} class="dropdown-button">
 						<span class="link-text">Modules</span>
-						<span class="dropdown-caret {moduleDropdownOpen ? 'open' : ''}">▼</span>
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							viewBox="0 0 20 20"
+							fill="currentColor"
+							class="dropdown-arrow {moduleDropdownOpen ? 'open' : ''}"
+						>
+							<path
+								fill-rule="evenodd"
+								d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"
+								clip-rule="evenodd"
+							/>
+						</svg>
 					</button>
 
 					{#if moduleDropdownOpen}
@@ -274,6 +285,17 @@
 		margin-bottom: 0.5rem;
 	}
 
+	.dropdown-arrow {
+		margin-left: 0.25rem;
+		height: 1rem;
+		width: 1rem;
+		transition: transform 0.2s;
+	}
+
+	.dropdown-arrow.open {
+		transform: rotate(180deg);
+	}
+
 	.dropdown-button {
 		width: 100%;
 		text-align: left;
@@ -290,15 +312,6 @@
 
 	.dropdown-button:hover {
 		background-color: #e8e5d7;
-	}
-
-	.dropdown-caret {
-		font-size: 0.875rem;
-		transition: transform 200ms ease;
-	}
-
-	.dropdown-caret.open {
-		transform: rotate(180deg);
 	}
 
 	.dropdown-content {
@@ -370,6 +383,7 @@
 		color: #c17c74;
 		font-weight: 500;
 	}
+    
 	.mobile-login-button {
 		position: relative;
 		display: flex;

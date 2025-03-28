@@ -19,7 +19,7 @@
 		class="module-dropdown-trigger {isOpen || isActive ? 'active' : ''}"
 		aria-expanded={isOpen}
 	>
-		<span>Modules</span>
+		<span class="module-text">Modules</span>
 		<svg
 			xmlns="http://www.w3.org/2000/svg"
 			viewBox="0 0 20 20"
@@ -65,6 +65,10 @@
 <style>
 	.module-dropdown {
 		position: relative;
+	}
+
+	.module-text {
+		color: #34667f;
 	}
 
 	.module-dropdown-trigger {
@@ -131,6 +135,7 @@
 		border-bottom: 1px solid #a0998a;
 		background-color: #e8e5d7;
 		padding: 0.5rem 1rem;
+		border-radius: 0.375rem 0.375rem 0 0;
 	}
 
 	.dropdown-header-text {
@@ -143,7 +148,7 @@
 	.dropdown-body {
 		max-height: calc(100vh - 200px);
 		overflow-y: auto;
-		padding: 0.5rem;
+		padding: 0.25rem;
 		box-shadow: inset 0 2px 4px rgba(51, 49, 46, 0.05);
 	}
 
