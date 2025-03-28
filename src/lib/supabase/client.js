@@ -249,10 +249,20 @@ export async function signOut() {
 }
 
 export async function getCurrentUser() {
-	const {
-		data: { user }
-	} = await supabase.auth.getUser();
-	return user;
+	try {
+		// Add timeout to the Supabase call
+		const authPromise = supabase.auth.getUser();
+		const timeoutPromise = new Promise((_, reject) =>
+			setTimeout(() => reject(new Error('getCurrentUser timeout')), 5000)
+		);
+
+		const { data } = await Promise.race([authPromise, timeoutPromise]);
+		return data.user;
+	} catch (error) {
+		console.error('Error getting current user:', error);
+		// Return null on error so the app can continue
+		return null;
+	}
 }
 
 // Update a unit's progress status
