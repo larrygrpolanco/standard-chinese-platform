@@ -14,11 +14,16 @@
 	$: if ($navigating) {
 		isLoading = true;
 		console.log("Page navigation started", $navigating?.to?.url?.pathname);
+		
+		// Execute any cleanup needed during navigation
+		// This will run when navigation starts, before components are destroyed
+		window.__navigationInProgress = true;
 	} else if (isLoading) {
 		// Navigation completed
 		tick().then(() => {
 			isLoading = false;
 			console.log("Page navigation completed");
+			window.__navigationInProgress = false;
 		});
 	}
 

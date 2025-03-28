@@ -46,6 +46,12 @@
 		// Safety timeout - if a loader is visible for more than 30 seconds,
 		// it might be stuck due to a failed async operation
 		safetyTimeoutId = setTimeout(() => {
+			// Skip warning if we're in the middle of page navigation
+			if (typeof window !== 'undefined' && window.__navigationInProgress) {
+				console.log('Loader timeout triggered during navigation - ignoring');
+				return;
+			}
+			
 			console.warn(`Loader showing "${message}" has been visible for 30+ seconds, might be stuck`);
 			
 			// Track loader stuck event in session storage for diagnostics
@@ -54,7 +60,8 @@
 				stuckLoaders.push({
 					message,
 					timestamp: new Date().toISOString(),
-					location: window.location.pathname
+					location: window.location.pathname,
+					navigationInProgress: window.__navigationInProgress
 				});
 				sessionStorage.setItem('stuckLoaders', JSON.stringify(stuckLoaders));
 				

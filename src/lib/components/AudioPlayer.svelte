@@ -118,23 +118,28 @@
 		e.stopPropagation();
 	}
 
+	// Define named handlers for cleanup
+	function handleTimeUpdate() {
+		currentTime = audio.currentTime;
+	}
+
+	function handleMetadata() {
+		if (audio && !isNaN(audio.duration)) {
+			duration = audio.duration;
+			loaded = true;
+		}
+	}
+
+	function handleEnded() {
+		playing = false;
+	}
+
 	// Setup event listeners when component mounts
 	onMount(() => {
 		if (audio) {
-			audio.addEventListener('timeupdate', () => {
-				currentTime = audio.currentTime;
-			});
-
-			audio.addEventListener('loadedmetadata', () => {
-				if (audio && !isNaN(audio.duration)) {
-					duration = audio.duration;
-					loaded = true;
-				}
-			});
-
-			audio.addEventListener('ended', () => {
-				playing = false;
-			});
+			audio.addEventListener('timeupdate', handleTimeUpdate);
+			audio.addEventListener('loadedmetadata', handleMetadata);
+			audio.addEventListener('ended', handleEnded);
 		}
 	});
 
@@ -142,6 +147,9 @@
 	onDestroy(() => {
 		if (audio) {
 			audio.pause();
+			audio.removeEventListener('timeupdate', handleTimeUpdate);
+			audio.removeEventListener('loadedmetadata', handleMetadata);
+			audio.removeEventListener('ended', handleEnded);
 		}
 	});
 </script>
