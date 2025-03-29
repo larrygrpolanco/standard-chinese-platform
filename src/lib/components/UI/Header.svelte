@@ -105,10 +105,6 @@
 			<NavigationItem href="/" label="Home" isActive={isActive('/')} />
 
 			<!-- Other navigation items -->
-			<NavigationItem href="/resource" label="Guide" isActive={isActive('/resource')} />
-
-			<NavigationItem href="/rwp" label="RWPs" isActive={isActive('/rwp')} />
-
 			<!-- Modules dropdown -->
 			<ModuleDropdown
 				isOpen={moduleDropdownOpen}
@@ -116,6 +112,10 @@
 				isActive={isActive('/modules')}
 				on:click={toggleModuleDropdown}
 			/>
+
+			<NavigationItem href="/resource" label="Guide" isActive={isActive('/resource')} />
+
+			<NavigationItem href="/rwp" label="RWPs" isActive={isActive('/rwp')} />
 
 			<!-- Conditional /profile button -->
 			{#if $authStore}

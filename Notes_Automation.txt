@@ -175,3 +175,80 @@ Important:
 - Maintain numbering of examples, questions, and dialogues
 
 
+
+CSV Generator for Exercises Database Table
+
+I need you to generates properly formatted CSV rows for the exercises table in my Supabase database based on module, unit, and exercise information.
+
+Input Template
+
+Unit Information:
+Module: 4
+Unit: 5
+
+Comprehension Exercises (Exercise# : Page count)
+1 : 1
+2 : 2
+3 : 1
+
+
+Production Exercises (Exercise# : Page count)
+1 : 2
+2 : 2
+
+
+CSV Format Rules
+The output will follow this structure:
+id,tape_id,title,exercise_type,instructions,display_url,order_num
+Where:
+
+id = [Module][Unit][Tape][Exercise]
+(Tape is 3 for comprehension, 4 for production)
+tape_id = First 3 digits of id
+title = "Exercise [Exercise#]"
+exercise_type = "comprehension" or "production"
+instructions = [empty]
+display_url = URLs to image files, comma-separated for multiple pages
+Format: https://mgujzfobtdqargxdnaai.supabase.co/storage/v1/object/public/exercise-displays/module-[Module]/unit-[Unit]/[c/p][Exercise#][Page#].jpg
+Where c=comprehension, p=production
+order_num = [Exercise#]
+
+Example Output
+For Module 4, Unit 1 with the exercises specified above, the output would be:
+id,tape_id,title,exercise_type,instructions,display_url,order_num
+4131,413,Exercise 1,comprehension,,"https://mgujzfobtdqargxdnaai.supabase.co/storage/v1/object/public/exercise-displays/module-4/unit-1/c11.jpg, https://mgujzfobtdqargxdnaai.supabase.co/storage/v1/object/public/exercise-displays/module-4/unit-1/c12.jpg",1
+4132,413,Exercise 2,comprehension,,"https://mgujzfobtdqargxdnaai.supabase.co/storage/v1/object/public/exercise-displays/module-4/unit-1/c21.jpg, https://mgujzfobtdqargxdnaai.supabase.co/storage/v1/object/public/exercise-displays/module-4/unit-1/c22.jpg",2
+4133,413,Exercise 3,comprehension,,https://mgujzfobtdqargxdnaai.supabase.co/storage/v1/object/public/exercise-displays/module-4/unit-1/c31.jpg,3
+4134,413,Exercise 4,comprehension,,https://mgujzfobtdqargxdnaai.supabase.co/storage/v1/object/public/exercise-displays/module-4/unit-1/c41.jpg,4
+4141,414,Exercise 1,production,,"https://mgujzfobtdqargxdnaai.supabase.co/storage/v1/object/public/exercise-displays/module-4/unit-1/p11.jpg, https://mgujzfobtdqargxdnaai.supabase.co/storage/v1/object/public/exercise-displays/module-4/unit-1/p12.jpg",1
+4142,414,Exercise 2,production,,https://mgujzfobtdqargxdnaai.supabase.co/storage/v1/object/public/exercise-displays/module-4/unit-1/p21.jpg,2
+4143,414,Exercise 3,production,,https://mgujzfobtdqargxdnaai.supabase.co/storage/v1/object/public/exercise-displays/module-4/unit-1/p31.jpg,3
+
+
+Full unit 4 Example:
+id,tape_id,title,exercise_type,instructions,display_url,order_num
+111,11,P&R Tape 1 Exercise,comprehension,,"https://mgujzfobtdqargxdnaai.supabase.co/storage/v1/object/public/exercise-displays/module-0/pronunciation-romanization/t1-1.jpg, https://mgujzfobtdqargxdnaai.supabase.co/storage/v1/object/public/exercise-displays/module-0/pronunciation-romanization/t1-2.jpg",1
+112,12,P&R Tape 2 Exercise,comprehension,,"https://mgujzfobtdqargxdnaai.supabase.co/storage/v1/object/public/exercise-displays/module-0/pronunciation-romanization/t2-1.jpg, https://mgujzfobtdqargxdnaai.supabase.co/storage/v1/object/public/exercise-displays/module-0/pronunciation-romanization/t2-2.jpg, https://mgujzfobtdqargxdnaai.supabase.co/storage/v1/object/public/exercise-displays/module-0/pronunciation-romanization/t2-3.jpg, https://mgujzfobtdqargxdnaai.supabase.co/storage/v1/object/public/exercise-displays/module-0/pronunciation-romanization/t2-4.jpg",2
+113,13,P&R Tape 3 Exercise,comprehension,,"https://mgujzfobtdqargxdnaai.supabase.co/storage/v1/object/public/exercise-displays/module-0/pronunciation-romanization/t3-1.jpg, https://mgujzfobtdqargxdnaai.supabase.co/storage/v1/object/public/exercise-displays/module-0/pronunciation-romanization/t3-2.jpg, https://mgujzfobtdqargxdnaai.supabase.co/storage/v1/object/public/exercise-displays/module-0/pronunciation-romanization/t3-3.jpg",3
+114,14,P&R Tape 4 Exercise,comprehension,,"https://mgujzfobtdqargxdnaai.supabase.co/storage/v1/object/public/exercise-displays/module-0/pronunciation-romanization/t4-1.jpg, https://mgujzfobtdqargxdnaai.supabase.co/storage/v1/object/public/exercise-displays/module-0/pronunciation-romanization/t4-2.jpg, https://mgujzfobtdqargxdnaai.supabase.co/storage/v1/object/public/exercise-displays/module-0/pronunciation-romanization/t4-3.jpg",4
+115,15,P&R Tape 5 Exercise,comprehension,,"https://mgujzfobtdqargxdnaai.supabase.co/storage/v1/object/public/exercise-displays/module-0/pronunciation-romanization/t5-1.jpg, https://mgujzfobtdqargxdnaai.supabase.co/storage/v1/object/public/exercise-displays/module-0/pronunciation-romanization/t5-2.jpg, https://mgujzfobtdqargxdnaai.supabase.co/storage/v1/object/public/exercise-displays/module-0/pronunciation-romanization/t5-3.jpg",5
+116,16,P&R Tape 6 Exercise,comprehension,,"https://mgujzfobtdqargxdnaai.supabase.co/storage/v1/object/public/exercise-displays/module-0/pronunciation-romanization/t6-1.jpg, https://mgujzfobtdqargxdnaai.supabase.co/storage/v1/object/public/exercise-displays/module-0/pronunciation-romanization/t6-2.jpg, https://mgujzfobtdqargxdnaai.supabase.co/storage/v1/object/public/exercise-displays/module-0/pronunciation-romanization/t6-3.jpg",6
+211,21,Numbers Tape 1 Exercise,comprehension,,"https://mgujzfobtdqargxdnaai.supabase.co/storage/v1/object/public/exercise-displays/module-0/numbers/11.jpg, https://mgujzfobtdqargxdnaai.supabase.co/storage/v1/object/public/exercise-displays/module-0/numbers/12.jpg",1
+212,22,Numbers Tape 2 Exercise,comprehension,,"https://mgujzfobtdqargxdnaai.supabase.co/storage/v1/object/public/exercise-displays/module-0/numbers/21.jpg, https://mgujzfobtdqargxdnaai.supabase.co/storage/v1/object/public/exercise-displays/module-0/numbers/22.jpg",2
+213,23,Numbers Tape 3 Exercise,comprehension,,"https://mgujzfobtdqargxdnaai.supabase.co/storage/v1/object/public/exercise-displays/module-0/numbers/31.jpg, https://mgujzfobtdqargxdnaai.supabase.co/storage/v1/object/public/exercise-displays/module-0/numbers/32.jpg",3
+214,24,Numbers Tape 4 Exercise,comprehension,,https://mgujzfobtdqargxdnaai.supabase.co/storage/v1/object/public/exercise-displays/module-0/numbers/41.jpg,4
+215,25,Numbers Tape 5 Exercise,comprehension,,"https://mgujzfobtdqargxdnaai.supabase.co/storage/v1/object/public/exercise-displays/module-0/numbers/51.jpg, https://mgujzfobtdqargxdnaai.supabase.co/storage/v1/object/public/exercise-displays/module-0/numbers/52.jpg, https://mgujzfobtdqargxdnaai.supabase.co/storage/v1/object/public/exercise-displays/module-0/numbers/53.jpg",5
+216,26,Numbers Tape 6 Exercise,comprehension,,"https://mgujzfobtdqargxdnaai.supabase.co/storage/v1/object/public/exercise-displays/module-0/numbers/61.jpg, https://mgujzfobtdqargxdnaai.supabase.co/storage/v1/object/public/exercise-displays/module-0/numbers/62.jpg, https://mgujzfobtdqargxdnaai.supabase.co/storage/v1/object/public/exercise-displays/module-0/numbers/63.jpg, https://mgujzfobtdqargxdnaai.supabase.co/storage/v1/object/public/exercise-displays/module-0/numbers/64.jpg, https://mgujzfobtdqargxdnaai.supabase.co/storage/v1/object/public/exercise-displays/module-0/numbers/65.jpg, https://mgujzfobtdqargxdnaai.supabase.co/storage/v1/object/public/exercise-displays/module-0/numbers/66.jpg",6
+311,31,Time and Dates Tape 1 Exercise,comprehension,,https://mgujzfobtdqargxdnaai.supabase.co/storage/v1/object/public/exercise-displays/module-0/time-dates/11.jpg,1
+312,32,Time and Dates Tape 2 Exercise,comprehension,,"https://mgujzfobtdqargxdnaai.supabase.co/storage/v1/object/public/exercise-displays/module-0/time-dates/21.jpg, https://mgujzfobtdqargxdnaai.supabase.co/storage/v1/object/public/exercise-displays/module-0/time-dates/22.jpg",2
+313,33,Time and Dates Tape 3 Exercise,comprehension,,"https://mgujzfobtdqargxdnaai.supabase.co/storage/v1/object/public/exercise-displays/module-0/time-dates/31.jpg, https://mgujzfobtdqargxdnaai.supabase.co/storage/v1/object/public/exercise-displays/module-0/time-dates/32.jpg, https://mgujzfobtdqargxdnaai.supabase.co/storage/v1/object/public/exercise-displays/module-0/time-dates/33.jpg",3
+314,34,Time and Dates Tape 4 Exercise,comprehension,,"https://mgujzfobtdqargxdnaai.supabase.co/storage/v1/object/public/exercise-displays/module-0/time-dates/41.jpg, https://mgujzfobtdqargxdnaai.supabase.co/storage/v1/object/public/exercise-displays/module-0/time-dates/42.jpg, https://mgujzfobtdqargxdnaai.supabase.co/storage/v1/object/public/exercise-displays/module-0/time-dates/43.jpg, https://mgujzfobtdqargxdnaai.supabase.co/storage/v1/object/public/exercise-displays/module-0/time-dates/44.jpg, https://mgujzfobtdqargxdnaai.supabase.co/storage/v1/object/public/exercise-displays/module-0/time-dates/45.jpg",4
+411,41,Classroom Expressions Tape 1 Exercise,comprehension,,https://mgujzfobtdqargxdnaai.supabase.co/storage/v1/object/public/exercise-displays/module-0/classroom-expressions/11.jpg,1
+412,42,Classroom Expressions Tape 2 Exercise,comprehension,,"https://mgujzfobtdqargxdnaai.supabase.co/storage/v1/object/public/exercise-displays/module-0/classroom-expressions/21.jpg, https://mgujzfobtdqargxdnaai.supabase.co/storage/v1/object/public/exercise-displays/module-0/classroom-expressions/22.jpg",2
+4131,413,Exercise 1,comprehension,,"https://mgujzfobtdqargxdnaai.supabase.co/storage/v1/object/public/exercise-displays/module-4/unit-1/c11.jpg, https://mgujzfobtdqargxdnaai.supabase.co/storage/v1/object/public/exercise-displays/module-4/unit-1/c12.jpg",1
+4132,413,Exercise 2,comprehension,,"https://mgujzfobtdqargxdnaai.supabase.co/storage/v1/object/public/exercise-displays/module-4/unit-1/c21.jpg, https://mgujzfobtdqargxdnaai.supabase.co/storage/v1/object/public/exercise-displays/module-4/unit-1/c22.jpg",2
+4133,413,Exercise 3,comprehension,,https://mgujzfobtdqargxdnaai.supabase.co/storage/v1/object/public/exercise-displays/module-4/unit-1/c31.jpg,3
+4134,413,Exercise 4,comprehension,,https://mgujzfobtdqargxdnaai.supabase.co/storage/v1/object/public/exercise-displays/module-4/unit-1/c41.jpg,4
+4141,414,Exercise 1,production,,"https://mgujzfobtdqargxdnaai.supabase.co/storage/v1/object/public/exercise-displays/module-4/unit-1/p11.jpg, https://mgujzfobtdqargxdnaai.supabase.co/storage/v1/object/public/exercise-displays/module-4/unit-1/p12.jpg",1
+4142,414,Exercise 2,production,,https://mgujzfobtdqargxdnaai.supabase.co/storage/v1/object/public/exercise-displays/module-4/unit-1/p21.jpg,2
+4143,414,Exercise 3,production,,https://mgujzfobtdqargxdnaai.supabase.co/storage/v1/object/public/exercise-displays/module-4/unit-1/p31.jpg,3
