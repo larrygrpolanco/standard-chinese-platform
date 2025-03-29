@@ -20,7 +20,7 @@
 		{ id: 6, title: 'MTG', fullTitle: 'Meetings' },
 		{ id: 7, title: 'SOC', fullTitle: 'Society' },
 		{ id: 8, title: 'TVL', fullTitle: 'Travel' },
-		{ id: 9, title: 'LIC', fullTitle: 'Living' }
+		// { id: 9, title: 'LIC', fullTitle: 'Living' }
 	];
 
 	// UI state

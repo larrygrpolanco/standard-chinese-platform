@@ -135,7 +135,7 @@
 			<!-- Module description -->
 			<div class="description-section">
 				<p class="description-text">
-					FSI Standard Chinese: A Modular Approach is divided into 9 core modules each with a
+					FSI Standard Chinese: A Modular Approach is divided into 8 core modules each with a
 					different focus. These modules were designed by linguist to break down Mandarin
 					systematically and provide practical language skills.
 				</p>
