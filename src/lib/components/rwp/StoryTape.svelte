@@ -219,14 +219,27 @@
 			<!-- Overlay when TTS is unavailable -->
 			<div class="audio-content disabled">
 				<div class="disabled-overlay">
-					{#if ttsStatus.reason === 'TTS requires premium subscription'}
+					{#if ttsStatus.reason === 'TTS requires premium subscription' || ttsStatus.reason === 'Not authenticated'}
 						<div class="message-container">
 							<h3 class="message-title">Listening Exercises</h3>
-							<p class="message-text">Please subscribe to access RWP audio recordings.</p>
-							<p class="message-note">
-								You'll always keep access to any practice exercises you've already generated.
+							<p class="message-text">
+								{ttsStatus.reason === 'Not authenticated'
+									? 'Please sign in to access audio recordings.'
+									: 'Please subscribe to access RWP audio recordings.'}
 							</p>
-							<button class="subscribe-button" on:click={goToProfile}> Become a Supporter </button>
+							{#if ttsStatus.reason === 'TTS requires premium subscription'}
+								<p class="message-note">
+									You'll always keep access to any practice exercises you've already generated.
+								</p>
+							{/if}
+							<button
+								class="subscribe-button"
+								on:click={ttsStatus.reason === 'Not authenticated'
+									? () => (window.location.href = '/login')
+									: goToProfile}
+							>
+								{ttsStatus.reason === 'Not authenticated' ? 'Sign In' : 'Become a Supporter'}
+							</button>
 						</div>
 					{:else}
 						<div class="message-container">
@@ -248,7 +261,6 @@
 				{#if isCacheLoading}
 					<div class="loading-state">
 						<Loader />
-
 					</div>
 				{:else if isLoading}
 					<div class="loading-state">

@@ -180,22 +180,28 @@ CSV Generator for Exercises Database Table
 
 I need you to generates properly formatted CSV rows for the exercises table in my Supabase database based on module, unit, and exercise information.
 
-Input Template
+Template
 
 Unit Information:
-Module: 4
-Unit: 5
+Module: 5
 
-Comprehension Exercises (Exercise# : Page count)
-1 : 1
-2 : 2
-3 : 1
+.jpg Files in each unit
 
+Unit 1
 
-Production Exercises (Exercise# : Page count)
-1 : 2
-2 : 2
+Unit 2
 
+Unit 3
+
+Unit 4
+
+Unit 5
+
+Unit 6
+
+Unit 7
+
+Unit 8
 
 CSV Format Rules
 The output will follow this structure:
