@@ -196,7 +196,7 @@
 										<h2 class="module-title">{module.title}</h2>
 
 										<!-- Small tape icon -->
-										<div class="tape-icon">
+										<!-- <div class="tape-icon">
 											<svg
 												width="24"
 												height="24"
@@ -224,7 +224,7 @@
 													stroke-width="1.5"
 												/>
 											</svg>
-										</div>
+										</div> -->
 									</div>
 
 									<!-- Progress meter styled as tape counter -->
@@ -437,12 +437,12 @@
 		color: #c17c74;
 	}
 
-	.tape-icon {
+	/* .tape-icon {
 		position: absolute;
 		top: 0;
 		right: 0;
 		opacity: 0.7;
-	}
+	} */
 
 	/* Progress meter */
 	.progress-meter-container {

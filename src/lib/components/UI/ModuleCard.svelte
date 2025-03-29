@@ -75,7 +75,7 @@
 					<h2 class="card-title">Core Modules</h2>
 
 					<!-- Small tape icon - positioned relative to the top-right -->
-					<div class="tape-icon" aria-hidden="true">
+					<!-- <div class="tape-icon" aria-hidden="true">
 						<svg
 							width="24"
 							height="24"
@@ -88,7 +88,7 @@
 							<circle cx="17" cy="12" r="2.5" stroke="#33312E" stroke-width="1.5" />
 							<line x1="9.5" y1="12" x2="14.5" y2="12" stroke="#33312E" stroke-width="1.5" />
 						</svg>
-					</div>
+					</div> -->
 				</div>
 
 				<!-- Progress meter styled as tape counter -->
@@ -271,12 +271,12 @@
 	}
 
 	/* Tape icon */
-	.tape-icon {
+	/* .tape-icon {
 		position: absolute;
 		top: 0;
 		right: 0;
 		opacity: 0.7;
-	}
+	} */
 
 	/* Progress section */
 	.progress-container {
