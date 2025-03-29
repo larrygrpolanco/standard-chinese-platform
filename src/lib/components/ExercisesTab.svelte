@@ -368,7 +368,7 @@
 
 						<div class="exercise-counter">
 							<span class="counter-text">
-								Exercise <br /> {currentExerciseIndex + 1}/{filteredExercises.length}</span
+								{currentExerciseIndex + 1}/{filteredExercises.length}</span
 							>
 						</div>
 
@@ -1024,18 +1024,17 @@
 			height: 40px;
 		}
 
-        .fullscreen-btn {
-		position: absolute;
-		bottom: 8px;
-		left: 8px;
-		width: 24px;
-		height: 24px;
-	}
+		.fullscreen-btn {
+			position: absolute;
+			bottom: 8px;
+			left: 8px;
+			width: 24px;
+			height: 24px;
+		}
 
-    	.icon-symbol {
-		font-size: 16px;
-		line-height: 1;
-	}
-
+		.icon-symbol {
+			font-size: 16px;
+			line-height: 1;
+		}
 	}
 </style>
