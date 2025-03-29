@@ -1069,7 +1069,7 @@
 		}
 
 		.handle-bar {
-			width: 14px;
+			width: 32px;
 		}
 	}
 </style>
