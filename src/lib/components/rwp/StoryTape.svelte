@@ -12,6 +12,7 @@
 	export let storyTitle = ''; // For reference
 	export let language = 'zh'; // Default language (Chinese)
 	export let instructions = ''; // Optional instructions for speech style
+	let isCacheLoading = false;
 	let ttsStatus;
 
 	// Cache settings
@@ -188,6 +189,9 @@
 
 	// On mount, check if this audio is already cached
 	onMount(async () => {
+		// Set cache loading flag
+		isCacheLoading = true;
+
 		// Get TTS availability status on component mount
 		ttsStatus = await checkTTSAvailability();
 
@@ -199,6 +203,8 @@
 			const metadata = { timestamp: Date.now() };
 			sessionStorage.setItem(`${cacheKey}_meta`, JSON.stringify(metadata));
 		}
+		// Clear loading flag
+		isCacheLoading = false;
 	});
 
 	function goToProfile() {
@@ -216,9 +222,7 @@
 					{#if ttsStatus.reason === 'TTS requires premium subscription'}
 						<div class="message-container">
 							<h3 class="message-title">Listening Exercises</h3>
-							<p class="message-text">
-								Please subscribe to access RWP audio recordings.
-							</p>
+							<p class="message-text">Please subscribe to access RWP audio recordings.</p>
 							<p class="message-note">
 								You'll always keep access to any practice exercises you've already generated.
 							</p>
@@ -239,9 +243,14 @@
 				</div>
 			</div>
 		{:else}
-			<!-- Normal component content -->
+			<!-- Audio Player Container -->
 			<div class="audio-player-grid-container">
-				{#if isLoading}
+				{#if isCacheLoading}
+					<div class="loading-state">
+						<Loader />
+
+					</div>
+				{:else if isLoading}
 					<div class="loading-state">
 						<Loader />
 						<p>Creating audio...</p>
@@ -253,21 +262,6 @@
 					</div>
 				{:else if audioUrl}
 					<div class="audio-player-container">
-						<!-- Small voice selector in top right corner -->
-						<div class="voice-select-container">
-							<label for="voice-select">Voice:</label>
-							<select
-								id="voice-select"
-								class="voice-select"
-								bind:value={selectedVoice}
-								on:change={handleVoiceChange}
-							>
-								{#each voices as voice}
-									<option value={voice.id}>{voice.name}</option>
-								{/each}
-							</select>
-						</div>
-
 						<AudioPlayer audioSrc={audioUrl} />
 
 						<div class="regenerate-container">
@@ -279,7 +273,7 @@
 						<p><em>Hear this story read aloud in Chinese</em></p>
 
 						<div class="options-container">
-							<!-- Voice selector before button when no audio yet -->
+							<!-- Voice selector - only visible before generating audio -->
 							<div class="voice-select-container">
 								<label for="voice-select-initial">Voice:</label>
 								<select id="voice-select-initial" class="voice-select" bind:value={selectedVoice}>
@@ -289,15 +283,15 @@
 								</select>
 							</div>
 
-							<!-- Advanced options toggle -->
-							<div class="advanced-toggle">
+							<!-- Advanced options toggle This does not work well add once OpenAI improves this  -->
+							<!-- <div class="advanced-toggle">
 								<button
 									class="toggle-button"
 									on:click={() => (showAdvancedOptions = !showAdvancedOptions)}
 								>
 									{showAdvancedOptions ? 'Hide' : 'Show'} advanced options
 								</button>
-							</div>
+							</div> -->
 
 							<!-- Advanced options (instructions) -->
 							{#if showAdvancedOptions}
