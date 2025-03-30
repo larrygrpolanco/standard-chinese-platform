@@ -17,12 +17,12 @@
 	// Track page navigation state
 	$: if ($navigating) {
 		isLoading = true;
-		console.log('Page navigation started', $navigating?.to?.url?.pathname);
+		// console.log('Page navigation started', $navigating?.to?.url?.pathname);
 	} else if (isLoading) {
 		// Navigation completed
 		tick().then(() => {
 			isLoading = false;
-			console.log('Page navigation completed');
+			// console.log('Page navigation completed');
 		});
 	}
 
