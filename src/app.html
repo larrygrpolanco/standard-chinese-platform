@@ -50,6 +50,33 @@
 				});
 			});
 		</script>
+		<!-- Font preload warning fix -->
+		<script>
+			// Remove font preload links to eliminate warnings
+			window.addEventListener('DOMContentLoaded', function() {
+				// Find and remove all font preload links
+				const preloads = document.querySelectorAll('link[rel="preload"][as="font"]');
+				preloads.forEach(link => link.remove());
+				
+				// Also set up a MutationObserver to catch any dynamically added preloads
+				const observer = new MutationObserver(mutations => {
+					for (const mutation of mutations) {
+						if (mutation.type === 'childList') {
+							mutation.addedNodes.forEach(node => {
+								if (node.nodeName === 'LINK' && 
+									node.rel === 'preload' && 
+									node.getAttribute('as') === 'font') {
+									node.remove();
+								}
+							});
+						}
+					}
+				});
+				
+				// Start observing the document head for added nodes
+				observer.observe(document.head, { childList: true, subtree: true });
+			});
+		</script>
 		%sveltekit.head%
 	</head>
 	<body data-sveltekit-preload-data="hover">
