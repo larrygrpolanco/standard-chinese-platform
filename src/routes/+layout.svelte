@@ -8,6 +8,7 @@
 	import Breadcrumb from '$lib/components/UI/Breadcrumb.svelte';
 	import { navigating } from '$app/stores';
 	import { tick } from 'svelte';
+    import { dev } from '$app/environment';
 
 	let isLoading = false;
 
