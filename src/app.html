@@ -5,21 +5,51 @@
 		<meta charset="utf-8" />
 		<link rel="icon" href="%sveltekit.assets%/favicon-32x32.png" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+		<!-- Preconnect hints - keep these -->
 		<link rel="preconnect" href="https://fonts.googleapis.com" />
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-		<link
-			href="https://fonts.googleapis.com/css2?family=Arvo:wght@400;700&family=DM+Serif+Display&family=Work+Sans:wght@300;400;500;600;700&display=swap"
-			rel="stylesheet"
-		/>
-		<link
-			href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&family=Noto+Sans+TC:wght@400;500;700&display=swap"
-			rel="stylesheet"
-		/>
+
+		<!-- Font Loading Strategy - Modified to prevent preload issues -->
+		<style>
+			/* Define font faces without preloading */
+			@import url('https://fonts.googleapis.com/css2?family=Arvo:wght@400;700&family=DM+Serif+Display&family=Work+Sans:wght@300;400;500;600;700&display=swap');
+			@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&family=Noto+Sans+TC:wght@400;500;700&display=swap');
+		</style>
+
+		<!-- Disable font preloading completely -->
+		<script>
+			// This is a more aggressive approach - it sets a flag to disable automatic preloads
+			window.__DISABLE_FONT_PRELOADS = true;
+
+			// Additional cleanup for any existing preloads
+			document.addEventListener('DOMContentLoaded', function () {
+				// Remove all font preload links
+				const fontPreloads = document.querySelectorAll('link[rel="preload"][as="font"]');
+				fontPreloads.forEach((link) => link.remove());
+
+				// Patch head.appendChild to intercept new preloads
+				const originalAppendChild = document.head.appendChild;
+				document.head.appendChild = function (node) {
+					if (
+						node.nodeName === 'LINK' &&
+						node.rel === 'preload' &&
+						node.getAttribute('as') === 'font'
+					) {
+						// Skip adding this node
+						return node;
+					}
+					return originalAppendChild.call(this, node);
+				};
+			});
+		</script>
+
 		<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
 		<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
 		<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
 		<link rel="manifest" href="/site.webmanifest" />
-		<!-- Page navigation recovery script -->
+
+		<!-- Keep your navigation recovery script -->
 		<script>
 			// Simple navigation timeout protection
 			window.addEventListener('DOMContentLoaded', function () {
@@ -48,33 +78,6 @@
 					window.sessionStorage.removeItem('navigation_in_progress');
 					window.sessionStorage.removeItem('navigation_start');
 				});
-			});
-		</script>
-		<!-- Font preload warning fix -->
-		<script>
-			// Remove font preload links to eliminate warnings
-			window.addEventListener('DOMContentLoaded', function() {
-				// Find and remove all font preload links
-				const preloads = document.querySelectorAll('link[rel="preload"][as="font"]');
-				preloads.forEach(link => link.remove());
-				
-				// Also set up a MutationObserver to catch any dynamically added preloads
-				const observer = new MutationObserver(mutations => {
-					for (const mutation of mutations) {
-						if (mutation.type === 'childList') {
-							mutation.addedNodes.forEach(node => {
-								if (node.nodeName === 'LINK' && 
-									node.rel === 'preload' && 
-									node.getAttribute('as') === 'font') {
-									node.remove();
-								}
-							});
-						}
-					}
-				});
-				
-				// Start observing the document head for added nodes
-				observer.observe(document.head, { childList: true, subtree: true });
 			});
 		</script>
 		%sveltekit.head%
