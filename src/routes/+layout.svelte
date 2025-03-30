@@ -2,6 +2,7 @@
 <script>
 	import '../app.css';
 	import { onMount } from 'svelte';
+	import { injectAnalytics } from '@vercel/analytics/sveltekit';
 	import { authStore } from '$lib/stores/authStore';
 	import Header from '$lib/components/UI/Header.svelte';
 	import Breadcrumb from '$lib/components/UI/Breadcrumb.svelte';
@@ -9,16 +10,16 @@
 	import { tick } from 'svelte';
 
 	let isLoading = false;
-	
+
 	// Track page navigation state
 	$: if ($navigating) {
 		isLoading = true;
-		console.log("Page navigation started", $navigating?.to?.url?.pathname);
+		console.log('Page navigation started', $navigating?.to?.url?.pathname);
 	} else if (isLoading) {
 		// Navigation completed
 		tick().then(() => {
 			isLoading = false;
-			console.log("Page navigation completed");
+			console.log('Page navigation completed');
 		});
 	}
 
@@ -27,7 +28,7 @@
 		try {
 			await authStore.initialize();
 		} catch (error) {
-			console.error("Auth initialization failed:", error);
+			console.error('Auth initialization failed:', error);
 		}
 	});
 </script>
@@ -89,7 +90,7 @@
 					<h3 class="footer-heading">Information</h3>
 					<nav class="footer-nav">
 						<a href="/policies" class="footer-link">Privacy Policy</a>
-                        <a href="/policies#terms" class="footer-link">Terms of Service</a>
+						<a href="/policies#terms" class="footer-link">Terms of Service</a>
 					</nav>
 				</div>
 
