@@ -19,7 +19,7 @@ function createAuthStore() {
 
 		// Only initialize once
 		if (!initializationPromise) {
-			console.log('Starting auth store initialization');
+			// console.log('Starting auth store initialization');
 			initializationPromise = (async () => {
 				try {
 					// Use Promise.race with a timeout for user fetch
@@ -30,7 +30,7 @@ function createAuthStore() {
 
 					const user = await Promise.race([userPromise, timeoutPromise]);
 					set(user);
-					console.log('Auth store: User state set initially', !!user);
+					// console.log('Auth store: User state set initially', !!user);
 
 					// Set up auth listener with error handling
 					// before running the potentially slow setupUserIfNeeded
@@ -40,7 +40,7 @@ function createAuthStore() {
 							const {
 								data: { subscription }
 							} = supabase.auth.onAuthStateChange((event, session) => {
-								console.log('Auth state change:', event);
+								// console.log('Auth state change:', event);
 								if (event === 'SIGNED_IN') {
 									set(session?.user || null);
 
