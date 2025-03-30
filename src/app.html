@@ -3,7 +3,7 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
-		<link rel="icon" href="%sveltekit.assets%/favicon.png" />
+		<link rel="icon" href="%sveltekit.assets%/favicon-32x32.png" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<link rel="preconnect" href="https://fonts.googleapis.com" />
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -22,13 +22,13 @@
 		<!-- Page navigation recovery script -->
 		<script>
 			// Simple navigation timeout protection
-			window.addEventListener('DOMContentLoaded', function() {
+			window.addEventListener('DOMContentLoaded', function () {
 				// Check if we have a stuck navigation state
 				if (window.sessionStorage && window.sessionStorage.getItem('navigation_in_progress')) {
 					// Get timestamp of navigation start
 					const navStart = parseInt(window.sessionStorage.getItem('navigation_start') || '0');
 					const now = Date.now();
-					
+
 					// If navigation has been "in progress" for more than 20 seconds, it's likely stuck
 					if (now - navStart > 20000) {
 						console.warn('Detected stuck navigation, clearing state');
@@ -36,15 +36,15 @@
 						window.sessionStorage.removeItem('navigation_start');
 					}
 				}
-				
+
 				// Listen for navigation events that might signify start of navigation
-				document.addEventListener('sveltekit:start', function() {
+				document.addEventListener('sveltekit:start', function () {
 					window.sessionStorage.setItem('navigation_in_progress', 'true');
 					window.sessionStorage.setItem('navigation_start', Date.now().toString());
 				});
-				
+
 				// Listen for navigation completion
-				document.addEventListener('sveltekit:end', function() {
+				document.addEventListener('sveltekit:end', function () {
 					window.sessionStorage.removeItem('navigation_in_progress');
 					window.sessionStorage.removeItem('navigation_start');
 				});
