@@ -11,6 +11,8 @@
 
 	let isLoading = false;
 
+	injectAnalytics({ mode: dev ? 'development' : 'production' });
+
 	// Track page navigation state
 	$: if ($navigating) {
 		isLoading = true;
