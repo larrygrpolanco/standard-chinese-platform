@@ -82,7 +82,7 @@
 			</div>
 
 			<p class="subtitle">
-				Foreign Service Institute diplomat language training, now digitized and improved
+				Foreign Service Institute language training, now digitized and improved
 			</p>
 
 			<!-- Core Module Card -->
@@ -162,8 +162,7 @@
 								<div class="item-content">
 									<h3 class="item-title">Personalized Stories</h3>
 									<p class="item-description">
-										Generated stories that use each unit's vocabulary and dialogues, making them
-										relevant to your interests and goals
+										Generated stories that use each unit's vocabulary and dialogues, connecting them to your interests and goals
 									</p>
 								</div>
 							</div>

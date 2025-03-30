@@ -145,27 +145,26 @@
 	}
 
 	.dialogue-number-badge {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		background-color: var(--color-gold, #ddb967);
-		background-image: linear-gradient(to bottom, rgba(255, 255, 255, 0.4), rgba(0, 0, 0, 0.05));
-		color: var(--color-charcoal, #33312e);
-		width: 28px;
-		height: 28px;
-		border-radius: 50%;
-		box-shadow:
-			0 1px 2px rgba(0, 0, 0, 0.1),
-			inset 0 1px 0 rgba(255, 255, 255, 0.5);
-	}
+    text-align: center;
+    line-height: 28px; /* Match the height of the badge */
+    background-color: var(--color-gold, #ddb967);
+    background-image: linear-gradient(to bottom, rgba(255, 255, 255, 0.4), rgba(0, 0, 0, 0.05));
+    color: var(--color-charcoal, #33312e);
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    box-shadow:
+        0 1px 2px rgba(0, 0, 0, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.5);
+}
 
-	.dialogue-number {
-		font-family: 'Courier New', monospace;
-		font-weight: 600;
-		font-size: 0.9rem;
-		line-height: 1;
-		text-shadow: 0 1px 0 rgba(255, 255, 255, 0.4);
-	}
+.dialogue-number {
+    font-family: 'Courier New', monospace;
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.4);
+    vertical-align: middle;
+}
 
 	/* Retro dialogue counter */
 	.dialogue-counter {
@@ -198,8 +197,8 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		width: 45.305px;
-		height: 28px;
+		width: 55px;
+		height: 34px;
 		background-color: var(--color-cream-paper, #f7f4e9);
 		border: 1px solid var(--color-warm-gray, #a09a8a);
 		border-radius: 4px;

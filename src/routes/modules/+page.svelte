@@ -150,15 +150,14 @@
 			</div>
 
 			<p class="page-description">
-				Start with the module topic you need/want to work on the most. Figure out your learning
-				style. Take what works for you and leave what doesn't. Learning a language is hard and it
-				isn't linear. Always remember the goal isn't 100% understanding, but to get general message.
-				Go easy on yourself.
+				Start with the module topic you need/want to work on the most. Adapt to your own learning style by using what works for you and skipping what doesn't—language learning is hard and rarely linear. This course is structured really well, and if you start from beginning to end,
+				you will be able to understand a lot of it. Always remember the goal isn't 100%
+				understanding, but that you got most of it. Go easy on yourself.
 			</p>
 			<p class="resource-description">
 				Please note, this resource is not meant to be a standalone learning solution. Instead, it
 				works best when used with Chinese language classes or other practice methods. If Pinyin and
-				Chinese characters are entirely new to you, or if you're seeking a tedious refresher, check
+				Chinese characters are entirely new to you, or if you're seeking a thorough refresher, check
 				out the resource modules on the Guide Page.
 			</p>
 		</header>

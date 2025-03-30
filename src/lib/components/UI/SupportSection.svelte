@@ -268,8 +268,9 @@
 		color: #e74c3c;
 	}
 
-    
-    
+	.cassette-icon {
+		position: relative;
+	}
 
 	@media (max-width: 640px) {
 		.support-card {

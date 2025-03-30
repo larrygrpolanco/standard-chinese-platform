@@ -658,7 +658,7 @@
 	.exercise-pages {
 		display: flex;
 		flex-direction: column;
-		gap: 2rem;
+		gap: 1rem;
 		align-items: center;
 		margin: 1.5rem 0;
 	}
@@ -853,8 +853,7 @@
 		}
 
 		.resize-handle {
-			right: -8px;
-			width: 16px; /* Smaller but still touchable */
+			display: none;
 		}
 
 		.resize-handle::after {
@@ -871,8 +870,8 @@
 		position: absolute;
 		bottom: 16px;
 		left: 16px;
-		width: 32px;
-		height: 32px;
+		width: 48px;
+		height: 48px;
 		background-color: rgba(51, 49, 46, 0.473);
 		border: 1px solid rgba(255, 255, 255, 0.2);
 		color: white;
@@ -882,7 +881,7 @@
 		cursor: pointer;
 		transition: all 0.2s ease;
 		z-index: 5;
-		opacity: 0.85;
+		opacity: 0.7;
 		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 		backdrop-filter: blur(2px);
 	}
@@ -894,7 +893,7 @@
 	}
 
 	.icon-symbol {
-		font-size: 24px;
+		font-size: 32px;
 		line-height: 1;
 	}
 
@@ -1025,15 +1024,15 @@
 		}
 
 		.fullscreen-btn {
-			position: absolute;
 			bottom: 8px;
-			left: 8px;
-			width: 24px;
-			height: 24px;
+			left: auto;
+            right: 8px;
+			width: 32px;
+			height: 32px;
 		}
 
 		.icon-symbol {
-			font-size: 16px;
+			font-size: 24px;
 			line-height: 1;
 		}
 	}
