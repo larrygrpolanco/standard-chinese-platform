@@ -1,0 +1,28 @@
+# static/robots.txt
+User-agent: *
+Disallow: /wp-admin/
+Disallow: /wordpress/
+Disallow: /api/
+Disallow: /login/
+Disallow: /reset-password/
+Disallow: /auth/
+Disallow: /profile/
+Disallow: /rwp/
+
+# Block common bots and crawlers that might cause issues
+User-agent: Baiduspider
+Disallow: /
+
+User-agent: Yandex
+Disallow: /
+
+User-agent: PetalBot
+Disallow: /
+
+User-agent: SemrushBot
+Disallow: /
+
+# Allow access to the main learning content
+Allow: /modules/
+Allow: /units/
+Allow: /resource/
