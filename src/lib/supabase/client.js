@@ -4,7 +4,7 @@ import { createClient } from '@supabase/supabase-js';
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-// Set Cache-Control headers for audio files
+// Set Cache-Control headers for audio files and exercise images
 // This middleware adds caching headers to all Supabase storage requests
 const supabaseOptions = {
   global: {
@@ -12,22 +12,45 @@ const supabaseOptions = {
       // Call the original fetch
       const response = await fetch(url, options);
       
-      // If this is a storage URL for audio, add cache headers to the response
-      if (url.toString().includes('storage/v1/object/public') && 
-          (url.toString().includes('.mp3') || 
-           url.toString().includes('audio') || 
-           url.toString().includes('.wav'))) {
+      const urlString = url.toString();
+      
+      // Check if this is a storage URL
+      if (urlString.includes('storage/v1/object/public')) {
+        // For audio files - 1 week cache
+        if (urlString.includes('.mp3') || 
+            urlString.includes('audio') || 
+            urlString.includes('.wav')) {
+          
+          // Create a new response with caching headers
+          // 1 week cache duration (604800 seconds)
+          return new Response(response.body, {
+            status: response.status,
+            statusText: response.statusText,
+            headers: {
+              ...Object.fromEntries(response.headers.entries()),
+              'Cache-Control': 'public, max-age=604800, immutable'
+            }
+          });
+        }
         
-        // Create a new response with caching headers
-        // 1 week cache duration (604800 seconds)
-        return new Response(response.body, {
-          status: response.status,
-          statusText: response.statusText,
-          headers: {
-            ...Object.fromEntries(response.headers.entries()),
-            'Cache-Control': 'public, max-age=604800, immutable'
-          }
-        });
+        // For exercise images - 3 days cache
+        if ((urlString.endsWith('.jpg') || 
+             urlString.endsWith('.jpeg') || 
+             urlString.endsWith('.png')) && 
+            (urlString.includes('exercises') || 
+             urlString.includes('workbook'))) {
+          
+          // Create a new response with caching headers
+          // 3 days cache duration (259200 seconds)
+          return new Response(response.body, {
+            status: response.status,
+            statusText: response.statusText,
+            headers: {
+              ...Object.fromEntries(response.headers.entries()),
+              'Cache-Control': 'public, max-age=259200'
+            }
+          });
+        }
       }
       
       return response;
