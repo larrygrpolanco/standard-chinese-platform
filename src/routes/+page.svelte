@@ -66,6 +66,22 @@
 		name="description"
 		content="Learn Mandarin Chinese with digitized FSI course materials, including authentic audio recordings originally developed for U.S. diplomats."
 	/>
+	<!-- Open Graph / Facebook -->
+	<meta property="og:type" content="website" />
+	<meta property="og:url" content="https://www.tapedchinese.com/" />
+	<meta property="og:title" content="Taped Chinese | Digitized FSI Language Learning" />
+	<meta property="og:description" content="Learn Mandarin Chinese with digitized FSI course materials, including authentic audio recordings originally developed for U.S. diplomats." />
+	<meta property="og:image" content="https://www.tapedchinese.com/android-chrome-512x512.png" />
+
+	<!-- Twitter -->
+	<meta name="twitter:card" content="summary_large_image" />
+	<meta name="twitter:url" content="https://www.tapedchinese.com/" />
+	<meta name="twitter:title" content="Taped Chinese | Digitized FSI Language Learning" />
+	<meta name="twitter:description" content="Learn Mandarin Chinese with digitized FSI course materials, including authentic audio recordings originally developed for U.S. diplomats." />
+	<meta name="twitter:image" content="https://www.tapedchinese.com/android-chrome-512x512.png" />
+	
+	<!-- Canonical URL -->
+	<link rel="canonical" href="https://www.tapedchinese.com/" />
 </svelte:head>
 
 <!-- Main container with paper texture background -->

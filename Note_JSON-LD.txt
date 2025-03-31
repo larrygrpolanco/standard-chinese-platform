@@ -1,0 +1,44 @@
+# JSON-LD Implementation for SEO
+
+## TODO: Add structured data for better search results
+
+To improve SEO with structured data markup:
+
+1. Implement JSON-LD schema.org/Course markup for each module/unit
+2. Query Supabase for accurate curriculum data
+3. Generate dynamic schemas based on page content
+
+Example structure for a module page:
+```
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Course",
+  "name": "Module X: [Title]",
+  "description": "[Module description]",
+  "provider": {
+    "@type": "Organization",
+    "name": "Taped Chinese",
+    "sameAs": "https://www.tapedchinese.com"
+  },
+  "courseCode": "MODULE-X",
+  "hasCourseInstance": {
+    "@type": "CourseInstance",
+    "courseMode": "online",
+    "inLanguage": "zh"
+  }
+}
+</script>
+```
+
+For the homepage, use WebSite or EducationalOrganization schema.
+
+Implementation approach:
+- Create a component that dynamically generates JSON-LD based on page content
+- Include in +layout.svelte with conditional logic for different page types
+- Ensure accurate data by fetching from Supabase when rendering pages
+
+Benefits:
+- Rich results in search
+- Better understanding of content by search engines
+- Improved click-through rates

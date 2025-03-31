@@ -124,28 +124,27 @@
 					<h3>1. Information We Collect</h3>
 					<p>We collect the following information:</p>
 					<ul>
-						<li>Account information (email, password)</li>
+						<li>Account information (email)</li>
 						<li>User preferences (traditional/simplified character settings)</li>
-						<li>Learning progress data</li>
+						<li>Learning progress</li>
 						<li>Optional user context for personalized exercises</li>
-						<li>Feedback and communications you provide</li>
+						<li>Feedback you provide</li>
 					</ul>
 
 					<h3>2. How We Use Your Information</h3>
 					<p>We use your information to:</p>
 					<ul>
-						<li>Provide and maintain the service</li>
+						<li>Provide the service</li>
 						<li>Personalize your learning experience</li>
 						<li>Process subscriptions and payments</li>
 						<li>Communicate with you about the service</li>
-						<li>Improve our offerings based on feedback</li>
+						<li>Improve our service based on feedback</li>
 					</ul>
 
 					<h3>3. Cookies and Tracking</h3>
 					<p>
 						Our site uses minimal cookies, primarily to store user preferences such as
-						simplified/traditional Chinese character selection. We do not use analytics tools to
-						track user behavior.
+						simplified/traditional Chinese character selection.
 					</p>
 
 					<h3>4. Data Security</h3>
@@ -167,14 +166,7 @@
 						Stripe according to their privacy policy.
 					</p>
 
-					<h3>7. International Users</h3>
-					<p>
-						Our services are operated in the United States. If you are located outside of the United
-						States, please be aware that information we collect will be transferred to and processed
-						in the United States.
-					</p>
-
-					<h3>8. Changes to Privacy Policy</h3>
+					<h3>7. Changes to Privacy Policy</h3>
 					<p>
 						We may update this privacy policy from time to time. We will notify you of any changes
 						by posting the new policy on this page.
@@ -204,7 +196,7 @@
 							</ul>
 						</div>
 
-						<div class="premium-option">
+						<!-- <div class="premium-option">
 							<h4>Annual Premium</h4>
 							<p class="price">$45 per year</p>
 							<p class="savings">Save $15 compared to monthly plan</p>
@@ -212,7 +204,7 @@
 								<li>All monthly premium features</li>
 								<li>Best value option</li>
 							</ul>
-						</div>
+						</div> -->
 					</div>
 
 					<h3>Free vs. Premium</h3>
@@ -244,7 +236,7 @@
 					<h3>Subscription Payments</h3>
 					<p>
 						Monthly and yearly subscriptions are non-refundable. When you purchase a subscription,
-						you agree to pay the recurring charges for the subscription period.
+						you agree to pay the recurring charges for the subscription period until you cancel.
 					</p>
 
 					<h3>Exceptional Circumstances</h3>

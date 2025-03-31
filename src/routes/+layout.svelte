@@ -9,6 +9,7 @@
 	import { navigating } from '$app/stores';
 	import { tick } from 'svelte';
     import { dev } from '$app/environment';
+    import { page } from '$app/stores';
 
 	let isLoading = false;
 
@@ -35,6 +36,15 @@
 		}
 	});
 </script>
+
+<svelte:head>
+	<!-- Open Graph default fallback image -->
+	<meta property="og:image" content="https://www.tapedchinese.com/android-chrome-512x512.png" />
+	<meta name="twitter:image" content="https://www.tapedchinese.com/android-chrome-512x512.png" />
+	
+	<!-- Canonical URL for the current page -->
+	<link rel="canonical" href={`https://www.tapedchinese.com${$page?.url?.pathname || ''}`} />
+</svelte:head>
 
 <div class="app-container">
 	<Header />
