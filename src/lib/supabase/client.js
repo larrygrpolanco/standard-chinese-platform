@@ -4,7 +4,38 @@ import { createClient } from '@supabase/supabase-js';
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+// Set Cache-Control headers for audio files
+// This middleware adds caching headers to all Supabase storage requests
+const supabaseOptions = {
+  global: {
+    fetch: async (url, options = {}) => {
+      // Call the original fetch
+      const response = await fetch(url, options);
+      
+      // If this is a storage URL for audio, add cache headers to the response
+      if (url.toString().includes('storage/v1/object/public') && 
+          (url.toString().includes('.mp3') || 
+           url.toString().includes('audio') || 
+           url.toString().includes('.wav'))) {
+        
+        // Create a new response with caching headers
+        // 1 week cache duration (604800 seconds)
+        return new Response(response.body, {
+          status: response.status,
+          statusText: response.statusText,
+          headers: {
+            ...Object.fromEntries(response.headers.entries()),
+            'Cache-Control': 'public, max-age=604800, immutable'
+          }
+        });
+      }
+      
+      return response;
+    }
+  }
+};
+
+export const supabase = createClient(supabaseUrl, supabaseAnonKey, supabaseOptions);
 
 // Add this to src/lib/supabase/client.js
 export async function resetPassword(email) {
@@ -906,4 +937,17 @@ export async function setupUserIfNeeded() {
 	}
 
 	return true;
+}
+
+// Register service worker for audio caching if browser supports it
+if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
+  window.addEventListener('load', function() {
+    navigator.serviceWorker.register('/service-worker.js')
+      .then(function(registration) {
+        console.log('Service Worker registered with scope:', registration.scope);
+      })
+      .catch(function(error) {
+        console.log('Service Worker registration failed:', error);
+      });
+  });
 }
