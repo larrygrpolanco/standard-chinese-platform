@@ -1,4 +1,4 @@
-# Standard Chinese Platform
+# Taped Chinese
 
 A modern web-based language learning platform that digitizes and enhances the Foreign Service Institute's "Standard Chinese: A Modular Approach" course materials with a vintage cassette tape aesthetic.
 
