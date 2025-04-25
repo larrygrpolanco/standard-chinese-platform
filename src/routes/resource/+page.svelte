@@ -91,30 +91,7 @@
 			</div>
 		</header>
 
-		<!-- Resource Modules Section -->
-		<div class="content-section">
-			<h2 class="section-title">Resource Modules</h2>
-			<div class="section-content">
-				<div class="resource-modules-container">
-					{#each resourceModules as module}
-						<ResourceModuleCard {module} />
-					{/each}
-				</div>
-
-				<p class="resource-modules-note">
-					These resources are organized to complement specific core modules and provide additional
-					foundational practice.
-				</p>
-
-				<div class="resource-module-warning">
-					<p>
-						<strong>Note:</strong> This course will not be easy for complete beginners as it was made
-						to be used along with classroom learning. The resource module tapes above cover a lot of
-						the basics, but they are dense, repetive, and possibly soul crushingly boring.
-					</p>
-				</div>
-			</div>
-		</div>
+		
 
 		<!-- Learning Guide Sections -->
 		<div id="learning-guide" class="content-section">
@@ -180,6 +157,32 @@
 					</svg>
 				</a>
 			</div>
+		</div>
+
+        <!-- Resource Modules Section -->
+         <!-- Temporarly removed -->
+		<div class="content-section">
+			<h2 class="section-title">Resource Modules (Under Construction)</h2>
+			<!-- <div class="section-content">
+				<div class="resource-modules-container">
+					{#each resourceModules as module}
+						<ResourceModuleCard {module} />
+					{/each}
+				</div>
+
+				<p class="resource-modules-note">
+					These resources are organized to complement specific core modules and provide additional
+					foundational practice.
+				</p>
+
+				<div class="resource-module-warning">
+					<p>
+						<strong>Note:</strong> This course will not be easy for complete beginners as it was made
+						to be used along with classroom learning. The resource module tapes above cover a lot of
+						the basics, but they are dense, repetive, and possibly soul crushingly boring.
+					</p>
+				</div>
+			</div> -->
 		</div>
 	</section>
 </div>
