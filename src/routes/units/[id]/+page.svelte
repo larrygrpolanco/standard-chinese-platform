@@ -181,19 +181,19 @@
 
 				<!-- Progress tracking and RWP practice area -->
 				<div class="action-buttons">
+					<!-- RWP practice button - Always available -->
+					<a href="/rwp/{unitData.id}" class="rwp-button"> Go to RWP </a>
+
+					<!-- Progress tracking - Only for authenticated users (hidden in demo) -->
 					{#if user}
 						<UnitProgressButton
 							unitId={unitData.id}
 							initialStatus={userProgress?.status || 'in_progress'}
 						/>
-
-						<a href="/rwp/{unitData.id}" class="rwp-button"> Go to RWP </a>
 					{:else}
-						<a href="/login?redirect=/units/{unitData.id}" class="signin-button">
+						<div class="signin-button disabled" title="Sign in to track progress">
 							Sign-in to Unlock Progress Tracking
-						</a>
-
-						<a href="/rwp" class="rwp-button"> Try RWPs </a>
+						</div>
 					{/if}
 				</div>
 			</header>
@@ -407,9 +407,15 @@
 	.signin-button {
 		background-color: #e8e5d7;
 		border: 1px solid #a0998a;
+		color: #a0998a;
 	}
 
-	.signin-button:hover {
+	.signin-button.disabled {
+		opacity: 0.6;
+		cursor: not-allowed;
+	}
+
+	.signin-button:not(.disabled):hover {
 		transform: translateY(-1px);
 		box-shadow: 0 2px 4px rgba(160, 153, 138, 0.2);
 		background-color: #f4f1de;

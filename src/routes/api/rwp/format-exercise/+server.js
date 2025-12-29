@@ -39,8 +39,7 @@ export async function POST({ request }) {
 
 		const { response, data } = await apiClient.fetchCompletion(messages, {
             response_format: { type: "json_object" },
-			temperature: 0.3, // Lower temperature for more precise formatting
-			model: 'gpt-4o-mini-2024-07-18'
+			temperature: 0.3 // Lower temperature for more precise formatting
 		});
 
 		if (!response.ok) {

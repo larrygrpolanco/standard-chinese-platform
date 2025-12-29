@@ -1,5 +1,5 @@
 // src/lib/apiClient.js
-import { OPENAI_API_KEY, DEEPSEEK_API_KEY } from '$env/static/private';
+import { OPENAI_API_KEY, DEEPSEEK_API_KEY, GOOGLE_API_KEY } from '$env/static/private';
 
 // API provider configurations
 const apiProviders = {
@@ -15,8 +15,8 @@ const apiProviders = {
   },
   google: {
     baseUrl: 'https://generativelanguage.googleapis.com/v1beta/models',
-    apiKey: process.env.GOOGLE_API_KEY, // Accessing from process.env if not in $env/static/private or checking import
-    defaultModel: 'gemini-1.5-flash'
+    apiKey: GOOGLE_API_KEY, // Accessing from imported env variable
+    defaultModel: 'gemini-3-flash-preview'
   }
 };
 

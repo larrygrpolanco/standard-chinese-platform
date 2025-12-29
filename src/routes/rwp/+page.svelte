@@ -1,22 +1,12 @@
 <!-- src/routes/rwp/+page.svelte -->
 <script>
 	import { onMount } from 'svelte';
-	import { authStore } from '$lib/stores/authStore';
 	import { goto } from '$app/navigation';
 
-	let user = null;
 
-	onMount(() => {
-		// Subscribe to the auth store
-		const unsubscribe = authStore.subscribe((value) => {
-			user = value;
-		});
-
-		return unsubscribe;
-	});
 
 	function handleDemoClick() {
-		goto('/rwp/demo');
+		goto('/rwp/27');
 	}
 </script>
 
@@ -46,21 +36,9 @@
 			</p>
 
 			<div class="header-buttons">
-				{#if !user}
-					<a href="/login?redirect=/rwp" class="primary-button">
-						Sign In For Full Access
-						<svg class="button-arrow" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-							<path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="2"
-								d="M14 5l7 7m0 0l-7 7m7-7H3"
-							/>
-						</svg>
-					</a>
-				{/if}
+
 				<button on:click={handleDemoClick} class="secondary-button">
-					Try The Demo
+					Try it out
 					<svg class="button-arrow" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 						<path
 							stroke-linecap="round"
@@ -129,19 +107,7 @@
 						helps RWP create more personalized content.
 					</p>
 					<p>You can even create a fictional character instead to learn chinese through!</p>
-					{#if user}
-						<a href="/profile" class="info-link">
-							Update your profile information
-							<svg class="link-arrow" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-								<path
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									stroke-width="2"
-									d="M14 5l7 7m0 0l-7 7m7-7H3"
-								/>
-							</svg>
-						</a>
-					{/if}
+
 				</div>
 			</div>
 		</div>
@@ -157,19 +123,7 @@
 				</p>
 
 				<div class="cta-container">
-					{#if !user}
-						<a href="/login?redirect=/rwp" class="primary-button">
-							Sign In For Full Access
-							<svg class="button-arrow" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-								<path
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									stroke-width="2"
-									d="M14 5l7 7m0 0l-7 7m7-7H3"
-								/>
-							</svg>
-						</a>
-					{/if}
+
 
 					<button on:click={handleDemoClick} class="secondary-button">
 						Try The Demo
@@ -258,11 +212,11 @@
 		box-shadow: 2px 2px 0 #826d5b;
 	}
 
-	.primary-button {
+	/* .primary-button {
 		background-color: #c17c74;
 		color: white;
 		border: 1px solid #ad6c66;
-	}
+	} */
 
 	.secondary-button {
 		background-color: #e8e5d7;
@@ -270,13 +224,11 @@
 		border: 1px solid #a0998a;
 	}
 
-	.primary-button:hover,
 	.secondary-button:hover {
 		transform: translateY(-0.125rem);
 		box-shadow: 3px 3px 0 #826d5b;
 	}
 
-	.primary-button:active,
 	.secondary-button:active {
 		transform: translateY(0.125rem);
 		box-shadow: 1px 1px 0 #826d5b;
@@ -289,7 +241,6 @@
 		transition: transform 0.2s;
 	}
 
-	.primary-button:hover .button-arrow,
 	.secondary-button:hover .button-arrow {
 		transform: translateX(0.25rem);
 	}
@@ -424,28 +375,5 @@
 		padding: 1rem;
 	} */
 
-	/* Info link */
-	.info-link {
-		display: inline-flex;
-		align-items: center;
-		margin-top: 0.5rem;
-		color: #34667f;
-		font-weight: 500;
-		transition: color 0.2s;
-	}
 
-	.info-link:hover {
-		color: #c17c74;
-	}
-
-	.link-arrow {
-		margin-left: 0.25rem;
-		height: 1rem;
-		width: 1rem;
-		transition: transform 0.2s;
-	}
-
-	.info-link:hover .link-arrow {
-		transform: translateX(0.25rem);
-	}
 </style>

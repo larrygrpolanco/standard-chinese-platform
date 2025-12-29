@@ -29,8 +29,7 @@ export async function POST({ request }) {
 		];
 
 		const { response, data } = await apiClient.fetchCompletion(messages, {
-			temperature: 0.7,
-			model: 'gpt-4o-mini-2024-07-18'
+			temperature: 0.7
 		});
 
 		if (!response.ok) {
