@@ -1,243 +1,147 @@
 // client.js
-import { createClient } from '@supabase/supabase-js';
+// Local Demo Version - Replaces Supabase backend
+import { DB } from '$lib/local-data';
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+// Helper function to simulate DB queries
+const cleanData = (data) => JSON.parse(JSON.stringify(data));
 
-// Set Cache-Control headers for audio files and exercise images
-// This middleware adds caching headers to all Supabase storage requests
-const supabaseOptions = {
-  global: {
-    fetch: async (url, options = {}) => {
-      // Call the original fetch
-      const response = await fetch(url, options);
-      
-      const urlString = url.toString();
-      
-      // Check if this is a storage URL
-      if (urlString.includes('storage/v1/object/public')) {
-        // For audio files - 1 week cache
-        if (urlString.includes('.mp3') || 
-            urlString.includes('audio') || 
-            urlString.includes('.wav')) {
-          
-          // Create a new response with caching headers
-          // 1 week cache duration (604800 seconds)
-          return new Response(response.body, {
-            status: response.status,
-            statusText: response.statusText,
-            headers: {
-              ...Object.fromEntries(response.headers.entries()),
-              'Cache-Control': 'public, max-age=604800, immutable'
-            }
-          });
-        }
-        
-        // For exercise images - 3 days cache
-        if ((urlString.endsWith('.jpg') || 
-             urlString.endsWith('.jpeg') || 
-             urlString.endsWith('.png')) && 
-            (urlString.includes('exercises') || 
-             urlString.includes('workbook'))) {
-          
-          // Create a new response with caching headers
-          // 3 days cache duration (259200 seconds)
-          return new Response(response.body, {
-            status: response.status,
-            statusText: response.statusText,
-            headers: {
-              ...Object.fromEntries(response.headers.entries()),
-              'Cache-Control': 'public, max-age=259200'
-            }
-          });
-        }
-      }
-      
-      return response;
+export const supabase = {
+    // Mock supabase client to avoid errors if imported elsewhere
+    auth: {
+        getSession: async () => ({ data: { session: null }, error: null }),
+        onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => {} } } }),
+        getUser: async () => ({ data: { user: null }, error: null }),
+        signOut: async () => ({ error: null }),
+        signInWithOAuth: async () => ({ data: null, error: { message: 'Demo mode' } }),
+    },
+    from: (table) => {
+        let mockData = [];
+        if (table === 'modules') mockData = DB.modules || [];
+        if (table === 'units') mockData = DB.units || [];
+        if (table === 'vocabulary') mockData = DB.vocabulary || [];
+        if (table === 'tapes') mockData = DB.tapes || [];
+        if (table === 'reference_list') mockData = DB.reference_list || [];
+        if (table === 'exercises') mockData = DB.exercises || [];
+
+        // For user tables, basically valid but empty
+        const isUserTable = ['user_usage', 'user_subscriptions', 'user_progress'].includes(table);
+
+        const mkBuilder = (data) => ({
+            select: () => mkBuilder(data),
+            eq: (col, val) => mkBuilder(data.filter(i => i[col] == val)),
+            in: (col, vals) => mkBuilder(data.filter(i => vals.includes(i[col]))),
+            order: (col) => {
+                 const sorted = [...data].sort((a,b) => a[col] - b[col]);
+                 return mkBuilder(sorted);
+            },
+            single: async () => ({ data: data[0] || null, error: null }),
+            maybeSingle: async () => ({ data: data[0] || null, error: null }),
+            // Make it thenable to return the data list
+            then: (resolve) => Promise.resolve({ data: cleanData(data), error: null }).then(resolve),
+            
+            // Write mocks
+            update: () => ({ eq: () => Promise.resolve({ data: null, error: null }) }),
+            insert: () => Promise.resolve({ data: null, error: null }),
+            upsert: () => Promise.resolve({ data: null, error: null }),
+            delete: () => Promise.resolve({ data: null, error: null })
+        });
+
+        return mkBuilder(mockData);
     }
-  }
 };
-
-export const supabase = createClient(supabaseUrl, supabaseAnonKey, supabaseOptions);
 
 // Add this to src/lib/supabase/client.js
 export async function resetPassword(email) {
-	const { error } = await supabase.auth.resetPasswordForEmail(email, {
-		redirectTo: `${window.location.origin}/reset-password`
-	});
-
-	if (error) throw error;
+	console.log('Reset password mock for:', email);
 	return true;
 }
 
 // Fetch all modules (ordered by order_num)
 export async function getModules() {
-	const { data, error } = await supabase
-		.from('modules')
-		.select('id, title, description, order_num, module_type')
-		.order('order_num');
-
-	if (error) {
-		console.error('Error fetching modules:', error);
-		return [];
-	}
-
-	return data || [];
+	const modules = DB.modules.sort((a, b) => a.order_num - b.order_num);
+	return cleanData(modules);
 }
 
 // Fetch a specific module by ID
 export async function getModuleById(id) {
-	const { data, error } = await supabase
-		.from('modules')
-		.select('id, title, description, order_num, module_type')
-		.eq('id', id)
-		.single();
-
-	if (error) {
-		console.error('Error fetching module:', error);
-		return null;
-	}
-
-	return data;
+	const module = DB.modules.find((m) => m.id == id);
+	return cleanData(module || null);
 }
 
 // Fetch units by module ID
 export async function getUnitsByModuleId(moduleId) {
-	const { data, error } = await supabase
-		.from('units')
-		.select('id, title, description, order_num, module_id')
-		.eq('module_id', moduleId)
-		.order('order_num');
-
-	if (error) {
-		console.error('Error fetching units:', error);
-		return [];
-	}
-
-	return data || [];
+	const units = DB.units
+		.filter((u) => u.module_id == moduleId)
+		.sort((a, b) => a.order_num - b.order_num);
+	return cleanData(units);
 }
 
 // Fetch unit with its module - basic info needed for all tabs
 export async function getUnitBasicInfo(unitId) {
-	const { data, error } = await supabase
-		.from('units')
-		.select(
-			`
-      id, title, description, order_num, module_id,
-      module:modules(id, title, description, order_num)
-    `
-		)
-		.eq('id', unitId)
-		.single();
+    const unit = DB.units.find(u => u.id == unitId);
+    if (!unit) return null;
 
-	if (error) {
-		console.error('Error fetching unit with module:', error);
-		return null;
-	}
-
-	return data;
+    const module = DB.modules.find(m => m.id == unit.module_id);
+    const result = {
+        ...unit,
+        module: module ? { ...module } : null
+    };
+    return cleanData(result);
 }
 
 // Fetch vocabulary for the Vocabulary tab
 export async function getUnitVocabularyData(unitId) {
-	const { data, error } = await supabase
-		.from('vocabulary')
-		.select('id, chinese_simplified, chinese_traditional, pinyin, english, order_num')
-		.eq('unit_id', unitId)
-		.order('order_num');
-
-	if (error) {
-		console.error('Error fetching vocabulary:', error);
-		return { vocabulary: [] };
-	}
-
-	return { vocabulary: data || [] };
+    const vocabulary = DB.vocabulary
+        .filter(v => v.unit_id == unitId)
+        .sort((a, b) => a.order_num - b.order_num);
+    
+    return { vocabulary: cleanData(vocabulary) };
 }
 
 // Fetch review tapes and dialogues for the Review tab
 export async function getUnitReviewData(unitId) {
-	const [tapesResult, dialoguesResult] = await Promise.all([
-		supabase
-			.from('tapes')
-			.select('id, title, tape_type, audio_file, order_num')
-			.eq('unit_id', unitId)
-			.eq('tape_type', 'review')
-			.order('order_num'),
+    const reviewTapes = DB.tapes
+        .filter(t => t.unit_id == unitId && t.tape_type === 'review')
+        .sort((a, b) => a.order_num - b.order_num);
+    
+    const dialogues = DB.reference_list
+        .filter(d => d.unit_id == unitId)
+        .sort((a, b) => a.order_num - b.order_num);
 
-		supabase
-			.from('reference_list')
-			.select(
-				'id, number, chinese_simplified, chinese_traditional, pinyin, english, notes, order_num'
-			)
-			.eq('unit_id', unitId)
-			.order('order_num')
-	]);
-
-	const { data: tapesData, error: tapesError } = tapesResult;
-	const { data: dialoguesData, error: dialoguesError } = dialoguesResult;
-
-	if (tapesError) console.error('Error fetching review tapes:', tapesError);
-	if (dialoguesError) console.error('Error fetching dialogues:', dialoguesError);
-
-	// Return the dialogues directly without restructuring them
 	return {
-		reviewTapes: tapesData || [],
-		dialogues: dialoguesData || [] // <-- This is now correct
+		reviewTapes: cleanData(reviewTapes),
+		dialogues: cleanData(dialogues)
 	};
 }
 
 // Fetch workbook tapes and exercises for the Exercises tab
 export async function getUnitExercisesData(unitId) {
-	const { data: tapesData, error: tapesError } = await supabase
-		.from('tapes')
-		.select('id, title, tape_type, audio_file, order_num')
-		.eq('unit_id', unitId)
-		.eq('tape_type', 'workbook')
-		.order('order_num');
+	const workbookTapes = DB.tapes
+        .filter(t => t.unit_id == unitId && t.tape_type === 'workbook')
+        .sort((a, b) => a.order_num - b.order_num);
+    
+    const workbookTapeIds = workbookTapes.map(t => t.id);
 
-	if (tapesError) {
-		console.error('Error fetching workbook tapes:', tapesError);
-		return { workbookTapes: [], exercises: [] };
-	}
-
-	const workbookTapes = tapesData || [];
-	const workbookTapeIds = workbookTapes.map((tape) => tape.id);
-
-	if (workbookTapeIds.length === 0) {
-		return { workbookTapes: [], exercises: [] };
-	}
-
-	const { data: exercisesData, error: exercisesError } = await supabase
-		.from('exercises')
-		.select('id, tape_id, title, exercise_type, instructions, display_url, order_num')
-		.in('tape_id', workbookTapeIds)
-		.order('order_num');
-
-	if (exercisesError) {
-		console.error('Error fetching exercises:', exercisesError);
-		return { workbookTapes, exercises: [] };
-	}
+    let exercises = [];
+    if (workbookTapeIds.length > 0) {
+        exercises = DB.exercises
+            .filter(e => workbookTapeIds.includes(e.tape_id))
+            .sort((a, b) => a.order_num - b.order_num);
+    }
 
 	return {
-		workbookTapes,
-		exercises: exercisesData || []
+		workbookTapes: cleanData(workbookTapes),
+		exercises: cleanData(exercises)
 	};
 }
 
 // New function to fetch questions for a specific exercise
 export async function getExerciseQuestions(exerciseId) {
-	const { data, error } = await supabase
-		.from('exercise_questions')
-		.select('id, exercise_id, question_text, question_type, options, order_num')
-		.eq('exercise_id', exerciseId)
-		.order('order_num');
-
-	if (error) {
-		console.error('Error fetching exercise questions:', error);
-		return [];
-	}
-
-	return data || [];
+    const questions = (DB.exercise_questions || [])
+        .filter(q => q.exercise_id == exerciseId)
+        .sort((a, b) => a.order_num - b.order_num);
+    
+    return cleanData(questions);
 }
 
 // Legacy function for backward compatibility
@@ -259,707 +163,118 @@ export async function getCompleteUnit(unitId) {
 	};
 }
 
-// Authentication functions
+// Authentication functions - Disabled for Demo
 export async function signUp(email, password) {
-	const { data, error } = await supabase.auth.signUp({
-		email,
-		password
-	});
-
-	if (error) throw error;
-
-	// Create necessary records for new user
-	if (data?.user) {
-		try {
-			// Create user_subscriptions record
-			await supabase.from('user_subscriptions').insert({
-				user_id: data.user.id,
-				subscription_status: 'free'
-			});
-
-			// Rest of code to create other records if needed...
-		} catch (insertError) {
-			console.error('Error creating subscription record:', insertError);
-		}
-	}
-
-	return data;
+    console.log('SignUp disabled in demo');
+	return { data: { user: null }, error: null };
 }
 
 export async function signIn(email, password) {
-	const { data, error } = await supabase.auth.signInWithPassword({
-		email,
-		password
-	});
-
-	if (error) throw error;
-	return data;
+    console.log('SignIn disabled in demo');
+    return { data: { user: null, session: null }, error: { message: 'Demo mode: Login disabled' } };
 }
 
 export async function signOut() {
-	const { error } = await supabase.auth.signOut();
-	if (error) throw error;
 	return true;
 }
 
 export async function getCurrentUser() {
-	try {
-		// Add timeout to the Supabase call
-		const authPromise = supabase.auth.getUser();
-		const timeoutPromise = new Promise((_, reject) =>
-			setTimeout(() => reject(new Error('getCurrentUser timeout')), 5000)
-		);
-
-		const { data } = await Promise.race([authPromise, timeoutPromise]);
-		return data.user;
-	} catch (error) {
-		console.error('Error getting current user:', error);
-		// Return null on error so the app can continue
-		return null;
-	}
+	return null; 
 }
 
 // Update a unit's progress status
 export async function updateUnitProgress(unitId, status) {
-	const user = await getCurrentUser();
-	if (!user) throw new Error('User not authenticated');
-
-	const { data, error } = await supabase.from('user_progress').upsert(
-		{
-			user_id: user.id,
-			unit_id: unitId,
-			status,
-			last_accessed: new Date().toISOString()
-		},
-		{
-			onConflict: 'user_id,unit_id'
-		}
-	);
-
-	if (error) throw error;
-	return data;
+	// No-op for demo
+	return null;
 }
 
 // Get user progress for either all units or a specific unit
 export async function getUserProgress(unitId = null) {
-	const user = await getCurrentUser();
-	if (!user) return unitId ? null : [];
-
-	let query = supabase
-		.from('user_progress')
-		.select(
-			`
-      id, 
-      unit_id, 
-      status, 
-      last_accessed
-    `
-		)
-		.eq('user_id', user.id);
-
-	// If unitId is provided, filter for just that unit
-	if (unitId) {
-		query = query.eq('unit_id', unitId);
-		const { data, error } = await query.maybeSingle();
-		if (error) throw error;
-		return data; // Will be null if no record exists
-	} else {
-		// Return all progress records
-		const { data, error } = await query;
-		if (error) throw error;
-		return data || [];
-	}
+	// Return empty progress
+    if (unitId) return null;
+    return [];
 }
 
 // Get the most recently accessed unit
 export async function getLatestUnit() {
-	const user = await getCurrentUser();
-	if (!user) return null;
-
-	const { data, error } = await supabase
-		.from('user_progress')
-		.select(
-			`
-      unit_id, 
-      status,
-      units(id, title, module_id, 
-        modules(id, title, order_num))
-    `
-		)
-		.eq('user_id', user.id)
-		.order('last_accessed', { ascending: false })
-		.limit(1)
-		.single();
-
-	if (error && error.code !== 'PGRST116') throw error;
-	return data;
+	return null;
 }
 
 // Get RWP content for a unit
 export async function getRwpContent(unitId) {
-	const user = await getCurrentUser();
-	if (!user) return null;
-
-	const { data, error } = await supabase
-		.from('rwp_content')
-		.select('*')
-		.eq('user_id', user.id)
-		.eq('unit_id', unitId)
-		.maybeSingle();
-
-	if (error && error.code !== 'PGRST116') throw error;
-
-	// Important: Make sure exercise_type is at root level when returning
-	if (data && data.content) {
-		// If exercise_type isn't in the content, set a default
-		if (!data.content.exercise_type) {
-			data.content.exercise_type = 'reading_comprehension';
-		}
-	}
-
-	return data;
+	return null;
 }
 
 // Save RWP generated content
 export async function saveRwpContent(unitId, content) {
-	const user = await getCurrentUser();
-	if (!user) throw new Error('User not authenticated');
-
-	// Ensure exercise_type is set
-	if (!content.exercise_type) {
-		content.exercise_type = 'reading_comprehension';
-	}
-
-	const { data, error } = await supabase.from('rwp_content').upsert(
-		{
-			user_id: user.id,
-			unit_id: unitId,
-			content,
-			created_at: new Date().toISOString()
-		},
-		{
-			onConflict: 'user_id,unit_id'
-		}
-	);
-
-	if (error) throw error;
-	return data;
+	// No-op
+	return null;
 }
 
 // Save or update user preferences
 export async function saveUserPreferences(preferences) {
-	const user = await getCurrentUser();
-	if (!user) throw new Error('User not authenticated');
-
-	const { data, error } = await supabase.from('user_preferences').upsert(
-		{
-			user_id: user.id,
-			...preferences,
-			updated_at: new Date().toISOString()
-		},
-		{
-			onConflict: 'user_id'
-		}
-	);
-
-	if (error) throw error;
-	return data;
+	return null;
 }
 
 // Get user preferences
 export async function getUserPreferences() {
-	const user = await getCurrentUser();
-	if (!user) return null;
-
-	const { data, error } = await supabase
-		.from('user_preferences')
-		.select('*')
-		.eq('user_id', user.id)
-		.maybeSingle();
-
-	if (error) throw error;
-	return data;
+	return null;
 }
 
 export async function deleteUserAccount() {
-	const { data: sessionData } = await supabase.auth.getSession();
-	const token = sessionData?.session?.access_token;
-
-	if (!token) {
-		throw new Error('Not authenticated. Please log in.');
-	}
-
-	const response = await fetch('/api/account/delete', {
-		method: 'POST',
-		headers: {
-			'Content-Type': 'application/json',
-			Authorization: `Bearer ${token}`
-		}
-	});
-
-	if (!response.ok) {
-		const errorData = await response.json();
-		throw new Error(errorData.message || 'Failed to delete account');
-	}
-
-	return true;
+    throw new Error('Demo mode: Action disabled');
 }
 
-// Stripe
-// Get user's subscription status
+// Stripe check
 export async function getUserSubscription() {
-	const user = await getCurrentUser();
-	if (!user) return { tier: 'free' };
-
-	const { data, error } = await supabase
-		.from('user_subscriptions')
-		.select('subscription_status, current_period_end, stripe_customer_id, subscription_id')
-		.eq('user_id', user.id)
-		.maybeSingle();
-
-	if (error) {
-		console.error('Error fetching subscription:', error);
-		return { tier: 'free' };
-	}
-
-	if (!data) {
-		return { tier: 'free' };
-	}
-
-	return {
-		tier: data.subscription_status || 'free',
-		expiresAt: data.current_period_end,
-		customerId: data.stripe_customer_id,
-		subscriptionId: data.subscription_id
-	};
+    return { tier: 'free' };
 }
 
 // Check if RWP is available for current user
+// Check if RWP is available for current user
 export async function checkRWPAvailability() {
-	const user = await getCurrentUser();
-	if (!user) return { allowed: false, reason: 'Not authenticated' };
-
-	// First get the subscription status
-	const subscription = await getUserSubscription();
-
-	// Get the usage information
-	const { data: usage, error } = await supabase
-		.from('user_usage')
-		.select('rwp_week_count, rwp_week_reset, rwp_day_count, rwp_day_reset')
-		.eq('user_id', user.id)
-		.maybeSingle();
-
-	if (error) {
-		console.error('Error fetching usage:', error);
-		return { allowed: false, reason: 'Error checking limits' };
-	}
-
-	// Initialize usage if not exists
-	if (!usage) {
-		// Create a new usage record
-		const now = new Date().toISOString();
-		const nextWeek = new Date();
-		nextWeek.setDate(nextWeek.getDate() + 7);
-
-		const tomorrow = new Date();
-		tomorrow.setDate(tomorrow.getDate() + 1);
-		tomorrow.setHours(0, 0, 0, 0);
-
-		await supabase.from('user_usage').insert({
-			user_id: user.id,
-			rwp_week_count: 0,
-			rwp_week_reset: nextWeek.toISOString(),
-			rwp_day_count: 0,
-			rwp_day_reset: tomorrow.toISOString(),
-			last_updated: now
-		});
-
-		return {
-			allowed: true,
-			remaining: subscription.tier === 'premium' ? 20 : 3,
-			tier: subscription.tier
-		};
-	}
-
-	// Check if we need to reset counters
-	const now = new Date();
-	let weekCount = usage.rwp_week_count;
-	let dayCount = usage.rwp_day_count;
-
-	// Check if week needs reset
-	if (new Date(usage.rwp_week_reset) <= now) {
-		weekCount = 0;
-		const nextWeek = new Date();
-		nextWeek.setDate(nextWeek.getDate() + 7);
-
-		await supabase
-			.from('user_usage')
-			.update({
-				rwp_week_count: 0,
-				rwp_week_reset: nextWeek.toISOString(),
-				last_updated: now.toISOString()
-			})
-			.eq('user_id', user.id);
-	}
-
-	// Check if day needs reset (for premium tier)
-	if (subscription.tier === 'premium' && new Date(usage.rwp_day_reset) <= now) {
-		dayCount = 0;
-		const tomorrow = new Date();
-		tomorrow.setDate(tomorrow.getDate() + 1);
-		tomorrow.setHours(0, 0, 0, 0);
-
-		await supabase
-			.from('user_usage')
-			.update({
-				rwp_day_count: 0,
-				rwp_day_reset: tomorrow.toISOString(),
-				last_updated: now.toISOString()
-			})
-			.eq('user_id', user.id);
-	}
-
-	// Check limits based on tier
-	if (subscription.tier === 'premium') {
-		// Premium: 20 per day limit
-		if (dayCount >= 20) {
-			const resetTime = new Date(usage.rwp_day_reset);
-			return {
-				allowed: false,
-				reason: 'Daily limit reached',
-				resetTime,
-				tier: 'premium',
-				remaining: 0
-			};
-		}
-
-		return {
-			allowed: true,
-			tier: 'premium',
-			remaining: 20 - dayCount
-		};
-	} else {
-		// Free tier: 3 per week limit
-		if (weekCount >= 3) {
-			const resetTime = new Date(usage.rwp_week_reset);
-			return {
-				allowed: false,
-				reason: 'Weekly limit reached',
-				resetTime,
-				tier: 'free',
-				remaining: 0
-			};
-		}
-
-		return {
-			allowed: true,
-			tier: 'free',
-			remaining: 3 - weekCount
-		};
-	}
+    return { allowed: false, reason: 'Not authenticated' };
 }
 
 // Increment RWP usage counter
 export async function incrementRWPUsage() {
-	const user = await getCurrentUser();
-	if (!user) return false;
-
-	const { data: usage } = await supabase
-		.from('user_usage')
-		.select('rwp_week_count, rwp_day_count')
-		.eq('user_id', user.id)
-		.maybeSingle();
-
-	if (!usage) {
-		// Handle first-time usage
-		await checkRWPAvailability(); // This creates the usage record
-		return true;
-	}
-
-	// Update both counters
-	const { error: updateError } = await supabase
-		.from('user_usage')
-		.update({
-			rwp_week_count: usage.rwp_week_count + 1,
-			rwp_day_count: usage.rwp_day_count + 1,
-			last_updated: new Date().toISOString()
-		})
-		.eq('user_id', user.id);
-
-	if (updateError) {
-		console.error('Error updating usage count:', updateError);
-		return false;
-	}
-
-	return true;
+    return false;
 }
 
 // Check if TTS is available for current user
 export async function checkTTSAvailability() {
-	const user = await getCurrentUser();
-	if (!user) return { allowed: false, reason: 'Not authenticated' };
-
-	// First get the subscription status
-	const subscription = await getUserSubscription();
-
-	// TTS is premium-only
-	if (subscription.tier !== 'premium') {
-		return {
-			allowed: false,
-			reason: 'TTS requires premium subscription',
-			upgradeAvailable: true
-		};
-	}
-
-	// Get the usage information
-	const { data: usage, error } = await supabase
-		.from('user_usage')
-		.select('tts_day_count, tts_day_reset')
-		.eq('user_id', user.id)
-		.maybeSingle();
-
-	if (error) {
-		console.error('Error fetching usage:', error);
-		return { allowed: false, reason: 'Error checking limits' };
-	}
-
-	// Initialize usage if not exists
-	if (!usage) {
-		// Create a new usage record
-		const now = new Date().toISOString();
-		const tomorrow = new Date();
-		tomorrow.setDate(tomorrow.getDate() + 1);
-		tomorrow.setHours(0, 0, 0, 0);
-
-		await supabase.from('user_usage').upsert({
-			user_id: user.id,
-			tts_day_count: 0,
-			tts_day_reset: tomorrow.toISOString(),
-			last_updated: now
-		});
-
-		return {
-			allowed: true,
-			remaining: 20,
-			tier: 'premium'
-		};
-	}
-
-	// Check if day needs reset
-	const now = new Date();
-	let dayCount = usage.tts_day_count;
-
-	if (new Date(usage.tts_day_reset) <= now) {
-		dayCount = 0;
-		const tomorrow = new Date();
-		tomorrow.setDate(tomorrow.getDate() + 1);
-		tomorrow.setHours(0, 0, 0, 0);
-
-		await supabase
-			.from('user_usage')
-			.update({
-				tts_day_count: 0,
-				tts_day_reset: tomorrow.toISOString(),
-				last_updated: now.toISOString()
-			})
-			.eq('user_id', user.id);
-	}
-
-	// Check if limit reached
-	if (dayCount >= 20) {
-		const resetTime = new Date(usage.tts_day_reset);
-		return {
-			allowed: false,
-			reason: 'Daily TTS limit reached',
-			resetTime,
-			tier: 'premium',
-			remaining: 0
-		};
-	}
-
-	return {
-		allowed: true,
-		tier: 'premium',
-		remaining: 20 - dayCount
-	};
+    return { allowed: false, reason: 'Demo mode' };
 }
 
 // Increment TTS usage counter
 export async function incrementTTSUsage() {
-	const user = await getCurrentUser();
-	if (!user) return false;
-
-	const { data: usage } = await supabase
-		.from('user_usage')
-		.select('tts_day_count')
-		.eq('user_id', user.id)
-		.maybeSingle();
-
-	if (!usage) {
-		// Handle first-time usage
-		await checkTTSAvailability(); // This creates the usage record
-		return true;
-	}
-
-	// Update counter
-	const { error: updateError } = await supabase
-		.from('user_usage')
-		.update({
-			tts_day_count: usage.tts_day_count + 1,
-			last_updated: new Date().toISOString()
-		})
-		.eq('user_id', user.id);
-
-	if (updateError) {
-		console.error('Error updating TTS usage count:', updateError);
-		return false;
-	}
-
-	return true;
+    return false;
 }
 
 // Helper function to generate TTS audio
 export async function generateTTS(text, voice, language = 'zh', instructions = '') {
-	// Check TTS availability first
-	const availability = await checkTTSAvailability();
-
-	if (!availability.allowed) {
-		throw new Error(
-			`TTS not available: ${availability.reason}. ${
-				availability.resetTime
-					? `Available again: ${new Date(availability.resetTime).toLocaleString()}`
-					: ''
-			}`
-		);
-	}
-
-	// Get current auth session
-	const { data: sessionData } = await supabase.auth.getSession();
-
-	if (!sessionData?.session?.access_token) {
-		throw new Error('Authentication required');
-	}
-
-	const response = await fetch('/api/tts', {
-		method: 'POST',
-		headers: {
-			'Content-Type': 'application/json',
-			Authorization: `Bearer ${sessionData.session.access_token}`
-		},
-		body: JSON.stringify({ text, voice, language, instructions })
-	});
-
-	if (!response.ok) {
-		const errorData = await response.json();
-		throw new Error(errorData.error || 'Failed to generate speech');
-	}
-
-	// Increment the usage after successful generation
-	await incrementTTSUsage();
-
-	return await response.json();
+    throw new Error('TTS disabled in demo mode');
 }
 
 // Create a checkout session
 export async function createCheckoutSession() {
-	// Get the current session token
-	const { data: sessionData } = await supabase.auth.getSession();
-	const token = sessionData?.session?.access_token;
-
-	if (!token) {
-		throw new Error('Not authenticated. Please log in.');
-	}
-
-	const response = await fetch('/api/stripe/create-checkout', {
-		method: 'POST',
-		headers: {
-			'Content-Type': 'application/json',
-			Authorization: `Bearer ${token}`
-		}
-	});
-
-	if (!response.ok) {
-		const errorData = await response.json();
-		throw new Error(errorData.message || 'Failed to create checkout session');
-	}
-
-	const data = await response.json();
-	return data.url;
+    throw new Error('Payments disabled in demo mode');
 }
 
 // Create a customer portal session for managing subscription
-// In src/lib/supabase/client.js
 export async function createCustomerPortalSession() {
-	// Get the current session token
-	const { data: sessionData } = await supabase.auth.getSession();
-	const token = sessionData?.session?.access_token;
-
-	if (!token) {
-		throw new Error('Not authenticated. Please log in.');
-	}
-
-	const response = await fetch('/api/stripe/portal', {
-		method: 'POST',
-		headers: {
-			'Content-Type': 'application/json',
-			Authorization: `Bearer ${token}`
-		}
-	});
-
-	if (!response.ok) {
-		const errorData = await response.json();
-		throw new Error(errorData.message || 'Failed to create portal session');
-	}
-
-	const data = await response.json();
-	return data.url;
+    throw new Error('Portal disabled in demo mode');
 }
 
 // Google OAuth
 export async function signInWithGoogle() {
-	// Get the current domain, defaulting to production URL if not in development
-	const isDevelopment = window.location.hostname === 'localhost';
-
-	const redirectTo = isDevelopment
-		? `${window.location.origin}/auth/callback`
-		: `https://www.tapedchinese.com/auth/callback`;
-
-	const { data, error } = await supabase.auth.signInWithOAuth({
-		provider: 'google',
-		options: {
-			redirectTo
-		}
-	});
-
-	if (error) throw error;
-	return data;
+    console.log('OAuth disabled in demo');
+    return { data: null, error: { message: 'Demo mode: Login disabled' } };
 }
 
 // Add this to handle user setup for OAuth users
 export async function setupUserIfNeeded() {
-	const user = await getCurrentUser();
-	if (!user) return null;
-
-	// Check if user has subscription record
-	const { data: subscription } = await supabase
-		.from('user_subscriptions')
-		.select('user_id')
-		.eq('user_id', user.id)
-		.maybeSingle();
-
-	if (!subscription) {
-		// Create initial user records (same as in your signUp function)
-		try {
-			await supabase.from('user_subscriptions').insert({
-				user_id: user.id,
-				subscription_status: 'free'
-			});
-		} catch (err) {
-			console.error('Error setting up new user:', err);
-		}
-	}
-
-	return true;
+    return null;
 }
 
 // Register service worker for audio caching if browser supports it

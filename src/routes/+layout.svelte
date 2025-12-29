@@ -2,7 +2,7 @@
 <script>
 	import '../app.css';
 	import { onMount } from 'svelte';
-	import { injectAnalytics } from '@vercel/analytics/sveltekit';
+	// import { injectAnalytics } from '@vercel/analytics/sveltekit';
 	import { authStore } from '$lib/stores/authStore';
 	import Header from '$lib/components/UI/Header.svelte';
 	import Breadcrumb from '$lib/components/UI/Breadcrumb.svelte';
@@ -12,8 +12,9 @@
     import { page } from '$app/stores';
 
 	let isLoading = false;
+	
+	// Analytics removed for demo version
 
-	injectAnalytics({ mode: dev ? 'development' : 'production' });
 
 	// Track page navigation state
 	$: if ($navigating) {

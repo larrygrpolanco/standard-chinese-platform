@@ -118,20 +118,9 @@
 			<NavigationItem href="/rwp" label="RWPs" isActive={isActive('/rwp')} />
 
 			<!-- Conditional /profile button -->
-			{#if $authStore}
-				<a
-					href="/profile"
-					class="login-button {subscription.tier === 'premium' ? 'premium-button' : ''}"
-				>
-					<span>Profile</span>
-					<div class="login-button-highlight"></div>
-				</a>
-			{:else}
-				<a href="/login" class="login-button">
-					<span>Login</span>
-					<div class="login-button-highlight"></div>
-				</a>
-			{/if}
+			<div class="login-button" style="cursor: default; opacity: 0.8">
+				<span>Demo Mode</span>
+			</div>
 		</nav>
 
 		<!-- Mobile menu button and panel -->
