@@ -12,6 +12,11 @@ const apiProviders = {
     baseUrl: 'https://api.deepseek.com/v1',
     apiKey: DEEPSEEK_API_KEY,
     defaultModel: 'deepseek-chat'
+  },
+  google: {
+    baseUrl: 'https://generativelanguage.googleapis.com/v1beta/models',
+    apiKey: process.env.GOOGLE_API_KEY, // Accessing from process.env if not in $env/static/private or checking import
+    defaultModel: 'gemini-1.5-flash'
   }
 };
 
@@ -44,6 +49,56 @@ export function createApiClient(provider = 'openai') {
     async fetchCompletion(messages, options = {}) {
       let model = options.model || config.defaultModel;
       
+      // Google Gemini specific implementation
+      if (provider === 'google') {
+        const url = `${config.baseUrl}/${model}:generateContent?key=${config.apiKey}`;
+        
+        // Convert messages to Gemini format
+        // System instructions are passed differently in Gemini, but for simplicity we'll prepend them or use system_instruction if supported
+        // v1beta supports system_instruction
+        
+        let systemInstruction = undefined;
+        let contents = [];
+        
+        for (const msg of messages) {
+          if (msg.role === 'system') {
+            systemInstruction = { parts: [{ text: msg.content }] };
+          } else if (msg.role === 'user') {
+            contents.push({ role: 'user', parts: [{ text: msg.content }] });
+          } else if (msg.role === 'assistant') {
+            contents.push({ role: 'model', parts: [{ text: msg.content }] });
+          }
+        }
+        
+        const response = await fetch(url, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            contents,
+            system_instruction: systemInstruction,
+            generationConfig: {
+              temperature: options.temperature ?? 0.7
+            }
+          })
+        });
+        
+        const data = await response.json();
+        
+        // Normalize response to look like OpenAI for the consumer
+        if (data.candidates && data.candidates[0]?.content?.parts?.[0]?.text) {
+             // Mocking OpenAI structure
+             data.choices = [{
+                 message: {
+                     content: data.candidates[0].content.parts[0].text
+                 }
+             }];
+        }
+        
+        return { response, data };
+      }
+
       // If using DeepSeek but providing an OpenAI model, map it
       if (provider === 'deepseek' && !model.startsWith('deepseek-') && modelMapping[model]) {
         model = modelMapping[model];

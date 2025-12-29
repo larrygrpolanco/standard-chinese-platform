@@ -91,11 +91,6 @@
 		<div class="hero-content">
 			<div class="hero-background-image"></div>
 
-			<!-- Demo Disclaimer -->
-            <div style="background: #f8d7da; color: #721c24; padding: 0.5rem 1rem; margin-bottom: 2rem; border-radius: 4px; border: 1px solid #f5c6cb; text-align: center; max-width: 600px;">
-                <strong>Demo Version:</strong> This is a static archiving of the platform. Authentication and dynamic features are disabled. 
-                Only Module 1 and 2 are available.
-            </div>
 
 			<!-- Headline with retro underline -->
 			<div class="title-container" in:fade={{ duration: 400, delay: 200 }}>

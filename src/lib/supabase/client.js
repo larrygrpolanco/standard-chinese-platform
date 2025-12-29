@@ -241,20 +241,7 @@ export async function incrementRWPUsage() {
     return false;
 }
 
-// Check if TTS is available for current user
-export async function checkTTSAvailability() {
-    return { allowed: false, reason: 'Demo mode' };
-}
 
-// Increment TTS usage counter
-export async function incrementTTSUsage() {
-    return false;
-}
-
-// Helper function to generate TTS audio
-export async function generateTTS(text, voice, language = 'zh', instructions = '') {
-    throw new Error('TTS disabled in demo mode');
-}
 
 // Create a checkout session
 export async function createCheckoutSession() {

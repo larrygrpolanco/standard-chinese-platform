@@ -8,7 +8,7 @@ export async function POST({ request }) {
 			unitData,
 			userProfile,
 			specificFocus,
-			apiProvider = 'deepseek',
+			apiProvider = 'google',
 			debug = false
 		} = await request.json();
 

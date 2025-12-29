@@ -8,7 +8,7 @@ export async function POST({ request }) {
 			story,
 			questions,
 			unitData,
-			apiProvider = 'openai',
+			apiProvider = 'google',
 			debug = false
 		} = await request.json();
 

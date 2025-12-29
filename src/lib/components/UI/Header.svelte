@@ -118,9 +118,6 @@
 			<NavigationItem href="/rwp" label="RWPs" isActive={isActive('/rwp')} />
 
 			<!-- Conditional /profile button -->
-			<div class="login-button" style="cursor: default; opacity: 0.8">
-				<span>Demo Mode</span>
-			</div>
 		</nav>
 
 		<!-- Mobile menu button and panel -->
@@ -229,41 +226,5 @@
 		}
 	}
 
-	.login-button {
-		position: relative;
-		margin-left: 0.5rem;
-		display: flex;
-		align-items: center;
-		gap: 0.375rem;
-		border-radius: 9999px;
-		background-color: #c17c74;
-		padding: 0.375rem 1rem;
-		font-size: 0.875rem;
-		font-weight: 500;
-		color: white;
-		box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-		transition: background-color 0.15s;
-	}
 
-	.login-button:hover {
-		background-color: #ad6c66;
-	}
-
-	.login-button-highlight {
-		position: absolute;
-		inset: 0;
-		top: 0;
-		height: 50%;
-		border-top-left-radius: 9999px;
-		border-top-right-radius: 9999px;
-		background-color: rgba(255, 255, 255, 0.2);
-	}
-	/* Add to the style block in the main component */
-	.premium-button {
-		background-color: #ddb967; /* Gold color */
-	}
-
-	.premium-button:hover {
-		background-color: #c9a658; /* Darker gold on hover */
-	}
 </style>

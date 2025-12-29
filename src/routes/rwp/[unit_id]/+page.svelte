@@ -10,8 +10,8 @@
 		getRwpContent,
 		getUnitVocabularyData
 	} from '$lib/supabase/client.js';
-	import { authStore } from '$lib/stores/authStore';
 	import { generateRwpExercise } from '$lib/rwp/rwpGenerator.js';
+
 	import { STRIPE_CONFIG } from '$lib/stripe/config';
 
 	import Loader from '$lib/components/UI/Loader.svelte';
@@ -20,27 +20,26 @@
 	import ComprehensionExercise from '$lib/components/rwp/ComprehensionExercise.svelte';
 	import TapeConstruction from '$lib/components/UI/TapeConstruction.svelte';
 
-	import { checkRWPAvailability } from '$lib/supabase/client';
 	import UnitDropdown from '$lib/components/UI/UnitDropdown.svelte';
-
-	let rwpStatus;
 
 	// State variables
 	let loading = true;
 	let generating = false;
 	let unitData = null;
-	let userPreferences = null;
+	let userPreferences = {
+		personal_context: {},
+		module_responses: {}
+	};
 	let rwpContent = null;
 	let specificFocus = '';
 	let showAnswers = false;
 	let error = null;
-	let user;
 	let unitVocabulary = [];
 	let generationPhase = 'init';
 	let debug = false;
 
 	// Collapsible panel state - only for context panel
-	let contextPanelOpen = false; // Open by default for first-time users
+	let contextPanelOpen = true; // Open by default for first-time users
 	let generatorPanelOpen = true; // Open by default
 
 	// Toast state
@@ -62,14 +61,8 @@
 		window.location.href = '/profile#subscription';
 	}
 
-	// Subscribe to auth store
-	authStore.subscribe((value) => {
-		user = value;
-	});
-
 	onMount(async () => {
 		loading = true;
-		rwpStatus = await checkRWPAvailability();
 
 		try {
 			// Load unit data
@@ -78,29 +71,6 @@
 			if (!unitData) {
 				error = 'Unit not found';
 				return;
-			}
-
-			if (user) {
-				// Load user preferences
-				userPreferences = await getUserPreferences();
-
-				// Initialize empty preferences if needed
-				if (!userPreferences) {
-					userPreferences = {
-						personal_context: {},
-						module_responses: {}
-					};
-				}
-
-				// Load existing RWP content
-				const rwpData = await getRwpContent(unitId);
-				if (rwpData) {
-					console.log('Loaded existing RWP content');
-					rwpContent = rwpData.content;
-
-					// Close context panel if user already has content
-					contextPanelOpen = false;
-				}
 			}
 
 			const vocabData = await getUnitVocabularyData(unitId);
@@ -123,32 +93,15 @@
 	}
 
 	// Save module responses
-	async function saveModuleResponses(event) {
-		try {
-			const updatedResponses = event.detail;
-
-			// Update preferences in database
-			await saveUserPreferences({
-				...userPreferences,
-				module_responses: updatedResponses
-			});
-
-			// Update local state
-			userPreferences.module_responses = updatedResponses;
-			showToast('Your responses have been saved!');
-		} catch (err) {
-			console.error('Error saving responses:', err);
-			showToast('Failed to save your responses');
-		}
+	function saveModuleResponses(event) {
+		const updatedResponses = event.detail;
+		// Update local state
+		userPreferences.module_responses = updatedResponses;
+		showToast('Your responses have been saved locally!');
 	}
 
 	// Generate a new exercise
 	async function generateExercise() {
-		if (!user) {
-			window.location.href = `/login?redirect=/rwp/${unitId}`;
-			return;
-		}
-
 		generating = true;
 		generationPhase = 'init'; // Reset to initial phase
 		showAnswers = false;
@@ -156,7 +109,8 @@
 
 		try {
 			// Pass the progress callback to track generation phases
-			rwpContent = await generateRwpExercise(unitId, specificFocus, debug, (phase) => {
+            // Pass userPreferences to the generator
+			rwpContent = await generateRwpExercise(unitId, specificFocus, userPreferences, debug, (phase) => {
 				generationPhase = phase;
 			});
 			showToast('Practice exercise generated successfully!');
@@ -244,7 +198,6 @@
 				<div class="practice-layout">
 					<!-- Sidebar -->
 					<div class="sidebar">
-						{#if user}
 							<!-- Context Panel -->
 							<div class="vintage-panel">
 								<button class="panel-toggle" on:click={toggleContextPanel}>
@@ -259,13 +212,11 @@
 
 								{#if contextPanelOpen}
 									<div class="panel-content" transition:slide={{ duration: 300 }}>
-										{#if userPreferences}
-											<ModuleQuestions
-												moduleId={unitData.module.id}
-												moduleResponses={userPreferences.module_responses}
-												on:save={saveModuleResponses}
-											/>
-										{/if}
+										<ModuleQuestions
+											moduleId={unitData.module.id}
+											moduleResponses={userPreferences.module_responses}
+											on:save={saveModuleResponses}
+										/>
 									</div>
 								{/if}
 							</div>
@@ -297,32 +248,15 @@
 											<!-- <p class="input-hint">Specific grammar, vocabulary, situations, etc.</p> -->
 										</div>
 
-										{#if rwpStatus && rwpStatus.remaining < 3}
-											<div class="input-hint">
-												{rwpStatus.remaining}
-												{rwpStatus.tier === 'premium' ? 'daily' : 'weekly'}
-												RWPs remaining
-											</div>
-										{/if}
-
 										<button
-											class={`generate-button ${generating ? 'generating' : ''} ${!rwpStatus?.allowed ? 'disabled' : ''}`}
-											on:click={rwpStatus?.allowed
-												? generateExercise
-												: rwpStatus?.tier === 'free'
-													? goToProfile
-													: null}
-											disabled={generating ||
-												(rwpStatus?.tier === 'premium' && !rwpStatus?.allowed)}
+											class={`generate-button ${generating ? 'generating' : ''}`}
+											on:click={generateExercise}
+											disabled={generating}
 										>
 											<div class="button-content">
 												{#if generating}
 													<div class="tape-spinner"></div>
 													<span>Creating your practice...</span>
-												{:else if !rwpStatus?.allowed && rwpStatus?.tier === 'free'}
-													<span>Support Taped Chinese</span>
-												{:else if !rwpStatus?.allowed && rwpStatus?.tier === 'premium'}
-													<span>Regenerate Practice</span>
 												{:else if rwpContent}
 													<svg class="button-icon" viewBox="0 0 24 24">
 														<path
@@ -341,38 +275,9 @@
 											</div>
 										</button>
 
-										{#if !rwpStatus?.allowed}
-											<div class="limit-message">
-												{#if rwpStatus?.tier === 'free'}
-													You've used all {STRIPE_CONFIG.FREE_TIER_LIMITS.rwp_per_week} weekly exercises.
-													Supporting Taped Chinese gives you {STRIPE_CONFIG.PREMIUM_TIER_LIMITS
-														.rwp_per_day} exercises every day. Don't worry - you'll always keep the exercises
-													you've already generated.
-												{:else}
-													You've reached today's limit of {STRIPE_CONFIG.PREMIUM_TIER_LIMITS
-														.rwp_per_day} exercises. This limit helps us maintain the service for everyone.
-													Please check back tomorrow for more!
-												{/if}
-											</div>
-										{/if}
 									</div>
 								{/if}
 							</div>
-						{:else}
-							<!-- Sign-in prompt -->
-							<div class="vintage-panel">
-								<div class="panel-content signup-prompt">
-									<h3 class="prompt-title">Create Your Personal Language Practice</h3>
-									<p class="prompt-text">
-										Sign in to save your preferences and generate exercises tailored to your
-										learning style and interests.
-									</p>
-									<a href="/login?redirect=/rwp/{unitId}" class="vintage-button full-width">
-										<span class="button-text">Sign In or Create Account</span>
-									</a>
-								</div>
-							</div>
-						{/if}
 					</div>
 
 					<!-- Main Content Area -->
@@ -429,39 +334,25 @@
 									Generate a personalized exercise based on what you've learned in this unit. It
 									will be tailored to your interests and learning goals.
 								</p>
-								{#if user}
-									<button
-										class="generate-button large {generating
-											? 'generating'
-											: ''} {!rwpStatus?.allowed ? 'disabled' : ''}"
-										on:click={rwpStatus?.allowed
-											? generateExercise
-											: rwpStatus?.tier === 'free'
-												? goToProfile
-												: null}
-										disabled={generating || (rwpStatus?.tier === 'premium' && !rwpStatus?.allowed)}
-									>
-										<div class="button-content">
-											{#if generating}
-												<div class="tape-spinner"></div>
-												<span>Creating your practice...</span>
-											{:else if !rwpStatus?.allowed && rwpStatus?.tier === 'free'}
-												<span>Subscribe for More Exercises</span>
-											{:else if !rwpStatus?.allowed && rwpStatus?.tier === 'premium'}
-												<span>Daily Limit Reached</span>
-											{:else}
-												<svg class="button-icon" viewBox="0 0 24 24">
-													<path d="M19 12H5M12 19V5" stroke="currentColor" stroke-width="2" />
-												</svg>
-												<span>Create Practice Exercise</span>
-											{/if}
-										</div>
-									</button>
-								{:else}
-									<a href="/login?redirect=/rwp/{unitId}" class="vintage-button large">
-										<span class="button-text">Sign In to Create Exercises</span>
-									</a>
-								{/if}
+								<button
+									class="generate-button large {generating
+										? 'generating'
+										: ''}"
+									on:click={generateExercise}
+									disabled={generating}
+								>
+									<div class="button-content">
+										{#if generating}
+											<div class="tape-spinner"></div>
+											<span>Creating your practice...</span>
+										{:else}
+											<svg class="button-icon" viewBox="0 0 24 24">
+												<path d="M19 12H5M12 19V5" stroke="currentColor" stroke-width="2" />
+											</svg>
+											<span>Create Practice Exercise</span>
+										{/if}
+									</div>
+								</button>
 							</div>
 						{/if}
 					</div>

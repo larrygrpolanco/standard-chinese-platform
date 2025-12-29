@@ -1,11 +1,6 @@
 // rwpGenerator.js OLD server-side generator
 import {
-	getCurrentUser,
-	getCompleteUnit,
-	getUserPreferences,
-	saveRwpContent,
-	checkRWPAvailability,
-    incrementRWPUsage
+	getCompleteUnit
 } from '$lib/supabase/client.js';
 
 /**
@@ -21,6 +16,7 @@ import {
 export async function generateRwpExercise(
 	unitId,
 	specificFocus = '',
+    userPreferences = null,
 	debug = false,
 	progressCallback = null
 ) {
@@ -30,30 +26,6 @@ export async function generateRwpExercise(
 				progressCallback(phase);
 			}
 		};
-
-		// Check RWP availability first
-		updateProgress('checking_limits');
-		const availability = await checkRWPAvailability();
-
-		if (!availability.allowed) {
-			throw new Error(
-				`RWP limit reached: ${availability.reason}. ${
-					availability.resetTime
-						? `Available again: ${new Date(availability.resetTime).toLocaleString()}`
-						: ''
-				}`
-			);
-		}
-
-		// Track usage immediately
-		await incrementRWPUsage();
-
-		// 1. Get user data
-		updateProgress('init'); // Initial phase
-		const user = await getCurrentUser();
-		if (!user) throw new Error('User not authenticated');
-
-		const userPreferences = await getUserPreferences();
 
 		// 2. Get unit data
 		const unitData = await getCompleteUnit(unitId);
@@ -196,9 +168,6 @@ export async function generateRwpExercise(
 			console.log('=== FORMATTED RESULT ===');
 			console.log(formatData);
 		}
-
-		// Save to database
-		await saveRwpContent(unitId, contentToSave);
 
 		// Return the content
 		return contentToSave;
