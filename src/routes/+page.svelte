@@ -91,6 +91,10 @@
 		<div class="hero-content">
 			<div class="hero-background-image"></div>
 
+			<!-- Demo Banner -->
+			<div class="demo-banner" in:fade={{ duration: 400, delay: 100 }}>
+				<p class="demo-text">Demo Site - No longer supported, but still working for testing. Try out the RWP feature!</p>
+			</div>
 
 			<!-- Headline with retro underline -->
 			<div class="title-container" in:fade={{ duration: 400, delay: 200 }}>
@@ -425,13 +429,32 @@
 		justify-content: center;
 	}
 
-	.hero-content {
+ 	.hero-content {
 		max-width: 1200px;
 		position: relative;
 		margin: 0 auto;
 		display: flex;
 		flex-direction: column;
 		align-items: center;
+	}
+
+	.demo-banner {
+		margin-bottom: 1rem;
+		padding: 0.75rem 1rem;
+		background-color: rgba(193, 124, 116, 0.1);
+		border: 2px solid var(--color-text);
+		border-radius: 0.5rem;
+		box-shadow: 2px 2px 0 var(--color-shadow);
+		text-align: center;
+	}
+
+	.demo-text {
+		font-family: var(--font-sans);
+		font-size: 0.875rem;
+		font-weight: 500;
+		color: var(--color-text);
+		margin: 0;
+		line-height: 1.4;
 	}
 
 	.hero-background-image {
